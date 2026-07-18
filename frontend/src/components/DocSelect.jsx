@@ -1,56 +1,32 @@
 import { useEffect, useState } from "react";
+import Preview from "./Preview";
 
 function SelectDoc({ selectedDoc }) {
-  const [blobURL, setBlobURL] = useState(null);
+  const [preview, setPreview] = useState({
+    filename: "",
+    url: null
+  });
+
   useEffect(() => {
-    if (selectedDoc) {
-      if (blobURL) URL.revokeObjectURL(blobURL);
-      
-      fetch("http://localhost:8080/document/" + selectedDoc.filename)
-        .then((response) => response.blob())
-        .then((blob) => setBlobURL(URL.createObjectURL(blob)));
+    if (!selectedDoc) return;
+
+    let url = null;
+    fetch("http://localhost:8080/document/" + selectedDoc.filename)
+      .then((response) => response.blob())
+      .then((blob) => {
+        url = URL.createObjectURL(blob); 
+        setPreview({filename: selectedDoc.filename, url: url}); 
+      });
+
+    // a return () => {} in a useEffect() is a special *cleanup function* that doesnt run at the end of the current effect, but at the beginning of the next
+    return () => {
+      URL.revokeObjectURL(url);
     }
   }, [selectedDoc]);
 
-  // Not a state variable since it already depends on a state
-  let preview = null;
-  if (blobURL) {
-    switch (selectedDoc.contentType) {
-      case "text/plain":
-      case "application/pdf":
-        preview = <iframe src={blobURL} />;
-        break;
-
-      case "image/jpeg":
-      case "image/png":
-      case "image/gif":
-      case "image/webp":
-        preview = <img src={blobURL} width="600" height="400" />;
-        break;
-
-      case "video/mp4":
-      case "video/webm":
-        preview = (
-          <video controls width="600">
-            <source src={blobURL} type={selectedDoc.contentType} />{" "}
-          </video>
-        );
-        break;
-
-      case "audio/wav":
-      case "audio/mp3":
-        preview = (
-          <audio controls>
-            <source src={blobURL} type={selectedDoc.contentType} />{" "}
-          </audio>
-        );
-        break;
-
-      default:
-        preview = <div>Preview not available</div>;
-    }
-  }
-  return <>{preview}</>;
+  /* preview.filename == selectedDoc.filename avoid trying to render an older selectedDoc's URL with an element meant for the current selectedDoc's contentType 
+     can happen because selectedDoc changes before the new blob fetch finishes */
+  return <> {(selectedDoc && preview.filename == selectedDoc.filename) && <Preview blobURL = {preview.url} contentType = {selectedDoc.contentType}/>} </>;
 }
 
 export default SelectDoc;

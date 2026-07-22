@@ -1,21 +1,42 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import DocumentList from "./components/DocumentList";
+import DocList from "./components/DocList";
 import SelectDoc from "./components/DocSelect";
 import FileUpload from "./components/FileUpload";
+import FolderUpload from "./components/FolderUpload";
+
+function setChildrenUIStates(rootJson) {
+  if (!rootJson || !rootJson.children) return;
+
+  rootJson.children.forEach(childJson => {
+    if (childJson.type == "folder") {
+      childJson = {
+        ...childJson,
+        isExpanded: false
+      };
+      setChildrenUIStates(childJson);
+    }
+  })
+}
 
 function App() {
   // Creates a *state* variable with the initial value null, and a function to update that variable
   //   React stores the state of state variables across renders, a render happens whenever the state changes
   //    Render: a function call to the parent component (App() in this case)
-  const [documents, setDocuments] = useState([]);
+  const [root, setRoot] = useState([]);
+  const [currentFolder, setCurrentFolder] = useState([]);
+  const [selectedDoc, setSelectedDoc] = useState(null);
 
   // () contains the parameters
   // [] contains dependencies to 'watch'
   useEffect(() => {
     fetch("http://localhost:8080/document")
       .then((response) => response.json())
-      .then((json) => setDocuments(json));
+      .then((json) => {
+        setChildrenUIStates(json);
+        setRoot(json);
+        setCurrentFolder(json);
+      });
   }, []);
 
   function uploadDoc(file) {
@@ -31,42 +52,39 @@ function App() {
     })
       .then((response) => response.json()) // response.json() doesnt return a json, but a 'Promise' that a json will be returned
       .then((json) => {
-        if (json != null) setDocuments((current) => [...current, json]);
+        if (json != null) setCurrentFolder({
+          ...currentFolder,
+          children: [...currentFolder.children, json]
+        });
       });
   }
 
-  const [selectedDoc, setSelectedDoc] = useState(null);
+  function createFolder(foldername) {
+    fetch("http://localhost:8080/folder?foldername=" + foldername, {method: "POST"})
+    .then(response => response.json())
+    .then((json) => setRoot({
+      ...root,
+      children: [...root.children, json]
+    }));
+  }
 
   function deleteDoc(filename) {
     fetch("http://localhost:8080/document/" + filename, {method: "DELETE"})
     .then(response => response.json())
-    .then(json => setDocuments(json))
+    .then(json => setRoot(json))
   }
-
-
-  function createFolder(foldername) {
-    fetch("http://localhost:8080/folder?foldername=" + foldername, {method: "POST"})
-  }
-  
-  const [foldernameToCreate, setFoldernameToCreate] = useState("")
   
   return (
     <>
       <h1> Docurel </h1>
 
       <FileUpload upload={uploadDoc} />
-
-      <DocumentList documents={documents} onDocClick={setSelectedDoc} onDocDelete={deleteDoc} />
+      <br />
+      <FolderUpload createFolder={createFolder} />
+      <br />
+      <DocList root={root} setRoot={setRoot} onDocClick={setSelectedDoc} onDocDelete={deleteDoc} />
 
       <SelectDoc selectedDoc={selectedDoc} />
-
-      <div>
-        <input 
-          type="text"
-          onChange={(e) => {setFoldernameToCreate(e.target.value)}}
-        />
-        <button onClick={() => {createFolder(foldernameToCreate)}}>Create File</button>
-      </div>
     </>
   );
 }

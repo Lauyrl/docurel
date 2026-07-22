@@ -18,7 +18,7 @@ function App() {
       .then((json) => setDocuments(json));
   }, []);
 
-  function upload(file) {
+  function uploadDoc(file) {
     if (!file) return;
     // files sent to Spring as FormData
     const formData = new FormData();
@@ -43,15 +43,30 @@ function App() {
     .then(json => setDocuments(json))
   }
 
+
+  function createFolder(foldername) {
+    fetch("http://localhost:8080/folder?foldername=" + foldername, {method: "POST"})
+  }
+  
+  const [foldernameToCreate, setFoldernameToCreate] = useState("")
+  
   return (
     <>
       <h1> Docurel </h1>
 
-      <FileUpload upload={upload} />
+      <FileUpload upload={uploadDoc} />
 
       <DocumentList documents={documents} onDocClick={setSelectedDoc} onDocDelete={deleteDoc} />
 
       <SelectDoc selectedDoc={selectedDoc} />
+
+      <div>
+        <input 
+          type="text"
+          onChange={(e) => {setFoldernameToCreate(e.target.value)}}
+        />
+        <button onClick={() => {createFolder(foldernameToCreate)}}>Create File</button>
+      </div>
     </>
   );
 }

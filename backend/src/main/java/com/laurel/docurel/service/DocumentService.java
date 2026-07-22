@@ -28,6 +28,21 @@ public class DocumentService {
         } catch (IOException e) { return new ArrayList<Document>(); }
     }
 
+    public Document storeDocument(MultipartFile document) {
+        try {
+            String filename = document.getOriginalFilename();
+            if (filename == null) {throw new IOException();}
+
+            Path dest = Path.of("C:\\CS\\docurel\\testUploads", filename);
+            if (Files.exists(dest)) return null;
+            document.transferTo(dest);
+
+            return new Document(document.getSize(), document.getOriginalFilename());
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     public byte[] getFileBytes(String filename) {
         Path loc = Path.of("C:\\CS\\docurel\\testUploads\\" + filename);
         try {
@@ -43,18 +58,10 @@ public class DocumentService {
         return getDocuments();
     }
 
-    public Document storeDocument(MultipartFile document) {
+    public void createDirectory(String foldername) {
+        Path loc = Path.of("C:\\CS\\docurel\\testUploads\\" + foldername);
         try {
-            String filename = document.getOriginalFilename();
-            if (filename == null) {throw new IOException();}
-
-            Path dest = Path.of("C:\\CS\\docurel\\testUploads", filename);
-            if (Files.exists(dest)) return null;
-            document.transferTo(dest);
-
-            return new Document(document.getSize(), document.getOriginalFilename());
-        } catch (IOException e) {
-            return null;
-        }
+            Files.createDirectory(loc);
+        } catch (IOException e) {}
     }
 }

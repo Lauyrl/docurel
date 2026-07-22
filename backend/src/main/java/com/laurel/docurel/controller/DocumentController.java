@@ -26,10 +26,10 @@ public class DocumentController {
     }
 
     @PostMapping("/document")
-    // @RequestParam: parameter annotation, tells Spring how to find a value
-    // RequestParam tells Spring that the desired parameter is one of the request's parameters
-    // Spring finds the form field named "document", and converts the value into a MultipartFile
-    // MultipartFile: a File that comes from a Multipart request, the File itself isnt Multipart
+    /* @RequestParam: parameter annotation, tells Spring how to find a value
+       RequestParam tells Spring that the desired parameter is one of the request's parameters
+       Spring finds the form field named "document", and converts the value into a MultipartFile
+       MultipartFile: a File that comes from a Multipart request, the File itself isnt Multipart */
     public Document postDocument(@RequestParam(value = "document") MultipartFile document) {
         return documentService.storeDocument(document);
     }
@@ -39,9 +39,9 @@ public class DocumentController {
         return documentService.getDocuments();
     }
 
-    // Service should provide only data to the Controller, if any additional HTTP-related packaging needs to happen, the Controller should handle it
-    // ResponseEntity: class that provides static factory methods to construct HTTP responses
-    // Content-Disposition: attachment; filename="{filename}": header that tells the client that the body contains a downloadable file attachment, named "filename"
+    /* Service should provide only data to the Controller, if any additional HTTP-related packaging needs to happen, the Controller should handle it
+       ResponseEntity: class that provides static factory methods to construct HTTP responses
+       Content-Disposition: attachment; filename="{filename}": header that tells the client that the body contains a downloadable file attachment, named "filename" */
     @GetMapping("/document/{filename}/download")
     public ResponseEntity<byte[]> getDocumentDownload(@PathVariable String filename) {
         byte[] file = documentService.getFileBytes(filename);
@@ -71,5 +71,10 @@ public class DocumentController {
     @DeleteMapping("/document/{filename}")
     public List<Document> deleteDocument(@PathVariable String filename) {
         return documentService.deleteDocument(filename);
+    }
+
+    @PostMapping("/folder")
+    public void postFolder(@RequestParam(value = "foldername") String foldername) {
+        documentService.createDirectory(foldername);
     }
 }

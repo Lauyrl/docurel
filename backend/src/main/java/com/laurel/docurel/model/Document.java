@@ -1,29 +1,21 @@
 package com.laurel.docurel.model;
 
-public class Document {
-    private long filesize; 
-    private String filename;
+public class Document extends DocItem {
     private String contentType;
 
     public Document(long filesize, String filename){
-        this.filesize = filesize;
-        this.filename = filename;
-        this.contentType = giveContentType(filename);
+        super(filesize, filename);
+        contentType = getContentTypeFromFilename(filename);
     }
 
-    public String getFilename() {
-        return filename;
-    }
-
-    public long getFilesize() {
-        return filesize;
-    }
+    @Override
+    public String getType() { return "doc"; }
 
     public String getContentType() {
         return contentType;
     }
 
-    public static String giveContentType(String filename) {
+    public static String getContentTypeFromFilename(String filename) {
         String extension = filename.substring(filename.lastIndexOf(".") + 1);
         return switch (extension) {
             case "txt"  -> "text/plain";

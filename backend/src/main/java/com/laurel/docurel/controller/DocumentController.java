@@ -2,9 +2,6 @@ package com.laurel.docurel.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.laurel.docurel.model.Document;
+import com.laurel.docurel.model.Folder;
 import com.laurel.docurel.service.DocumentService;
 
 // Controllers should recieve HTTP requests, call a Service, then return a result
@@ -35,7 +33,7 @@ public class DocumentController {
     }
 
     @GetMapping("/document")
-    public List<Document> getDocuments() {
+    public Folder getDocuments() {
         return documentService.getDocuments();
     }
 
@@ -61,7 +59,7 @@ public class DocumentController {
         if (file != null) {
             return ResponseEntity
                 .ok()
-                .header("Content-Type", Document.giveContentType(filename))
+                .header("Content-Type", Document.getContentTypeFromFilename(filename))
                 .body(file);
         } else {
             return ResponseEntity.notFound().build();
@@ -69,12 +67,12 @@ public class DocumentController {
     }
 
     @DeleteMapping("/document/{filename}")
-    public List<Document> deleteDocument(@PathVariable String filename) {
+    public Folder deleteDocument(@PathVariable String filename) {
         return documentService.deleteDocument(filename);
     }
 
     @PostMapping("/folder")
-    public void postFolder(@RequestParam(value = "foldername") String foldername) {
-        documentService.createDirectory(foldername);
+    public Folder postFolder(@RequestParam(value = "foldername") String foldername) {
+        return documentService.createDirectory(foldername);
     }
 }

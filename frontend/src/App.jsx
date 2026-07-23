@@ -67,9 +67,8 @@ function App() {
     }));
   }
 
-  function deleteItem(name) {
-
-    fetch(API + "document/" + name, {method: "DELETE"})
+  function deleteItem(item) {
+    fetch(API + item.type + "/" + item.name, {method: "DELETE"})
     .then(response => response.json())
     .then(json => setRoot(json))
   }

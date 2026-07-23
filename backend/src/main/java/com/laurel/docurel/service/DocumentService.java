@@ -72,4 +72,21 @@ public class DocumentService {
             return new Folder(foldername);
         } catch (IOException e) { return null; }
     }
+
+    public Folder deleteDirectory(String foldername) {
+        Path loc = Path.of("C:\\CS\\docurel\\testUploads\\" + foldername);
+        deleteDirectoryRecursive(loc);
+        return getDocuments();
+    }
+
+    public void deleteDirectoryRecursive(Path loc) {
+        try {
+            if (Files.isDirectory(loc)) {
+                try (DirectoryStream<Path> dirstream = Files.newDirectoryStream(loc)) {   
+                    for (Path path : dirstream) deleteDirectoryRecursive(path);        
+                }
+            }
+            Files.delete(loc);
+        } catch (Exception e) {e.printStackTrace();} 
+    }
 }

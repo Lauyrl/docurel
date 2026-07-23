@@ -1,4 +1,4 @@
-function ContextMenu({ contextMenu, downloadDocumentRedirect, deleteItem }) {
+function ContextMenu({ contextMenu, downloadDocumentRedirect, onItemDelete }) {
   return (
     <div
       className="context-menu"
@@ -22,7 +22,7 @@ function ContextMenu({ contextMenu, downloadDocumentRedirect, deleteItem }) {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              deleteItem(contextMenu.item.name);
+              onItemDelete(contextMenu.item);
             }}
           >
             Delete
@@ -31,7 +31,7 @@ function ContextMenu({ contextMenu, downloadDocumentRedirect, deleteItem }) {
       )}
       {contextMenu.item?.type === "folder" && (
         <div>
-          <button onClick={() => deleteItem(contextMenu.item.name)}>
+          <button onClick={() => onItemDelete(contextMenu.item)}>
             Delete
           </button>
         </div>

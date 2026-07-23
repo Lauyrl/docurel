@@ -25,8 +25,8 @@ public class Document extends DocItem {
             case "gif"  -> "image/gif";
             case "webp" -> "image/webp";
 
-            case "mp4"  -> "image/mp4";
-            case "webm" -> "image/webm";
+            case "mp4"  -> "video/mp4";
+            case "webm" -> "video/webm";
 
             case "wav"  -> "audio/wav";
             case "mp3"  -> "audio/mp3";

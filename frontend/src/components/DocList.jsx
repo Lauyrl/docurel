@@ -48,7 +48,7 @@ function DocList({ root, setRoot, onDocClick, onDocDelete }) {
 
   return (
     <>
-      {(!root || root.children.length === 0) &&  <h2> Upload a file </h2>}
+      {(!root || root.children?.length === 0) &&  <h2> Upload a file </h2>}
       { displayFolder(root, 0) }
     </>
   );

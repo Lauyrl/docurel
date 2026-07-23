@@ -1,42 +1,36 @@
-function Preview({blobURL, contentType}) {
-  let preview = null;
-  if (blobURL) {
-    switch (contentType) {
-      case "text/plain":
-      case "application/pdf":
-        preview = <iframe width={1400} height={600} src={blobURL} />;
-        break;
+function Preview({ blobURL, contentType }) {
+  if (!blobURL) return;
 
-      case "image/jpeg":
-      case "image/png":
-      case "image/gif":
-      case "image/webp":
-        preview = <img width={1400} src={blobURL} />;
-        break;
+  switch (contentType) {
+    case "text/plain":
+    case "application/pdf":
+      return <iframe width={1400} height={600} src={blobURL} />;
 
-      case "video/mp4":
-      case "video/webm":
-        preview = (
-          <video controls width={1400}>
-            <source src={blobURL} type={contentType} />{" "}
-          </video>
-        );
-        break;
+    case "image/jpeg":
+    case "image/png":
+    case "image/gif":
+    case "image/webp":
+      return <img src={blobURL} />;
 
-      case "audio/wav":
-      case "audio/mp3":
-        preview = (
-          <audio controls>
-            <source src={blobURL} type={contentType} />{" "}
-          </audio>
-        );
-        break;
+    case "video/mp4":
+    case "video/webm":
+      return (
+        <video controls width={1400}>
+          <source src={blobURL} type={contentType} />
+        </video>
+      );
 
-      default:
-        preview = <div>Preview not available</div>;
-    }
+    case "audio/wav":
+    case "audio/mp3":
+       return (
+        <audio controls>
+          <source src={blobURL} type={contentType} />
+        </audio>
+      );
+
+    default:
+      return <div>Preview not available</div>;
   }
-  return <>{preview}</>
 }
 
 export default Preview;

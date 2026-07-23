@@ -7,15 +7,17 @@ function FolderUpload({ createFolder }) {
     <div>
       <input
         type="text"
+        value={foldernameToCreate}
         placeholder="Enter Folder name here"
-        onChange={(e) => {
-          setFoldernameToCreate(e.target.value);
-        }}
+        onChange={(e) => setFoldernameToCreate(e.target.value)}
       />
       <button
-        onClick={() => {createFolder(foldernameToCreate);}}
+        onClick={() => {
+          createFolder(foldernameToCreate);
+          setFoldernameToCreate("");
+        }}
       >
-        Create File
+        Create Folder
       </button>
     </div>
   );

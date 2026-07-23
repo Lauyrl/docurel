@@ -4,18 +4,16 @@ import DocList from "./components/DocList";
 import SelectDoc from "./components/DocSelect";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
+import { API } from "./constants";
 
-function setChildrenUIStates(rootJson) {
+function initializeUIStates(rootJson) {
   if (!rootJson || !rootJson.children) return;
+  rootJson.isExpanded = false
 
   rootJson.children.forEach(childJson => {
-    if (childJson.type == "folder") {
-      childJson = {
-        ...childJson,
-        isExpanded: false
-      };
-      setChildrenUIStates(childJson);
-    }
+    if (childJson.type === "folder") {
+      initializeUIStates(childJson);
+    };
   })
 }
 
@@ -30,12 +28,13 @@ function App() {
   // () contains the parameters
   // [] contains dependencies to 'watch'
   useEffect(() => {
-    fetch("http://localhost:8080/document")
+    fetch(API + "document")
       .then((response) => response.json())
       .then((json) => {
-        setChildrenUIStates(json);
+        initializeUIStates(json);
         setRoot(json);
         setCurrentFolder(json);
+        setSelectedDoc(json);
       });
   }, []);
 
@@ -46,7 +45,7 @@ function App() {
     // name has to match the field name that Spring expects
     formData.append("document", file);
 
-    fetch("http://localhost:8080/document", {
+    fetch(API + "document", {
       method: "POST",
       body: formData
     })
@@ -60,7 +59,7 @@ function App() {
   }
 
   function createFolder(foldername) {
-    fetch("http://localhost:8080/folder?foldername=" + foldername, {method: "POST"})
+    fetch(API + "folder?foldername=" + foldername, {method: "POST"})
     .then(response => response.json())
     .then((json) => setRoot({
       ...root,
@@ -69,7 +68,7 @@ function App() {
   }
 
   function deleteDoc(filename) {
-    fetch("http://localhost:8080/document/" + filename, {method: "DELETE"})
+    fetch(API + "document/" + filename, {method: "DELETE"})
     .then(response => response.json())
     .then(json => setRoot(json))
   }
@@ -83,7 +82,7 @@ function App() {
         <FolderUpload createFolder={createFolder} />
       </div>
       <br />
-      
+
       <div className="workspace">
         <DocList root={root} setRoot={setRoot} onDocClick={setSelectedDoc} onDocDelete={deleteDoc} />
         <SelectDoc selectedDoc={selectedDoc} />

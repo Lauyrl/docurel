@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function FileUpload({ upload }) {
-  const [file, setFile] = useState(null); // Stores file
+  const [uploadedFile, setUploadedFile] = useState(null);
 
   return (
     <div>
@@ -12,13 +12,14 @@ function FileUpload({ upload }) {
            e.target: HTML element that created the event (<input type = "file">)
            e.target.files: access the file property of <input type = "file">
         */
-        onChange={(e) => setFile(e.target.files[0])}
+        onChange={(e) => setUploadedFile(e.target.files[0])}
       />
-      <button onClick={() => upload(file)}>Upload</button>{" "}
-        {/* 
-            onClick is a component parameter, and needs to evaluate to a function, not a value 
-            (//parameters) => {//body} evaluates to a function, upload(file) is just a result
-        */}
+      <button
+        /*  onClick is a component parameter, and needs to evaluate to a function, not a value */
+        onClick={() => upload(uploadedFile)}
+      >
+        Upload
+      </button>
     </div>
   );
 }

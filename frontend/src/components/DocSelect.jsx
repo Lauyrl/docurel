@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API } from "../constants";
 import Preview from "./Preview";
 
 function SelectDoc({ selectedDoc }) {
@@ -8,32 +9,40 @@ function SelectDoc({ selectedDoc }) {
   });
 
   useEffect(() => {
-    if (!selectedDoc) return;
+    if (!selectedDoc || selectedDoc.type === "folder") return;
 
     let url = null;
-    fetch("http://localhost:8080/document/" + selectedDoc.name)
+    fetch(API + "document/" + selectedDoc.name)
       .then((response) => response.blob())
       .then((blob) => {
         url = URL.createObjectURL(blob); 
-        setPreview({name: selectedDoc.name, url: url}); 
+        setPreview({
+          name: selectedDoc.name, 
+          url: url}
+        ); 
       });
 
-    // a return () => {} in a useEffect() is a special *cleanup function* that doesnt run at the end of the current effect, but at the beginning of the next
-    return () => {
-      URL.revokeObjectURL(url);
-    }
+    // a 'return () => {}' in a useEffect() is a special *cleanup function* that doesnt run at the end of the current effect, but at the beginning of the next
+    return () => URL.revokeObjectURL(url);
   }, [selectedDoc]);
+  
+  if (!selectedDoc) return null;
 
-  /* preview.name == selectedDoc.name avoid trying to render an older selectedDoc's URL with an element meant for the current selectedDoc's contentType 
-     can happen because selectedDoc changes before the new blob fetch finishes */
-  return (
-    <> 
-      {(selectedDoc && preview.name == selectedDoc.name) && 
+  if (selectedDoc.type === "doc" && preview.name === selectedDoc.name) {
+    return (
       <div className="preview">
         <Preview blobURL = {preview.url} contentType = {selectedDoc.contentType}/>
-      </div>} 
-    </>
-  );
+      </div>
+    );
+  }
+  else if (selectedDoc.type === "folder") {
+    // result of .map() needs to be returned
+    return (
+      <div className="item-listing">
+        { selectedDoc.children.map(item => (<div> {item.name} </div>)) }
+      </div>
+    )
+  }
 }
 
 export default SelectDoc;

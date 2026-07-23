@@ -4,7 +4,7 @@ function FolderUpload({ createFolder }) {
   const [foldernameToCreate, setFoldernameToCreate] = useState("");
 
   return (
-    <>
+    <div>
       <input
         type="text"
         placeholder="Enter Folder name here"
@@ -17,7 +17,7 @@ function FolderUpload({ createFolder }) {
       >
         Create File
       </button>
-    </>
+    </div>
   );
 }
 

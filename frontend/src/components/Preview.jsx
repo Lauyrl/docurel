@@ -4,20 +4,20 @@ function Preview({blobURL, contentType}) {
     switch (contentType) {
       case "text/plain":
       case "application/pdf":
-        preview = <iframe src={blobURL} />;
+        preview = <iframe width={1400} height={600} src={blobURL} />;
         break;
 
       case "image/jpeg":
       case "image/png":
       case "image/gif":
       case "image/webp":
-        preview = <img src={blobURL} width="600" height="400" />;
+        preview = <img width={1400} src={blobURL} />;
         break;
 
       case "video/mp4":
       case "video/webm":
         preview = (
-          <video controls width="600">
+          <video controls width={1400}>
             <source src={blobURL} type={contentType} />{" "}
           </video>
         );

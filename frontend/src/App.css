@@ -186,3 +186,34 @@
 .doc-list {
   text-align: left;
 }
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.ribbon {
+    display: flex;
+    gap: 50px;
+}
+
+.workspace {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.preview {
+    flex: 1;
+    overflow: auto;
+    height: calc(100vh - 180px);
+}
+
+.preview img,
+.preview iframe,
+.preview video {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}

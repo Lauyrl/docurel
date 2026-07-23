@@ -4,9 +4,9 @@ function FileUpload({ upload }) {
   const [file, setFile] = useState(null); // Stores file
 
   return (
-    <>
+    <div>
       <input
-        // creates an <input type = "file"> element with default value = "No file selected", creates a built in input UI
+        /* creates an <input type = "file"> element with default value = "No file selected", creates a built in input UI */
         type="file"
         /* e: the event object, is created when <input type = "file"> changes 
            e.target: HTML element that created the event (<input type = "file">)
@@ -15,11 +15,11 @@ function FileUpload({ upload }) {
         onChange={(e) => setFile(e.target.files[0])}
       />
       <button onClick={() => upload(file)}>Upload</button>{" "}
-      {/* 
-        onClick is a component parameter, and needs to evaluate to a function, not a value 
-        (//parameters) => {//body} evaluates to a function, upload(file) is just a result
-      */}
-    </>
+        {/* 
+            onClick is a component parameter, and needs to evaluate to a function, not a value 
+            (//parameters) => {//body} evaluates to a function, upload(file) is just a result
+        */}
+    </div>
   );
 }
 

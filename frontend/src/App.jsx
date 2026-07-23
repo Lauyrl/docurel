@@ -75,17 +75,20 @@ function App() {
   }
   
   return (
-    <>
+    <div className="app">
       <h1> Docurel </h1>
 
-      <FileUpload upload={uploadDoc} />
+      <div className="ribbon">
+        <FileUpload upload={uploadDoc} />
+        <FolderUpload createFolder={createFolder} />
+      </div>
       <br />
-      <FolderUpload createFolder={createFolder} />
-      <br />
-      <DocList root={root} setRoot={setRoot} onDocClick={setSelectedDoc} onDocDelete={deleteDoc} />
-
-      <SelectDoc selectedDoc={selectedDoc} />
-    </>
+      
+      <div className="workspace">
+        <DocList root={root} setRoot={setRoot} onDocClick={setSelectedDoc} onDocDelete={deleteDoc} />
+        <SelectDoc selectedDoc={selectedDoc} />
+      </div>
+    </div>
   );
 }
 

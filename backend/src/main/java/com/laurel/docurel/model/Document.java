@@ -9,7 +9,7 @@ public class Document extends DocItem {
     }
 
     @Override
-    public String getType() { return "doc"; }
+    public String getType() { return "document"; }
 
     public String getContentType() {
         return contentType;

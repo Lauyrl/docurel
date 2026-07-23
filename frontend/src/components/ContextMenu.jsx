@@ -8,7 +8,7 @@ function ContextMenu({ contextMenu, downloadDocumentRedirect, deleteItem }) {
         top: contextMenu.y,
       }}
     >
-      {contextMenu.item?.type === "doc" && (
+      {contextMenu.item?.type === "document" && (
         <div>
           <button
             onClick={(e) => {

@@ -30,7 +30,7 @@ function SelectDoc({ selectedDoc }) {
 
   /* preview.filename === selectedDoc.filename: avoid trying to render an older selectedDoc's URL with an element meant for the current selectedDoc's contentType,
   can happen because selectedDoc changes before the new blob fetch finishes */
-  if (selectedDoc.type === "doc" && preview.name === selectedDoc.name) {
+  if (selectedDoc.type === "document" && preview.name === selectedDoc.name) {
     return (
       <div className="preview">
         <Preview blobURL = {preview.url} contentType = {selectedDoc.contentType}/>

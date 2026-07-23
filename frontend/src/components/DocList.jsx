@@ -48,7 +48,7 @@ function DocList({ root, setRoot, onItemClick, onItemDelete }) {
         <div className="doc-list" style={{marginLeft: 10 + depth * 20}}>
           {rootFolder && rootFolder.children && ( 
             rootFolder.children.map((item) => {
-              if (item.type === "doc") {
+              if (item.type === "document") {
                 return (
                   <div>
                     <span 

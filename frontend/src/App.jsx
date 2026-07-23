@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import ItemList from "./components/DocList";
-import SelectedItem from "./components/DocSelect";
+import ItemList from "./components/ItemList";
+import SelectedItem from "./components/SelectedItem";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
 import { API } from "./constants";

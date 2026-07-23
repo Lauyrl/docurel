@@ -1,48 +1,97 @@
+import { useEffect, useState } from "react";
 import { API } from "../constants";
+import ContextMenu from "./ContextMenu";
 
-function DocList({ root, setRoot, onDocClick, onDocDelete }) {
-  
+function DocList({ root, setRoot, onItemClick, onItemDelete }) {
+  const [contextMenu, setContextMenu] = useState({
+    item: null,
+    x: null,
+    y: null
+  });
+
+  function makeContextMenu(eventObject, item) {
+    setContextMenu({
+      item: item,
+      x: eventObject.clientX,
+      y: eventObject.clientY
+    });
+  }
+
   function downloadDocumentRedirect(filename) {
     /* window.location: Location object of the browser window, window.location.href: the full URL the browser is displaying */
-    window.location.href = API + "document/" + filename + "/download";
+    window.open(API + "document/" + filename + "/download");
   }
+
+  useEffect(() => {
+    const close = (() => setContextMenu(null))
+    window.addEventListener("click", close);
+    return (() => window.removeEventListener("click", close))
+  })
 
   function displayFolder(rootFolder, depth) {
     return (
-      <div className="doc-list" style={{marginLeft: 10 + depth * 20}}>
-        {rootFolder && rootFolder.children && ( 
-          rootFolder.children.map((item) => {
-            if (item.type === "doc") {
-              return (
-                <div>
-                  <span onClick={() => onDocClick(item)}>
-                    {item.name}{" "}
-                  </span>
-                  <button onClick={() => downloadDocumentRedirect(item.name)}>
-                    Download
-                  </button>{" "}
-                  <button onClick={() => onDocDelete(item.name)}>
-                    Delete
-                  </button>
-                </div>
-              )
-            }
-            else if (item.type === "folder") {
-              return (
-                <div>
-                    <div onClick={() => {
-                      onDocClick(item);
-                      item.isExpanded = !item.isExpanded;
-                      setRoot({...root});
-                    }}>
-                      {item.name}{" "}
-                    </div>
-                    <div> { item.isExpanded && displayFolder(item, depth+1) } </div>
-                </div>
-              );
-            }
-          })
-        )}
+      <div
+        className="vertical-item-listing" 
+        onClick={() => {
+          onItemClick(root);
+          setContextMenu(null);
+        }}
+      >
+        {contextMenu && 
+          <ContextMenu 
+            contextMenu={contextMenu}
+            downloadDocumentRedirect={downloadDocumentRedirect}
+            onItemDelete={onItemDelete}
+          />
+        }
+
+        <div className="doc-list" style={{marginLeft: 10 + depth * 20}}>
+          {rootFolder && rootFolder.children && ( 
+            rootFolder.children.map((item) => {
+              if (item.type === "doc") {
+                return (
+                  <div>
+                    <span 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setContextMenu(null);
+                        onItemClick(item);
+                      }}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        makeContextMenu(e, item)
+                      }}
+                    >
+                      {item.name}
+                    </span>
+                  </div>
+                )
+              }
+              else if (item.type === "folder") {
+                return (
+                  <div>
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          item.isExpanded = !item.isExpanded;
+                          setContextMenu(null);
+                          onItemClick(item);
+                          setRoot({...root});
+                        }}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          makeContextMenu(e, item)
+                        }}
+                      >
+                        {item.name}
+                      </div>
+                      <div> { item.isExpanded && displayFolder(item, depth+1) } </div>
+                  </div>
+                );
+              }
+            })
+          )}
+        </div>
       </div>
     );
   }

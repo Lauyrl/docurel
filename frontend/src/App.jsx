@@ -23,7 +23,7 @@ function App() {
   //    Render: a function call to the parent component (App() in this case)
   const [root, setRoot] = useState([]);
   const [currentFolder, setCurrentFolder] = useState([]);
-  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [selectedDoc, setSelectedItem] = useState(null);
 
   // () contains the parameters
   // [] contains dependencies to 'watch'
@@ -34,7 +34,7 @@ function App() {
         initializeUIStates(json);
         setRoot(json);
         setCurrentFolder(json);
-        setSelectedDoc(json);
+        setSelectedItem(json);
       });
   }, []);
 
@@ -67,15 +67,15 @@ function App() {
     }));
   }
 
-  function deleteDoc(filename) {
-    fetch(API + "document/" + filename, {method: "DELETE"})
+  function deleteItem(name) {
+    fetch(API + "document/" + name, {method: "DELETE"})
     .then(response => response.json())
     .then(json => setRoot(json))
   }
   
   return (
     <div className="app">
-      <h1> Docurel </h1>
+      <h1 className="logo"> Docurel </h1>
 
       <div className="ribbon">
         <FileUpload upload={uploadDoc} />
@@ -84,7 +84,7 @@ function App() {
       <br />
 
       <div className="workspace">
-        <DocList root={root} setRoot={setRoot} onDocClick={setSelectedDoc} onDocDelete={deleteDoc} />
+        <DocList root={root} setRoot={setRoot} onItemClick={setSelectedItem} onItemDelete={deleteItem} />
         <SelectDoc selectedDoc={selectedDoc} />
       </div>
     </div>

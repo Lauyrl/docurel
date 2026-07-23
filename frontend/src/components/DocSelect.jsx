@@ -18,8 +18,8 @@ function SelectDoc({ selectedDoc }) {
         url = URL.createObjectURL(blob); 
         setPreview({
           name: selectedDoc.name, 
-          url: url}
-        ); 
+          url: url
+        }); 
       });
 
     // a 'return () => {}' in a useEffect() is a special *cleanup function* that doesnt run at the end of the current effect, but at the beginning of the next
@@ -28,6 +28,8 @@ function SelectDoc({ selectedDoc }) {
   
   if (!selectedDoc) return null;
 
+  /* preview.filename === selectedDoc.filename: avoid trying to render an older selectedDoc's URL with an element meant for the current selectedDoc's contentType,
+  can happen because selectedDoc changes before the new blob fetch finishes */
   if (selectedDoc.type === "doc" && preview.name === selectedDoc.name) {
     return (
       <div className="preview">
@@ -38,7 +40,7 @@ function SelectDoc({ selectedDoc }) {
   else if (selectedDoc.type === "folder") {
     // result of .map() needs to be returned
     return (
-      <div className="item-listing">
+      <div className="grid-item-listing">
         { selectedDoc.children.map(item => (<div> {item.name} </div>)) }
       </div>
     )

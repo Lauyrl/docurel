@@ -59,7 +59,7 @@ function App() {
   }
 
   function createFolder(foldername) {
-    fetch(API + "folder?foldername=" + foldername, {method: "POST"})
+    fetch(API + "folder/" + foldername, {method: "POST"})
     .then(response => response.json())
     .then((json) => setRoot({
       ...root,
@@ -68,6 +68,7 @@ function App() {
   }
 
   function deleteItem(name) {
+
     fetch(API + "document/" + name, {method: "DELETE"})
     .then(response => response.json())
     .then(json => setRoot(json))

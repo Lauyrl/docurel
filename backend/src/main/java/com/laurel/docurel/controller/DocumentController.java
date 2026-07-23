@@ -71,8 +71,8 @@ public class DocumentController {
         return documentService.deleteDocument(filename);
     }
 
-    @PostMapping("/folder")
-    public Folder postFolder(@RequestParam(value = "foldername") String foldername) {
+    @PostMapping("/folder/{foldername}")
+    public Folder postFolder(@PathVariable String foldername) {
         return documentService.createDirectory(foldername);
     }
 }

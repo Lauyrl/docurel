@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { API } from "../constants";
 import ContextMenu from "./ContextMenu";
 
-function DocList({ root, setRoot, onItemClick, onItemDelete }) {
+function ItemList({ root, setRoot, onItemClick, onItemDelete }) {
   const [contextMenu, setContextMenu] = useState({
     item: null,
     x: null,
@@ -104,4 +104,4 @@ function DocList({ root, setRoot, onItemClick, onItemDelete }) {
   );
 }
 
-export default DocList;
+export default ItemList;

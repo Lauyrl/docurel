@@ -2,49 +2,49 @@ import { useEffect, useState } from "react";
 import { API } from "../constants";
 import Preview from "./Preview";
 
-function SelectDoc({ selectedDoc }) {
+function SelectedItem({ selectedItem }) {
   const [preview, setPreview] = useState({
     name: "",
     url: null
   });
 
   useEffect(() => {
-    if (!selectedDoc || selectedDoc.type === "folder") return;
+    if (!selectedItem || selectedItem.type === "folder") return;
 
     let url = null;
-    fetch(API + "document/" + selectedDoc.name)
+    fetch(API + "document/" + selectedItem.name)
       .then((response) => response.blob())
       .then((blob) => {
         url = URL.createObjectURL(blob); 
         setPreview({
-          name: selectedDoc.name, 
+          name: selectedItem.name, 
           url: url
         }); 
       });
 
     // a 'return () => {}' in a useEffect() is a special *cleanup function* that doesnt run at the end of the current effect, but at the beginning of the next
     return () => URL.revokeObjectURL(url);
-  }, [selectedDoc]);
+  }, [selectedItem]);
   
-  if (!selectedDoc) return null;
+  if (!selectedItem) return null;
 
-  /* preview.filename === selectedDoc.filename: avoid trying to render an older selectedDoc's URL with an element meant for the current selectedDoc's contentType,
-  can happen because selectedDoc changes before the new blob fetch finishes */
-  if (selectedDoc.type === "document" && preview.name === selectedDoc.name) {
+  /* preview.filename === selectedItem.filename: avoid trying to render an older selectedItem's URL with an element meant for the current selectedItem's contentType,
+  can happen because selectedItem changes before the new blob fetch finishes */
+  if (selectedItem.type === "document" && preview.name === selectedItem.name) {
     return (
       <div className="preview">
-        <Preview blobURL = {preview.url} contentType = {selectedDoc.contentType}/>
+        <Preview blobURL = {preview.url} contentType = {selectedItem.contentType}/>
       </div>
     );
   }
-  else if (selectedDoc.type === "folder") {
+  else if (selectedItem.type === "folder") {
     // result of .map() needs to be returned
     return (
       <div className="grid-item-listing">
-        { selectedDoc.children.map(item => (<div> {item.name} </div>)) }
+        { selectedItem.children.map(item => (<div> {item.name} </div>)) }
       </div>
     )
   }
 }
 
-export default SelectDoc;
+export default SelectedItem;

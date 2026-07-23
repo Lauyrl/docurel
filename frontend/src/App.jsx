@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import DocList from "./components/DocList";
-import SelectDoc from "./components/DocSelect";
+import ItemList from "./components/DocList";
+import SelectedItem from "./components/DocSelect";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
 import { API } from "./constants";
@@ -23,7 +23,7 @@ function App() {
   //    Render: a function call to the parent component (App() in this case)
   const [root, setRoot] = useState([]);
   const [currentFolder, setCurrentFolder] = useState([]);
-  const [selectedDoc, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // () contains the parameters
   // [] contains dependencies to 'watch'
@@ -85,8 +85,8 @@ function App() {
       <br />
 
       <div className="workspace">
-        <DocList root={root} setRoot={setRoot} onItemClick={setSelectedItem} onItemDelete={deleteItem} />
-        <SelectDoc selectedDoc={selectedDoc} />
+        <ItemList root={root} setRoot={setRoot} onItemClick={setSelectedItem} onItemDelete={deleteItem} />
+        <SelectedItem selectedItem={selectedItem} />
       </div>
     </div>
   );

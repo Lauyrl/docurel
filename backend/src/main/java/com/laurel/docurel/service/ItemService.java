@@ -13,8 +13,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 
 @Service
-public class DocumentService {
-    public static Folder scrapeDirectory(Path loc) {
+public class ItemService {
+    private static Folder scrapeDirectory(Path loc) {
         Folder root = new Folder(loc.getFileName().toString());
         try (DirectoryStream<Path> dirstream = Files.newDirectoryStream(loc)) {
             for (Path path : dirstream) {
@@ -32,7 +32,7 @@ public class DocumentService {
         } catch (IOException e) { return new Folder(""); }
     }
 
-    public Folder getDocuments() {
+    public Folder getRoot() {
         Path loc = Path.of("C:\\CS\\docurel\\testUploads");
         return scrapeDirectory(loc);
     }
@@ -62,7 +62,7 @@ public class DocumentService {
         try {
             Files.delete(loc);
         } catch (IOException e) {} 
-        return getDocuments();
+        return getRoot();
     }
 
     public Folder createDirectory(String foldername) {
@@ -76,10 +76,10 @@ public class DocumentService {
     public Folder deleteDirectory(String foldername) {
         Path loc = Path.of("C:\\CS\\docurel\\testUploads\\" + foldername);
         deleteDirectoryRecursive(loc);
-        return getDocuments();
+        return getRoot();
     }
 
-    public void deleteDirectoryRecursive(Path loc) {
+    private static void deleteDirectoryRecursive(Path loc) {
         try {
             if (Files.isDirectory(loc)) {
                 try (DirectoryStream<Path> dirstream = Files.newDirectoryStream(loc)) {   

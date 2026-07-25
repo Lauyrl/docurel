@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.laurel.docurel.model.Document;
 import com.laurel.docurel.model.Folder;
-import com.laurel.docurel.service.DocumentService;
+import com.laurel.docurel.service.ItemService;
 
 // Controllers should recieve HTTP requests, call a Service, then return a result
 @RestController
-public class DocumentController {
-    private final DocumentService documentService;
+public class ItemController {
+    private final ItemService itemService;
 
     // Spring creates Dependency Beans first, then automatically injects them into the Beans that need them 
-    public DocumentController(DocumentService documentService){
-        this.documentService = documentService;
+    public ItemController(ItemService itemService){
+        this.itemService = itemService;
     }
 
     @PostMapping("/document")
@@ -30,12 +30,12 @@ public class DocumentController {
        MultipartFile: a File that comes from a Multipart request, the File itself isnt Multipart */
     public Document postDocument(@RequestParam(value = "document") MultipartFile document,
                                  @RequestParam(value = "dest") String destDir) {
-        return documentService.storeDocument(document, destDir);
+        return itemService.storeDocument(document, destDir);
     }
 
     @GetMapping("/document")
     public Folder getDocuments() {
-        return documentService.getDocuments();
+        return itemService.getRoot();
     }
 
     /* Service should provide only data to the Controller, if any additional HTTP-related packaging needs to happen, the Controller should handle it
@@ -43,7 +43,7 @@ public class DocumentController {
        Content-Disposition: attachment; filename="{filename}": header that tells the client that the body contains a downloadable file attachment, named "filename" */
     @GetMapping("/document/{filename}/download")
     public ResponseEntity<byte[]> getDocumentDownload(@PathVariable String filename) {
-        byte[] file = documentService.getFileBytes(filename);
+        byte[] file = itemService.getFileBytes(filename);
         if (file != null) {
             return ResponseEntity
                 .ok()
@@ -56,7 +56,7 @@ public class DocumentController {
 
     @GetMapping("/document/{filename}")
     public ResponseEntity<byte[]> getDocumentPreview(@PathVariable String filename) {
-        byte[] file = documentService.getFileBytes(filename);
+        byte[] file = itemService.getFileBytes(filename);
         if (file != null) {
             return ResponseEntity
                 .ok()
@@ -69,16 +69,16 @@ public class DocumentController {
 
     @DeleteMapping("/document/{filename}")
     public Folder deleteDocument(@PathVariable String filename) {
-        return documentService.deleteDocument(filename);
+        return itemService.deleteDocument(filename);
     }
 
     @PostMapping("/folder/{foldername}")
     public Folder postFolder(@PathVariable String foldername) {
-        return documentService.createDirectory(foldername);
+        return itemService.createDirectory(foldername);
     }
 
     @DeleteMapping("/folder/{foldername}")
     public Folder deleteFolder(@PathVariable String foldername) {
-        return documentService.deleteDirectory(foldername);
+        return itemService.deleteDirectory(foldername);
     }
 }

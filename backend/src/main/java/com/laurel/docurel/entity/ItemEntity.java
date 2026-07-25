@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import com.laurel.docurel.enums.ItemType;
 
@@ -38,4 +39,16 @@ public class ItemEntity {
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Column(name = "public_id")
+    private UUID publicId;
+
+    public static ItemEntity createItemEntity(String name, Long parent_id, ItemType type, Long sizeByes) {
+        ItemEntity entity = new ItemEntity();
+        entity.setName(name);
+        entity.setParentId(parent_id);
+        entity.setType(type);
+        entity.setSizeBytes(sizeByes);
+        return entity;
+    }
 }

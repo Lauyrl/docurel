@@ -44,6 +44,7 @@ function App() {
     const formData = new FormData();
     // name has to match the field name that Spring expects
     formData.append("document", file);
+    formData.append("dest", currentFolder.name);
 
     fetch(API + "document", {
       method: "POST",
@@ -51,15 +52,23 @@ function App() {
     })
       .then((response) => response.json()) // response.json() doesnt return a json, but a 'Promise' that a json will be returned
       .then((json) => {
-        if (json != null) setCurrentFolder({
-          ...currentFolder,
-          children: [...currentFolder.children, json]
-        });
+        if (json != null) {
+          currentFolder.children.push(json);
+          setRoot({...root});
+        }
       });
   }
 
+  function selectItem(item) {
+    setSelectedItem(item);
+    if (item.type == "folder") setCurrentFolder(item);
+  }
+
   function createFolder(foldername) {
-    fetch(API + "folder/" + foldername, {method: "POST"})
+    fetch(API + "folder/" + foldername, {
+      method: "POST",
+      body: currentFolder.name
+    })
     .then(response => response.json())
     .then((json) => setRoot({
       ...root,
@@ -81,10 +90,11 @@ function App() {
         <FileUpload upload={uploadDoc} />
         <FolderUpload createFolder={createFolder} />
       </div>
+      <div> Current Folder: {currentFolder.name} </div>
       <br />
 
       <div className="workspace">
-        <ItemList root={root} setRoot={setRoot} onItemClick={setSelectedItem} onItemDelete={deleteItem} />
+        <ItemList root={root} setRoot={setRoot} onItemClick={selectItem} onItemDelete={deleteItem} />
         <SelectedItem selectedItem={selectedItem} />
       </div>
     </div>

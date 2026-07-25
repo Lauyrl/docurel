@@ -28,8 +28,9 @@ public class DocumentController {
        RequestParam tells Spring that the desired parameter is one of the request's parameters
        Spring finds the form field named "document", and converts the value into a MultipartFile
        MultipartFile: a File that comes from a Multipart request, the File itself isnt Multipart */
-    public Document postDocument(@RequestParam(value = "document") MultipartFile document) {
-        return documentService.storeDocument(document);
+    public Document postDocument(@RequestParam(value = "document") MultipartFile document,
+                                 @RequestParam(value = "dest") String destDir) {
+        return documentService.storeDocument(document, destDir);
     }
 
     @GetMapping("/document")

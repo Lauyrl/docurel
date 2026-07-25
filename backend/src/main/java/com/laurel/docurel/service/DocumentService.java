@@ -37,12 +37,12 @@ public class DocumentService {
         return scrapeDirectory(loc);
     }
 
-    public Document storeDocument(MultipartFile document) {
+    public Document storeDocument(MultipartFile document, String destDir) {
         try {
             String filename = document.getOriginalFilename();
             if (filename == null) {throw new IOException();}
 
-            Path dest = Path.of("C:\\CS\\docurel\\testUploads", filename);
+            Path dest = Path.of("C:\\CS\\docurel\\" + destDir + "\\", filename);
             if (Files.exists(dest)) return null;
             document.transferTo(dest);
 

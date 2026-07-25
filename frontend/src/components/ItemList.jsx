@@ -37,7 +37,7 @@ function ItemList({ root, setRoot, onItemClick, onItemDelete }) {
           setContextMenu(null);
         }}
       >
-        {contextMenu && 
+        {contextMenu && contextMenu.item &&
           <ContextMenu 
             contextMenu={contextMenu}
             downloadDocumentRedirect={downloadDocumentRedirect}

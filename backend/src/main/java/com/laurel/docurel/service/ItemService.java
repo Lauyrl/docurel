@@ -11,6 +11,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Objects;
 
 @Service
 public class ItemService {
@@ -40,9 +41,10 @@ public class ItemService {
     public Document storeDocument(MultipartFile document, String destDir) {
         try {
             String filename = document.getOriginalFilename();
-            if (filename == null) {throw new IOException();}
+            if (filename == null) {throw new IOException("Filename is null");}
 
-            Path dest = Path.of("C:\\CS\\docurel\\" + destDir + "\\", filename);
+            // Objects.requireNonNull() throws an exception at runtime if null
+            Path dest = Objects.requireNonNull(Path.of("C:\\CS\\docurel\\" + destDir + "\\", filename));
             if (Files.exists(dest)) return null;
             document.transferTo(dest);
 

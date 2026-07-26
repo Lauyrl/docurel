@@ -50,6 +50,7 @@ public class ItemService {
                 rootResponse = (FolderResponse) itemResponses.get(id);
                 continue;
             }
+            // assuming only folders would be parents
             FolderResponse parentResponse = (FolderResponse) itemResponses.get(parentId);
             parentResponse.getChildren().add(itemResponses.get(id));
         }
@@ -109,6 +110,15 @@ public class ItemService {
         }
         itemRepository.deleteById(rootId);
         return getRoot();
+    }
+
+//-----helpers
+    public String getItemName(UUID publicId) {
+        return itemRepository.findNameByPublicId(publicId);
+    }
+
+    public String getItemContentType(UUID publicId) {
+        return itemRepository.findContentTypeByPublicId(publicId);
     }
 
     // @SuppressWarnings("null")

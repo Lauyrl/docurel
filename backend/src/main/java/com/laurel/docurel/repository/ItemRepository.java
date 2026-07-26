@@ -65,5 +65,9 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
     Long findIdByPublicId(UUID publicId);
 
+    String findNameByPublicId(UUID publicId);
+
+    String findContentTypeByPublicId(UUID publicId);
+
     List<ItemEntity> findByParentId(Long parentId);
 }

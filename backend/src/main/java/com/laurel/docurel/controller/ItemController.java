@@ -2,6 +2,10 @@ package com.laurel.docurel.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,8 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.laurel.docurel.model.Document;
-import com.laurel.docurel.model.Folder;
+import com.laurel.docurel.dto.FolderResponse;
+import com.laurel.docurel.dto.ItemResponse;
 import com.laurel.docurel.service.ItemService;
 
 // Controllers should recieve HTTP requests, call a Service, then return a result
@@ -28,57 +32,50 @@ public class ItemController {
        RequestParam tells Spring that the desired parameter is one of the request's parameters
        Spring finds the form field named "document", and converts the value into a MultipartFile
        MultipartFile: a File that comes from a Multipart request, the File itself isnt Multipart */
-    public Document postDocument(@RequestParam(value = "document") MultipartFile document,
-                                 @RequestParam(value = "dest") String destDir) {
-        return itemService.storeDocument(document, destDir);
+    public ItemResponse postDocument(@RequestParam(value = "document") MultipartFile document,
+                                     @RequestParam(value = "publicParentId") UUID publicParentId) throws IOException {
+        return itemService.storeDocument(document, publicParentId);
     }
 
     @GetMapping("/document")
-    public Folder getDocuments() {
+    public FolderResponse getRoot() {
         return itemService.getRoot();
     }
 
     /* Service should provide only data to the Controller, if any additional HTTP-related packaging needs to happen, the Controller should handle it
        ResponseEntity: class that provides static factory methods to construct HTTP responses
        Content-Disposition: attachment; filename="{filename}": header that tells the client that the body contains a downloadable file attachment, named "filename" */
-    @GetMapping("/document/{filename}/download")
-    public ResponseEntity<byte[]> getDocumentDownload(@PathVariable String filename) {
-        byte[] file = itemService.getFileBytes(filename);
-        if (file != null) {
-            return ResponseEntity
-                .ok()
-                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
-                .body(file);
-        } else {
-            return ResponseEntity.notFound().build(); 
-        }
+    @GetMapping("/document/{publicId}/download")
+    public ResponseEntity<byte[]> getDocumentDownload(@PathVariable UUID publicId) throws IOException {
+        byte[] file = itemService.getFileBytes(publicId);
+        return ResponseEntity
+            .ok()
+            .header("Content-Disposition", "attachment; filename=\"" + itemService.getItemName(publicId) + "\"")
+            .body(file);
     }
 
-    @GetMapping("/document/{filename}")
-    public ResponseEntity<byte[]> getDocumentPreview(@PathVariable String filename) {
-        byte[] file = itemService.getFileBytes(filename);
-        if (file != null) {
-            return ResponseEntity
-                .ok()
-                .header("Content-Type", Document.getContentTypeFromFilename(filename))
-                .body(file);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/document/{publicId}")
+    public ResponseEntity<byte[]> getDocumentPreview(@PathVariable UUID publicId) throws IOException {
+        byte[] file = itemService.getFileBytes(publicId);
+        return ResponseEntity
+            .ok()
+            .header("Content-Type", itemService.getItemContentType(publicId))
+            .body(file);
     }
 
-    @DeleteMapping("/document/{filename}")
-    public Folder deleteDocument(@PathVariable String filename) {
-        return itemService.deleteDocument(filename);
+    @DeleteMapping("/document/{publicId}")
+    public FolderResponse deleteDocument(@PathVariable UUID publicId) throws IOException {
+        return itemService.deleteDocument(publicId);
     }
 
-    @PostMapping("/folder/{foldername}")
-    public Folder postFolder(@PathVariable String foldername) {
-        return itemService.createDirectory(foldername);
+    @PostMapping("/folder/")
+    public FolderResponse postFolder(@RequestParam(value = "foldername") String foldername,
+                                     @RequestParam(value = "publicParentId") UUID publicParentId) {
+        return itemService.createDirectory(foldername, publicParentId);
     }
 
-    @DeleteMapping("/folder/{foldername}")
-    public Folder deleteFolder(@PathVariable String foldername) {
-        return itemService.deleteDirectory(foldername);
+    @DeleteMapping("/folder/{publicId}")
+    public FolderResponse deleteFolder(@PathVariable UUID publicId) throws IOException {
+        return itemService.deleteDirectory(publicId);
     }
 }

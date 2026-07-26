@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import  org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -63,11 +63,17 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
     boolean existsByParentIdAndName(Long parentId, String name);
 
-    Long findIdByPublicId(UUID publicId);
+    @Query("SELECT i.id FROM ItemEntity i WHERE i.publicId = :publicId")
+    Long findIdByPublicId(@Param("publicId") UUID publicId);
 
-    String findNameByPublicId(UUID publicId);
+    @Query("SELECT i.publicId FROM ItemEntity i WHERE i.id = :id")
+    UUID findPublicIdById(@Param("id") Long id);
 
-    String findContentTypeByPublicId(UUID publicId);
+    @Query("SELECT i.name FROM ItemEntity i WHERE i.publicId = :publicId")
+    String findNameByPublicId(@Param("publicId") UUID publicId);
+
+    @Query("SELECT i.contentType FROM ItemEntity i WHERE i.publicId = :publicId")
+    String findContentTypeByPublicId(@Param("publicId") UUID publicId);
 
     List<ItemEntity> findByParentId(Long parentId);
 }

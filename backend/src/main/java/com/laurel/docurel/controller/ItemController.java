@@ -27,6 +27,11 @@ public class ItemController {
         this.itemService = itemService;
     }
 
+    @GetMapping("/document")
+    public FolderResponse getRoot() {
+        return itemService.getRoot();
+    }
+    
     @PostMapping("/document")
     /* @RequestParam: parameter annotation, tells Spring how to find a value
        RequestParam tells Spring that the desired parameter is one of the request's parameters
@@ -35,11 +40,6 @@ public class ItemController {
     public ItemResponse postDocument(@RequestParam(value = "document") MultipartFile document,
                                      @RequestParam(value = "publicParentId") UUID publicParentId) throws IOException {
         return itemService.storeDocument(document, publicParentId);
-    }
-
-    @GetMapping("/document")
-    public FolderResponse getRoot() {
-        return itemService.getRoot();
     }
 
     /* Service should provide only data to the Controller, if any additional HTTP-related packaging needs to happen, the Controller should handle it
@@ -68,7 +68,7 @@ public class ItemController {
         return itemService.deleteDocument(publicId);
     }
 
-    @PostMapping("/folder/")
+    @PostMapping("/folder")
     public FolderResponse postFolder(@RequestParam(value = "foldername") String foldername,
                                      @RequestParam(value = "publicParentId") UUID publicParentId) {
         return itemService.createDirectory(foldername, publicParentId);

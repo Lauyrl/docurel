@@ -1,9 +1,69 @@
 package com.laurel.docurel.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import  org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.laurel.docurel.entity.ItemEntity;
 
 /* this repo is attached to the same table("items") that ItemEntity is attached to,
    Spring creates basic methods and implentations for querying that table automatically */
-public interface ItemRepository extends JpaRepository<ItemEntity, Long> {}
+public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
+
+    @Query(value = """
+        WITH RECURSIVE path AS (
+            -----initial entry added to the recursive 'path' table
+            SELECT
+                id,
+                parent_id,
+                name,
+                0 AS depth
+            FROM items
+            WHERE id = :destId     -----:destId indicates a parameter named "destId" that will be passed to this query
+
+            UNION ALL
+
+            -----UNION to the 'path' table ('p'), the entry ('i') where: i.id = p.parent_id
+            -----during each iteration, the *working version* of 'path' only contains the rows added during the previous iteration
+            SELECT
+                i.id,
+                i.parent_id,
+                i.name,
+                p.depth + 1
+            FROM items i
+            JOIN path p ON i.id = p.parent_id
+        )
+        -----'aggregates' the name values (ordered by descending 'depth' so that higher dirs end up first) with '/' as a delimiter
+        SELECT STRING_AGG(name, '/' ORDER BY depth DESC)
+        FROM path;
+        """, nativeQuery = true)
+    String getPath(@Param("destId") Long destId);
+
+    @Query(value = """
+        WITH RECURSIVE tree AS (
+            SELECT id, type
+            FROM items
+            WHERE id = :rootId
+
+            UNION ALL
+
+            SELECT i.id, i.type
+            FROM items i
+            JOIN tree t ON i.parent_id = t.id
+        )
+        SELECT id FROM tree WHERE type != 'FOLDER';        
+        """, nativeQuery = true)
+    List<Long> findDocumentIdsByTree(@Param("rootId") Long rootId);
+
+    Optional<ItemEntity> findByPublicId(UUID publicId);
+
+    boolean existsByParentIdAndName(Long parentId, String name);
+
+    Long findIdByPublicId(UUID publicId);
+
+    List<ItemEntity> findByParentId(Long parentId);
+}

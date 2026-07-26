@@ -16,6 +16,15 @@ import com.laurel.docurel.enums.ItemType;
 @Entity
 @Table(name = "items")
 public class ItemEntity {
+    protected ItemEntity() {}
+
+    public ItemEntity(String name, Long parent_id, ItemType type, Long sizeByes) {
+        setName(name);
+        setParentId(parent_id);
+        setType(type);
+        setSizeBytes(sizeByes);
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,13 +51,4 @@ public class ItemEntity {
 
     @Column(name = "public_id")
     private UUID publicId;
-
-    public static ItemEntity createItemEntity(String name, Long parent_id, ItemType type, Long sizeByes) {
-        ItemEntity entity = new ItemEntity();
-        entity.setName(name);
-        entity.setParentId(parent_id);
-        entity.setType(type);
-        entity.setSizeBytes(sizeByes);
-        return entity;
-    }
 }

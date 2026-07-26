@@ -3,6 +3,7 @@ package com.laurel.docurel.dto;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.enums.ItemType;
 
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ItemResponse {
-    private Long parentId;
+    private Long publicParentId;
     private String name;
     private ItemType type;
     private Long sizeBytes;
@@ -20,4 +21,15 @@ public class ItemResponse {
     private Instant createdAt;
     private Instant updatedAt;
     private UUID publicId;
+
+    public ItemResponse(ItemEntity entity) {
+        setPublicParentId(entity.getParentId());
+        setName(entity.getName());
+        setType(entity.getType());
+        setSizeBytes(entity.getSizeBytes());
+        setContentType(entity.getContentType());
+        setCreatedAt(entity.getCreatedAt());
+        setUpdatedAt(entity.getUpdatedAt());
+        setPublicId(entity.getPublicId());
+    }
 }

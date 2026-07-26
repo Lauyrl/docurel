@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ItemResponse {
-    private Long publicParentId;
+    private UUID publicParentId;
     private String name;
     private ItemType type;
     private Long sizeBytes;
@@ -22,8 +22,8 @@ public class ItemResponse {
     private Instant updatedAt;
     private UUID publicId;
 
-    public ItemResponse(ItemEntity entity) {
-        setPublicParentId(entity.getParentId());
+    public ItemResponse(ItemEntity entity, UUID publicParentId) {
+        setPublicParentId(publicParentId);
         setName(entity.getName());
         setType(entity.getType());
         setSizeBytes(entity.getSizeBytes());

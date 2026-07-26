@@ -36,10 +36,10 @@ public class ItemService {
         Map<Long, ItemResponse> itemResponses = new HashMap<>(itemEntities.size());
 
         for (ItemEntity entity : itemEntities) {
-            itemResponses.put(
-                entity.getId(), 
-                entity.getType() == ItemType.DOCUMENT ? new ItemResponse(entity) : new FolderResponse(entity)
-            );
+            Long id = entity.getId();
+            ItemType type = entity.getType();
+            UUID publicParentId = itemRepository.findPublicIdById(entity.getParentId());
+            itemResponses.put(id, type == ItemType.DOCUMENT ? new ItemResponse(entity, publicParentId) : new FolderResponse(entity, publicParentId));
         }
 
         FolderResponse rootResponse = null;
@@ -71,7 +71,7 @@ public class ItemService {
         Path dest = Path.of(STORAGE_PATH, entity.getId().toString());            
         document.transferTo(dest);
 
-        return new ItemResponse(entity);
+        return new ItemResponse(entity, itemRepository.findPublicIdById(parentId));
     }
 
     public byte[] getFileBytes(UUID publicId) throws IOException {
@@ -97,7 +97,7 @@ public class ItemService {
         }
 
         ItemEntity folderEntity = itemRepository.save(new ItemEntity(foldername, parentId, ItemType.FOLDER, null));
-        return new FolderResponse(folderEntity);
+        return new FolderResponse(folderEntity, itemRepository.findPublicIdById(parentId));
     }
 
     @SuppressWarnings("null")

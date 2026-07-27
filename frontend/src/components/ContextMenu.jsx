@@ -1,4 +1,4 @@
-function ContextMenu({ contextMenu, downloadDocumentRedirect, onItemDelete }) {
+function ContextMenu({ contextMenu, setContextMenu, downloadDocumentRedirect, onItemDelete }) {
   return (
     <div
       className="context-menu"
@@ -8,12 +8,13 @@ function ContextMenu({ contextMenu, downloadDocumentRedirect, onItemDelete }) {
         top: contextMenu.y,
       }}
     >
-      {contextMenu.item?.type === "document" && (
+      {contextMenu.item?.type === "DOCUMENT" && (
         <div>
           <button
             onClick={(e) => {
               e.stopPropagation();
-              downloadDocumentRedirect(contextMenu.item.name);
+              downloadDocumentRedirect(contextMenu.item.publicId);
+              setContextMenu(null);
             }}
           >
             Download
@@ -23,15 +24,21 @@ function ContextMenu({ contextMenu, downloadDocumentRedirect, onItemDelete }) {
             onClick={(e) => {
               e.stopPropagation();
               onItemDelete(contextMenu.item);
+              setContextMenu(null);
             }}
           >
             Delete
           </button>
         </div>
       )}
-      {contextMenu.item?.type === "folder" && (
+      {contextMenu.item?.type === "FOLDER" && (
         <div>
-          <button onClick={() => onItemDelete(contextMenu.item)}>
+          <button onClick={(e) => {
+            e.stopPropagation();
+            onItemDelete(contextMenu.item)
+            setContextMenu(null);
+          }}
+          >
             Delete
           </button>
         </div>

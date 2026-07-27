@@ -57,7 +57,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         )
         SELECT id FROM tree WHERE type != 'FOLDER';        
         """, nativeQuery = true)
-    List<Long> findDocumentIdsByTree(@Param("rootId") Long rootId);
+    List<Long> findDocumentIdsByAncestorId(@Param("rootId") Long rootId);
 
     Optional<ItemEntity> findByPublicId(UUID publicId);
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { API } from "../constants";
 import ContextMenu from "./ContextMenu";
 
-function ItemList({ root, setRoot, onItemClick, onItemDelete }) {
+function ItemList({ root, childrenIndex, onItemClick, onItemDelete }) {
   const [contextMenu, setContextMenu] = useState({
     item: null,
     x: null,
@@ -17,9 +17,9 @@ function ItemList({ root, setRoot, onItemClick, onItemDelete }) {
     });
   }
 
-  function downloadDocumentRedirect(filename) {
+  function downloadDocumentRedirect(publicId) {
     /* window.location: Location object of the browser window, window.location.href: the full URL the browser is displaying */
-    window.open(API + "document/" + filename + "/download");
+    window.open(API + "document/" + publicId + "/download");
   }
 
   useEffect(() => {
@@ -28,78 +28,68 @@ function ItemList({ root, setRoot, onItemClick, onItemDelete }) {
     return (() => window.removeEventListener("click", close))
   })
 
-  function displayFolder(rootFolder, depth) {
+  function getItemListing(item) {
     return (
       <div
-        className="vertical-item-listing" 
-        onClick={() => {
-          onItemClick(root);
+        onClick={(e) => {
+          e.stopPropagation();
           setContextMenu(null);
+          onItemClick(item);
+        }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          makeContextMenu(e, item)
         }}
       >
-        {contextMenu && contextMenu.item &&
-          <ContextMenu 
-            contextMenu={contextMenu}
-            downloadDocumentRedirect={downloadDocumentRedirect}
-            onItemDelete={onItemDelete}
-          />
-        }
+        {item.name}
+      </div>
+    );
+  }
 
-        <div className="doc-list" style={{marginLeft: 10 + depth * 20}}>
-          {rootFolder && rootFolder.children && ( 
-            rootFolder.children.map((item) => {
-              if (item.type === "document") {
-                return (
-                  <div>
-                    <span 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setContextMenu(null);
-                        onItemClick(item);
-                      }}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        makeContextMenu(e, item)
-                      }}
-                    >
-                      {item.name}
-                    </span>
-                  </div>
-                )
-              }
-              else if (item.type === "folder") {
-                return (
-                  <div>
-                      <div 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          item.isExpanded = !item.isExpanded;
-                          setContextMenu(null);
-                          onItemClick(item);
-                          setRoot({...root});
-                        }}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          makeContextMenu(e, item)
-                        }}
-                      >
-                        {item.name}
-                      </div>
-                      <div> { item.isExpanded && displayFolder(item, depth+1) } </div>
-                  </div>
-                );
-              }
-            })
-          )}
-        </div>
+  function displayFolderContents(folderRoot, depth) {
+    return(
+      <div className="doc-list" style={{marginLeft: 10 + depth * 20}}>
+        { (childrenIndex.get(folderRoot.publicId) ?? []).map(item => {
+          if (item.type === "DOCUMENT") {
+            return getItemListing(item);
+          }
+          else if (item.type === "FOLDER") {
+            let folder = getItemListing(item);
+            return (
+              <>
+                { folder }
+                { item.isExpanded && displayFolderContents(item, depth + 1) }
+              </>
+            );
+          }
+        })}
       </div>
     );
   }
 
   return (
     <>
-      {(!root || root.children?.length === 0) &&  <h2> Upload a file </h2>}
-      { displayFolder(root, 0) }
+      {contextMenu && contextMenu.item &&
+        <ContextMenu 
+          contextMenu={contextMenu}
+          setContextMenu={setContextMenu}
+          downloadDocumentRedirect={downloadDocumentRedirect}
+          onItemDelete={onItemDelete}
+        />
+      }
+      { (!childrenIndex.get(root.publicId) || 
+          childrenIndex.get(root.publicId).length === 0) &&  
+        <h2> Upload a file </h2> 
+      }
+      <div
+        className="vertical-item-listing" 
+        onClick={() => {
+          onItemClick(root);
+          setContextMenu(null);
+        }}
+      > 
+        { displayFolderContents(root, 0) }
+      </div>
     </>
   );
 }

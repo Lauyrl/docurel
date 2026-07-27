@@ -23,7 +23,7 @@ public class ItemResponse {
     private UUID publicId;
 
     public ItemResponse(ItemEntity entity, UUID publicParentId) {
-        setPublicParentId(publicParentId);
+        setPublicParentId(entity.getParentId() == null ? null : publicParentId);
         setName(entity.getName());
         setType(entity.getType());
         setSizeBytes(entity.getSizeBytes());

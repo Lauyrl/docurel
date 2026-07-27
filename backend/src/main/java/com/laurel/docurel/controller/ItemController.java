@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.laurel.docurel.dto.FolderResponse;
 import com.laurel.docurel.dto.ItemResponse;
 import com.laurel.docurel.service.ItemService;
 
@@ -28,8 +28,8 @@ public class ItemController {
     }
 
     @GetMapping("/document")
-    public FolderResponse getRoot() {
-        return itemService.getRoot();
+    public List<ItemResponse> getDocuments() {
+        return itemService.getDocuments();
     }
     
     @PostMapping("/document")
@@ -64,18 +64,18 @@ public class ItemController {
     }
 
     @DeleteMapping("/document/{publicId}")
-    public FolderResponse deleteDocument(@PathVariable UUID publicId) throws IOException {
-        return itemService.deleteDocument(publicId);
+    public ResponseEntity<Void> deleteDocument(@PathVariable UUID publicId) throws IOException {
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/folder")
-    public FolderResponse postFolder(@RequestParam(value = "foldername") String foldername,
+    public ItemResponse postFolder(@RequestParam(value = "foldername") String foldername,
                                      @RequestParam(value = "publicParentId") UUID publicParentId) {
         return itemService.createDirectory(foldername, publicParentId);
     }
 
     @DeleteMapping("/folder/{publicId}")
-    public FolderResponse deleteFolder(@PathVariable UUID publicId) throws IOException {
-        return itemService.deleteDirectory(publicId);
+    public ResponseEntity<Void> deleteFolder(@PathVariable UUID publicId) throws IOException {
+        return ResponseEntity.noContent().build();
     }
 }

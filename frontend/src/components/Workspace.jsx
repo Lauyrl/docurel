@@ -2,6 +2,7 @@ import "./css/Workspace.css";
 import ItemList from "./ItemList";
 import SelectedItem from "./SelectedItem";
 import ContextMenu from "./ContextMenu";
+import PreviewOverlay from "./PreviewOverlay";
 import { useEffect, useState } from "react";
 import { API } from "../constants";
 import { useExplorer } from "../ExplorerContext";
@@ -148,6 +149,7 @@ function Workspace() {
         <SelectedItem 
           renderItemListing={renderItemListing}
         />
+        <PreviewOverlay />
       </div>
     </>
   );

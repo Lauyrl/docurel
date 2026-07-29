@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
-import ItemList from "./components/ItemList";
-import SelectedItem from "./components/SelectedItem";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
+import Workspace from "./components/Workspace"
 import { API } from "./constants";
+import { ExplorerContext } from "./ExplorerContext";
+import Breadcrumbs from "./components/Breadcrumbs";
 
-function setUIState(item) {
+function initializeFolderUIState(item) {
   return { ...item, isExpanded: false }
 }
 
@@ -17,7 +18,7 @@ function App() {
   const [itemMap, setItemMap] = useState(new Map);
   const [rootId, setRootId] = useState(null);
   const [currentFolderId, setCurrentFolderId] = useState(null);
-  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [previewItemId, setPreviewItemId] = useState(null);
   
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const childrenIndex = useMemo(() => {
@@ -42,16 +43,15 @@ function App() {
             rootIdTemp = item.publicId; 
             setRootId(item.publicId);
           }
-          if (item.type === "FOLDER") item = setUIState(item);
+          if (item.type === "FOLDER") item = initializeFolderUIState(item);
           itemMapTemp.set(item.publicId, item)
         })
         setItemMap(itemMapTemp);
         setCurrentFolderId(rootIdTemp);
-        setSelectedItemId(rootIdTemp);
       });
   }, []);
 
-  function uploadDoc(file) {
+  function uploadDocument(file) {
     if (!file) return;
 
     const formData = new FormData();   // files sent to Spring as FormData
@@ -69,8 +69,9 @@ function App() {
     }
 
   function selectItem(item) {
-    setSelectedItemId(item.publicId);
-    if (item.type == "FOLDER") {
+    setPreviewItemId(null);
+    if (item.type === "DOCUMENT") setPreviewItemId(item.publicId);
+    if (item.type === "FOLDER") {
       const itemTemp = { ...item, isExpanded: !item.isExpanded }; 
       setItemMap(current => new Map(current).set(item.publicId, itemTemp)) // make new map with new entry to avoid mutating state
       setCurrentFolderId(item.publicId);
@@ -88,7 +89,7 @@ function App() {
     })
       .then((response) => response.json())
       .then((item) => { 
-        if (item.type === 'FOLDER') item = setUIState(item);
+        if (item.type === 'FOLDER') item = initializeFolderUIState(item);
         setItemMap(current => new Map(current).set(item.publicId, item))
       });
   }
@@ -102,9 +103,7 @@ function App() {
   }
 
   function deleteItem(item) {
-    let type = null;
-    if      (item.type === 'DOCUMENT') type = 'document';
-    else if (item.type === 'FOLDER') type = 'folder';
+    const type = (item.type === "DOCUMENT" ? "document" : "folder");
     fetch(API + type + "/" + item.publicId, { method: "DELETE" })
       .then(() => {
         let next = new Map(itemMap);
@@ -114,7 +113,7 @@ function App() {
           return next;
         });
 
-        selectItem(item.publicParentId);
+        selectItem(itemMap.get(item.publicParentId));
     });
   }
 
@@ -133,32 +132,33 @@ function App() {
         }))
   }
 
+  function getItem(publicId) {return itemMap.get(publicId);}
+  const root          = getItem(rootId);
+  const currentFolder = getItem(currentFolderId);
+  const previewItem   = getItem(previewItemId);
+
   return (
-    <div className="app">
-      <h1 className="logo"> Docurel </h1>
+    <ExplorerContext.Provider
+      value={{
+        childrenIndex, root, currentFolder, previewItem,
+        setRootId, setCurrentFolderId, setPreviewItemId,
+        uploadDocument, selectItem, deleteItem, patchItem,
+        getItem, createFolder
+      }}
+    >
+      <div className="app">
+        <h1 className="logo"> Docurel </h1>
 
-      <div className="ribbon">
-        <FileUpload upload={uploadDoc} />
-        <FolderUpload createFolder={createFolder} />
-      </div>
-      { currentFolderId && itemMap?.get(currentFolderId) && <div> Current Folder: { itemMap.get(currentFolderId).name } </div> }
-      <br />
+        <div className="ribbon">
+          <FileUpload   />
+          <FolderUpload />
+        </div>
+        
+        <Breadcrumbs />
+        <Workspace /> 
 
-      <div className="workspace">
-        { rootId && itemMap && childrenIndex && (<ItemList
-          root={itemMap.get(rootId)}
-          setRootId={setRootId}
-          childrenIndex={childrenIndex}
-          onItemClick={selectItem}
-          onItemDelete={deleteItem}
-          onItemPatch={patchItem}
-        />) }
-        { selectedItemId && itemMap && childrenIndex && (<SelectedItem 
-          childrenIndex={childrenIndex} 
-          selectedItem={itemMap.get(selectedItemId)} 
-        />) }
       </div>
-    </div>
+    </ExplorerContext.Provider>
   );
 }
 

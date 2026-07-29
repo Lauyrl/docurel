@@ -1,0 +1,28 @@
+import { useExplorer } from "../ExplorerContext";
+
+function Breadcrumbs() {
+    const {currentFolder, getItem, selectItem} = useExplorer();
+    if (!currentFolder) return null;
+    
+    let path = [];
+    let folder = currentFolder;
+    while (folder) {
+      path.push(folder);
+      folder = getItem(folder.publicParentId);
+    }
+    path = path.reverse();
+    return(
+      <div className="breadcrumb">
+        { "Path: " }
+        { path.map((item, i) => (
+            <span key={item.publicId} onClick={() => selectItem(item)}>
+              {(i > 0) && " > "}
+              {item.name} 
+            </span>
+          )) 
+        }
+      </div>
+    );
+}
+
+export default Breadcrumbs;

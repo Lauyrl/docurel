@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import { API } from "../constants";
 import ContextMenu from "./ContextMenu";
 
-function ItemList({ root, childrenIndex, onItemClick, onItemDelete }) {
+function ItemList({ root, childrenIndex, onItemClick, onItemDelete, onItemPatch }) {
   const [contextMenu, setContextMenu] = useState({
     item: null,
     x: null,
     y: null
+  });
+
+  const [itemRename, setItemRename] = useState({
+    item: null,
+    newName: null
   });
 
   function makeContextMenu(eventObject, item) {
@@ -23,10 +28,13 @@ function ItemList({ root, childrenIndex, onItemClick, onItemDelete }) {
   }
 
   useEffect(() => {
-    const close = (() => setContextMenu(null))
+    const close = (() => {
+      setContextMenu(null);
+      setItemRename(null);
+    })
     window.addEventListener("click", close);
     return (() => window.removeEventListener("click", close))
-  })
+  }, [])
 
   function getItemListing(item) {
     return (
@@ -41,7 +49,26 @@ function ItemList({ root, childrenIndex, onItemClick, onItemDelete }) {
           makeContextMenu(e, item)
         }}
       >
-        {item.name}
+        {(!itemRename || !itemRename.item || itemRename.item.publicId !== item.publicId) && (item.name)}
+        {itemRename?.item?.publicId === item.publicId && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <input
+              autoFocus
+              type='text'
+              value={itemRename.newName}
+              onChange={(e) => setItemRename({ item: item, newName: e.target.value })}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
+                  if (newName && newName != "") {
+                    onItemPatch(itemRename.item, newName, null);
+                    setItemRename(null);
+                  }
+                }
+              }}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -73,8 +100,9 @@ function ItemList({ root, childrenIndex, onItemClick, onItemDelete }) {
         <ContextMenu 
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
-          downloadDocumentRedirect={downloadDocumentRedirect}
+          onItemDownload={downloadDocumentRedirect}
           onItemDelete={onItemDelete}
+          onItemRename={(item) => {setItemRename({item: item, newName: item.name})}}
         />
       }
       { (!childrenIndex.get(root.publicId) || 

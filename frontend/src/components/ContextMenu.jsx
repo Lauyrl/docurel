@@ -1,4 +1,40 @@
-function ContextMenu({ contextMenu, setContextMenu, downloadDocumentRedirect, onItemDelete }) {
+function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete, onItemRename }) {
+  let downloadButton = (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onItemDownload(contextMenu.item.publicId);
+        setContextMenu(null);
+      }}
+    >
+      Download
+    </button>
+  );
+
+  let deleteButton = (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onItemDelete(contextMenu.item);
+        setContextMenu(null);
+      }}
+    >
+      Delete
+    </button>
+  );
+  
+  let renameButton = (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onItemRename(contextMenu.item);
+        setContextMenu(null);
+      }}
+    >
+      Rename
+    </button>
+  );
+
   return (
     <div
       className="context-menu"
@@ -10,37 +46,15 @@ function ContextMenu({ contextMenu, setContextMenu, downloadDocumentRedirect, on
     >
       {contextMenu.item?.type === "DOCUMENT" && (
         <div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              downloadDocumentRedirect(contextMenu.item.publicId);
-              setContextMenu(null);
-            }}
-          >
-            Download
-          </button>
-          <br />
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onItemDelete(contextMenu.item);
-              setContextMenu(null);
-            }}
-          >
-            Delete
-          </button>
+          { downloadButton } <br />
+          { deleteButton }   <br />
+          { renameButton }
         </div>
       )}
       {contextMenu.item?.type === "FOLDER" && (
         <div>
-          <button onClick={(e) => {
-            e.stopPropagation();
-            onItemDelete(contextMenu.item)
-            setContextMenu(null);
-          }}
-          >
-            Delete
-          </button>
+          { deleteButton } <br />
+          { renameButton }
         </div>
       )}
     </div>

@@ -118,6 +118,21 @@ function App() {
     });
   }
 
+  function patchItem(item, newName, newParentPublicId) {
+    fetch(API + "item/" + item.publicId, { 
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: newName,
+        publicParentId: newParentPublicId
+      })
+    })
+      .then(() => setItemMap(current => {
+          if (newParentPublicId == null) return new Map(current).set(item.publicId, { ...item, name: newName })
+          else if      (newName == null) return new Map(current).set(item.publicId, { ...item, publicParentId: newParentPublicId })
+        }))
+  }
+
   return (
     <div className="app">
       <h1 className="logo"> Docurel </h1>
@@ -136,6 +151,7 @@ function App() {
           childrenIndex={childrenIndex}
           onItemClick={selectItem}
           onItemDelete={deleteItem}
+          onItemPatch={patchItem}
         />) }
         { selectedItemId && itemMap && childrenIndex && (<SelectedItem 
           childrenIndex={childrenIndex} 

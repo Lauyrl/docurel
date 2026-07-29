@@ -10,11 +10,14 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.laurel.docurel.dto.ItemResponse;
+import com.laurel.docurel.dto.UpdateItemRequest;
 import com.laurel.docurel.service.ItemService;
 
 // Controllers should recieve HTTP requests, call a Service, then return a result
@@ -65,17 +68,26 @@ public class ItemController {
 
     @DeleteMapping("/document/{publicId}")
     public ResponseEntity<Void> deleteDocument(@PathVariable UUID publicId) throws IOException {
+        itemService.deleteDocument(publicId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/folder")
     public ItemResponse postFolder(@RequestParam(value = "foldername") String foldername,
-                                     @RequestParam(value = "publicParentId") UUID publicParentId) {
+                                   @RequestParam(value = "publicParentId") UUID publicParentId) {
         return itemService.createDirectory(foldername, publicParentId);
     }
 
     @DeleteMapping("/folder/{publicId}")
     public ResponseEntity<Void> deleteFolder(@PathVariable UUID publicId) throws IOException {
+        itemService.deleteDirectory(publicId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/item/{publicId}")
+    public ResponseEntity<Void> patchItem(@PathVariable UUID publicId,
+                                          @RequestBody UpdateItemRequest request) {
+        itemService.updateItem(publicId, request.getName(), request.getPublicParentId());
         return ResponseEntity.noContent().build();
     }
 }

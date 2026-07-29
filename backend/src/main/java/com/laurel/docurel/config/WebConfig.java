@@ -12,6 +12,6 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(@NonNull CorsRegistry registry){
         registry.addMapping("/**")   // Apply the following CORS rule to all (**) endpoints: localhost:5173 is a valid origin that is allowed to access them with the specified methods 
                 .allowedOrigins("http://localhost:5173")
-                .allowedMethods("GET", "POST", "PUT", "DELETE");
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS");
     }
 }

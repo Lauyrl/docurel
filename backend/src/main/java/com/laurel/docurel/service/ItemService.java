@@ -91,6 +91,16 @@ public class ItemService {
         itemRepository.deleteById(rootId);
     }
 
+    public void updateItem(UUID publicId, String newName, UUID newPublicParentId) {
+        ItemEntity entityToUpdate = itemRepository.findByPublicId(publicId).orElseThrow();
+        if           (newName != null) entityToUpdate.setName(newName);
+        if (newPublicParentId != null) {
+            Long newParentId = itemRepository.findIdByPublicId(newPublicParentId);
+            entityToUpdate.setParentId(newParentId);
+        } 
+        itemRepository.save(entityToUpdate);
+    }
+
 //-----helpers
     public String getItemName(UUID publicId) {
         return itemRepository.findNameByPublicId(publicId);

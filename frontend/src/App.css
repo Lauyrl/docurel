@@ -183,16 +183,13 @@
   }
 }
 
-.doc-list {
-  text-align: left;
-}
-
 .app {
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
 
+/* in App */
 .ribbon {
   background: rgb(43, 42, 41);
   display: flex;
@@ -200,41 +197,9 @@
   border: rgb(16, 16, 16)
 }
 
-.workspace {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    gap: 20px
-}
-
-.grid-item-listing {
-    display: flex;
-    gap: 40px
-}
-
-.vertical-item-listing {
-  background: rgb(43, 42, 41);
-}
-
-.preview {
-    flex: 1;
-    overflow: auto;
-    height: calc(100vh - 180px);
-}
-
-.preview img,
-.preview iframe,
-.preview video {
-    max-width: 100%;
-    max-height: 100%;
-    display: block;
-}
-
-.context-menu {
-    position: fixed;
-    background: rgb(43, 42, 41);
-    border: 2px solid rgb(249, 203, 133);
-    z-index: 1000;
+.breadcrumb {
+  text-align: left;
+  margin-left: 10px;
 }
 
 .logo {

@@ -1,0 +1,24 @@
+.context-menu {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+
+    background: rgb(43, 42, 41);
+    border: 2px solid rgb(249, 203, 133);
+    z-index: 1000;
+}
+
+.context-item {
+    padding: 8px 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.context-item:not(:last-child) {
+    border-bottom: 1px solid #555;
+}
+
+.context-item:hover {
+    background: #3a3a3a;
+}

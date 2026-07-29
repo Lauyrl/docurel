@@ -1,7 +1,7 @@
 import { useExplorer } from "../ExplorerContext";
-import "./css/ItemList.css";
+import "./css/ItemTreeView.css";
 
-function ItemList({draggedItem, renderItemListing}) {
+function ItemTreeView({draggedItem, renderItemListing}) {
   const {root, childrenIndex, selectItem, patchItem} = useExplorer();
 
   function displayItem(item) {
@@ -56,4 +56,4 @@ function ItemList({draggedItem, renderItemListing}) {
   );
 }
 
-export default ItemList;
+export default ItemTreeView;

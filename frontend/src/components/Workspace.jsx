@@ -1,6 +1,6 @@
 import "./css/Workspace.css";
-import ItemList from "./ItemList";
-import SelectedItem from "./SelectedItem";
+import ItemTreeView from "./ItemTreeView";
+import FolderContentsView from "./FolderContentsView";
 import ContextMenu from "./ContextMenu";
 import PreviewOverlay from "./PreviewOverlay";
 import { useEffect, useState } from "react";
@@ -142,11 +142,11 @@ function Workspace() {
         />
       }
       <div className="workspace">
-        <ItemList
+        <ItemTreeView
           draggedItem={draggedItem}
           renderItemListing={renderItemListing}
         />
-        <SelectedItem 
+        <FolderContentsView 
           renderItemListing={renderItemListing}
         />
         <PreviewOverlay />

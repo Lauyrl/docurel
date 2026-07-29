@@ -1,4 +1,8 @@
-function FileUpload({ upload }) {
+import { useExplorer } from "../ExplorerContext";
+
+function FileUpload() {
+  const {uploadDocument} = useExplorer();
+
   return (
     <div>
       <input
@@ -10,7 +14,8 @@ function FileUpload({ upload }) {
         */
         onChange={(e) => {
           const file = e.target.files[0];
-          if (file) upload(file);
+          if (file) uploadDocument(file);
+          e.target.value = "";
         }}
       />
     </div>

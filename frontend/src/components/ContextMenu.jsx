@@ -2,7 +2,7 @@ import "./css/ContextMenu.css";
 
 function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete, onItemRename }) {
   
-  function contextButton(label, contextAction) {
+  function renderContextButton(label, contextAction) {
     return (
       <div 
         className="context-item"
@@ -29,15 +29,15 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
     >
       {contextMenu.item?.type === "DOCUMENT" && (
         <div>
-          { contextButton("Download", onItemDownload) }
-          { contextButton("Delete"  , onItemDelete  ) }
-          { contextButton("Rename"  , onItemRename  ) }
+          { renderContextButton("Download", onItemDownload) }
+          { renderContextButton("Delete"  , onItemDelete  ) }
+          { renderContextButton("Rename"  , onItemRename  ) }
         </div>
       )}
       {contextMenu.item?.type === "FOLDER" && (
         <div>
-          { contextButton("Delete"  , onItemDelete) }
-          { contextButton("Rename"  , onItemRename) }
+          { renderContextButton("Delete"  , onItemDelete) }
+          { renderContextButton("Rename"  , onItemRename) }
         </div>
       )}
     </div>

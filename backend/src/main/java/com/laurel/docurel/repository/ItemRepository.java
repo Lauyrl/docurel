@@ -14,6 +14,44 @@ import com.laurel.docurel.entity.ItemEntity;
    Spring creates basic methods and implentations for querying that table automatically */
 public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
+    Optional<ItemEntity> findByPublicId(UUID publicId);
+
+    boolean existsByParentIdAndName(Long parentId, String name);
+
+    @Query("SELECT i.id FROM ItemEntity i WHERE i.publicId = :publicId")
+    Long findIdByPublicId(@Param("publicId") UUID publicId);
+
+    @Query("SELECT i.publicId FROM ItemEntity i WHERE i.id = :id")
+    UUID findPublicIdById(@Param("id") Long id);
+
+    @Query("SELECT i.name FROM ItemEntity i WHERE i.publicId = :publicId")
+    String findNameByPublicId(@Param("publicId") UUID publicId);
+
+    @Query("SELECT i.contentType FROM ItemEntity i WHERE i.publicId = :publicId")
+    String findContentTypeByPublicId(@Param("publicId") UUID publicId);
+
+    List<ItemEntity> findByParentId(Long parentId);
+
+    @Query(value = """
+        WITH RECURSIVE family AS (
+            SELECT id, parent_id
+            FROM items
+            WHERE id = :potentialAncestorId
+
+            UNION ALL
+
+            SELECT i.id, i.parent_id
+            FROM items i
+            JOIN family f ON i.parent_id = f.id
+        )
+        SELECT EXISTS (
+            SELECT 1 
+            FROM family
+            WHERE id = :potentialDescendantId
+        )
+    """, nativeQuery = true)
+    public boolean isDescendant(Long potentialAncestorId, Long potentialDescendantId); 
+
     @Query(value = """
         WITH RECURSIVE path AS (
             -----initial entry added to the recursive 'path' table
@@ -40,7 +78,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         -----'aggregates' the name values (ordered by descending 'depth' so that higher dirs end up first) with '/' as a delimiter
         SELECT STRING_AGG(name, '/' ORDER BY depth DESC)
         FROM path;
-        """, nativeQuery = true)
+    """, nativeQuery = true)
     String getPath(@Param("destId") Long destId);
 
     @Query(value = """
@@ -56,24 +94,6 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
             JOIN tree t ON i.parent_id = t.id
         )
         SELECT id FROM tree WHERE type != 'FOLDER';        
-        """, nativeQuery = true)
+    """, nativeQuery = true)
     List<Long> findDocumentIdsByAncestorId(@Param("rootId") Long rootId);
-
-    Optional<ItemEntity> findByPublicId(UUID publicId);
-
-    boolean existsByParentIdAndName(Long parentId, String name);
-
-    @Query("SELECT i.id FROM ItemEntity i WHERE i.publicId = :publicId")
-    Long findIdByPublicId(@Param("publicId") UUID publicId);
-
-    @Query("SELECT i.publicId FROM ItemEntity i WHERE i.id = :id")
-    UUID findPublicIdById(@Param("id") Long id);
-
-    @Query("SELECT i.name FROM ItemEntity i WHERE i.publicId = :publicId")
-    String findNameByPublicId(@Param("publicId") UUID publicId);
-
-    @Query("SELECT i.contentType FROM ItemEntity i WHERE i.publicId = :publicId")
-    String findContentTypeByPublicId(@Param("publicId") UUID publicId);
-
-    List<ItemEntity> findByParentId(Long parentId);
 }

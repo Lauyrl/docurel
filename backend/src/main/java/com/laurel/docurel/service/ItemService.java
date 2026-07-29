@@ -95,7 +95,17 @@ public class ItemService {
         ItemEntity entityToUpdate = itemRepository.findByPublicId(publicId).orElseThrow();
         if           (newName != null) entityToUpdate.setName(newName);
         if (newPublicParentId != null) {
-            Long newParentId = itemRepository.findIdByPublicId(newPublicParentId);
+            ItemEntity newParent = itemRepository.findByPublicId(newPublicParentId).orElseThrow();
+            Long entityId = entityToUpdate.getId();
+            Long oldParentId = entityToUpdate.getParentId();
+            Long newParentId = newParent.getId();
+            if (newParent.getType() != ItemType.FOLDER ||
+                Objects.equals(entityId, newParentId)  ||
+                Objects.equals(oldParentId, newParentId)) return;
+            if (entityToUpdate.getType() == ItemType.FOLDER && 
+                itemRepository.isDescendant(entityId, newParentId)) {
+                    throw new IllegalArgumentException("Cannot move a folder into one of its' descendants");
+                }
             entityToUpdate.setParentId(newParentId);
         } 
         itemRepository.save(entityToUpdate);

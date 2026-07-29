@@ -14,6 +14,8 @@ function ItemList({ root, childrenIndex, onItemClick, onItemDelete, onItemPatch 
     newName: null
   });
 
+  const [draggedItem, setDraggedItem] = useState(null);
+
   function makeContextMenu(eventObject, item) {
     setContextMenu({
       item: item,
@@ -25,6 +27,24 @@ function ItemList({ root, childrenIndex, onItemClick, onItemDelete, onItemPatch 
   function downloadDocumentRedirect(publicId) {
     /* window.location: Location object of the browser window, window.location.href: the full URL the browser is displaying */
     window.open(API + "document/" + publicId + "/download");
+  }
+
+  function isDescendant(potentialDescendantItem, potentialAncestorItem) {
+    if (potentialAncestorItem.type !== "FOLDER") return false;
+    for (const child of (childrenIndex.get(potentialAncestorItem.publicId) ?? [])) {
+      if (child.publicId === potentialDescendantItem.publicId || 
+         (child.type === "FOLDER" && isDescendant(potentialDescendantItem, child))) return true;
+    } 
+    return false;
+  }
+
+  function canDropInto(destinationItem) {
+    return (draggedItem && 
+            destinationItem.type === "FOLDER" && 
+            destinationItem.publicId !== draggedItem?.publicId && 
+            destinationItem.publicId !== draggedItem?.publicParentId &&
+            !(draggedItem.type === "FOLDER" && isDescendant(destinationItem, draggedItem))) 
+            /* deny dragging a folder into one of its' descendant folders, causing a cyclic relationship */ 
   }
 
   useEffect(() => {
@@ -39,6 +59,7 @@ function ItemList({ root, childrenIndex, onItemClick, onItemDelete, onItemPatch 
   function getItemListing(item) {
     return (
       <div
+        draggable
         onClick={(e) => {
           e.stopPropagation();
           setContextMenu(null);
@@ -48,8 +69,19 @@ function ItemList({ root, childrenIndex, onItemClick, onItemDelete, onItemPatch 
           e.preventDefault();
           makeContextMenu(e, item)
         }}
+        onDragStart={() => setDraggedItem(item)}
+        onDragEnd={() => setDraggedItem(null)}
+        onDragOver={(e) => {e.preventDefault()}}
+        onDrop={(e) => {
+          e.preventDefault();
+          if (canDropInto(item)) { 
+            e.stopPropagation();
+            onItemClick(item);
+            onItemPatch(draggedItem, null, item.publicId);
+          }
+        }}
       >
-        {(!itemRename || !itemRename.item || itemRename.item.publicId !== item.publicId) && (item.name)}
+        {(!itemRename || !itemRename.item || itemRename.item.publicId !== item.publicId) && (<> {item.name} </>)}
         {itemRename?.item?.publicId === item.publicId && (
           <div onClick={(e) => e.stopPropagation()}>
             <input
@@ -114,6 +146,12 @@ function ItemList({ root, childrenIndex, onItemClick, onItemDelete, onItemPatch 
         onClick={() => {
           onItemClick(root);
           setContextMenu(null);
+        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          onItemClick(root);
+          if (draggedItem) onItemPatch(draggedItem, null, root.publicId);
         }}
       > 
         { displayFolderContents(root, 0) }

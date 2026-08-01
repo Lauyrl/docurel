@@ -1,4 +1,4 @@
-package com.laurel.docurel.dto;
+package com.laurel.docurel.dto.request;
 
 import java.util.UUID;
 

@@ -70,4 +70,4 @@ build/
 
 ### Misc ###
 MVP.md
-/backend/src/main/java/com/laurel/docurel/dto/FolderResponse.java
+/backend/src/main/java/com/laurel/docurel/dto/response/FolderResponse.java

@@ -1,4 +1,4 @@
-package com.laurel.docurel.dto;
+package com.laurel.docurel.dto.response;
 
 import java.time.Instant;
 import java.util.UUID;

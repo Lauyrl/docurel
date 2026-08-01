@@ -3,12 +3,13 @@ package com.laurel.docurel.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.laurel.docurel.dto.ItemResponse;
+import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.repository.ItemRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,15 +20,12 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class ItemService {
     private static final String STORAGE_PATH = "C:\\CS\\docurel\\storage\\";
 
     private final ItemRepository itemRepository;
-
-    public ItemService(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
 
     public List<ItemResponse> getDocuments() {
         List<ItemEntity> entities = itemRepository.findAll();

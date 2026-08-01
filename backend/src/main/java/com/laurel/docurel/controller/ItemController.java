@@ -16,19 +16,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.laurel.docurel.dto.ItemResponse;
-import com.laurel.docurel.dto.UpdateItemRequest;
+import com.laurel.docurel.dto.request.UpdateItemRequest;
+import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.service.ItemService;
+
+import lombok.RequiredArgsConstructor;
 
 // Controllers should recieve HTTP requests, call a Service, then return a result
 @RestController
+@RequiredArgsConstructor
 public class ItemController {
+    // Spring creates Dependency Beans first, then automatically injects them into the Beans that need them
     private final ItemService itemService;
-
-    // Spring creates Dependency Beans first, then automatically injects them into the Beans that need them 
-    public ItemController(ItemService itemService){
-        this.itemService = itemService;
-    }
 
     @GetMapping("/document")
     public List<ItemResponse> getDocuments() {

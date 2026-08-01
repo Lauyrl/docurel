@@ -8,7 +8,7 @@ import { API } from "../constants";
 import { useExplorer } from "../ExplorerContext";
 
 function Workspace() {
-  const {childrenIndex, selectItem, patchItem} = useExplorer();
+  const {childrenIndex, selectItem, deleteItem, patchItem} = useExplorer();
   function onItemClick(item) {
     selectItem(item);
     setContextMenu(null);
@@ -138,6 +138,7 @@ function Workspace() {
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           onItemDownload={downloadDocumentRedirect}
+          onItemDelete={deleteItem}
           onItemRename={(item) => {setItemRename({item: item, newName: item.name})}}
         />
       }
@@ -147,6 +148,7 @@ function Workspace() {
           renderItemListing={renderItemListing}
         />
         <FolderContentsView 
+          draggedItem={draggedItem}
           renderItemListing={renderItemListing}
         />
         <PreviewOverlay />

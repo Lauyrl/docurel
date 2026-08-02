@@ -3,6 +3,7 @@ package com.laurel.docurel.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.laurel.docurel.dto.response.LoginResponse;
 import com.laurel.docurel.dto.response.UserResponse;
 import com.laurel.docurel.entity.UserEntity;
 import com.laurel.docurel.repository.UserRepository;
@@ -14,8 +15,9 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public UserResponse registerUser(String username, String email, String password) {
+    public LoginResponse registerUser(String username, String email, String password) {
         UserEntity entity = new UserEntity(username, email, passwordEncoder.encode(password));
 
         if (username != null && userRepository.existsByUsername(username)) {
@@ -26,16 +28,16 @@ public class UserService {
         }
 
         entity = userRepository.save(entity);
-        return new UserResponse(entity);
+        return new LoginResponse(entity, jwtService.generateToken(entity));
     }
 
-    public UserResponse loginUser(String usernameOrEmail, String password) {
+    public LoginResponse loginUser(String usernameOrEmail, String password) {
         UserEntity entity = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(() ->
             new IllegalArgumentException("Wrong username, email, or password")
         );
         
         if (passwordEncoder.matches(password, entity.getPasswordHash())) {
-            return new UserResponse(entity);
+            return new LoginResponse(entity, jwtService.generateToken(entity));
         }
         else throw new IllegalArgumentException("Wrong username, email, or password");
     }

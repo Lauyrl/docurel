@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.laurel.docurel.dto.request.AuthRequest;
 import com.laurel.docurel.dto.request.LoginRequest;
-import com.laurel.docurel.dto.response.UserResponse;
+import com.laurel.docurel.dto.response.LoginResponse;
 import com.laurel.docurel.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,14 +21,14 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register") // register a new user
-    public ResponseEntity<UserResponse> register(@RequestBody AuthRequest request) {
-        UserResponse user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
+    public ResponseEntity<LoginResponse> register(@RequestBody AuthRequest request) {
+        LoginResponse user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login") // login as an existing user
-    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
-        UserResponse user = userService.loginUser(request.getUsernameOrEmail(), request.getPassword());
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse user = userService.loginUser(request.getUsernameOrEmail(), request.getPassword());
         return ResponseEntity.ok(user);
     }
 }

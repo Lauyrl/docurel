@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.laurel.docurel.dto.request.UpdateItemRequest;
 import com.laurel.docurel.dto.response.ItemResponse;
+import com.laurel.docurel.exception.InvalidPermissionsException;
 import com.laurel.docurel.service.ItemService;
 
 import lombok.RequiredArgsConstructor;
 
-// Controllers should recieve HTTP requests, call a Service, then return a result
-@RestController
-@RequiredArgsConstructor
+@RestController // Controllers should recieve HTTP requests, call a Service, then return a result
+@RequiredArgsConstructor // Automatically defines a constructor that sets private final fields
 public class ItemController {
     // Spring creates Dependency Beans first, then automatically injects them into the Beans that need them
     private final ItemService itemService;
@@ -40,7 +40,7 @@ public class ItemController {
        Spring finds the form field named "document", and converts the value into a MultipartFile
        MultipartFile: a File that comes from a Multipart request, the File itself isnt Multipart */
     public ItemResponse postDocument(@RequestParam(value = "document") MultipartFile document,
-                                     @RequestParam(value = "publicParentId") UUID publicParentId) throws IOException {
+                                     @RequestParam(value = "publicParentId") UUID publicParentId) throws IOException, InvalidPermissionsException {
         return itemService.storeDocument(document, publicParentId);
     }
 
@@ -48,7 +48,7 @@ public class ItemController {
        ResponseEntity: class that provides static factory methods to construct HTTP responses
        Content-Disposition: attachment; filename="{filename}": header that tells the client that the body contains a downloadable file attachment, named "filename" */
     @GetMapping("/document/{publicId}/download")
-    public ResponseEntity<byte[]> getDocumentDownload(@PathVariable UUID publicId) throws IOException {
+    public ResponseEntity<byte[]> getDocumentDownload(@PathVariable UUID publicId) throws IOException, InvalidPermissionsException {
         byte[] file = itemService.getFileBytes(publicId);
         return ResponseEntity
             .ok()
@@ -57,7 +57,7 @@ public class ItemController {
     }
 
     @GetMapping("/document/{publicId}")
-    public ResponseEntity<byte[]> getDocumentPreview(@PathVariable UUID publicId) throws IOException {
+    public ResponseEntity<byte[]> getDocumentPreview(@PathVariable UUID publicId) throws IOException, InvalidPermissionsException {
         byte[] file = itemService.getFileBytes(publicId);
         return ResponseEntity
             .ok()
@@ -66,26 +66,31 @@ public class ItemController {
     }
 
     @DeleteMapping("/document/{publicId}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable UUID publicId) throws IOException {
+    public ResponseEntity<Void> deleteDocument(@PathVariable UUID publicId) throws IOException, InvalidPermissionsException {
         itemService.deleteDocument(publicId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/folder")
     public ItemResponse postFolder(@RequestParam(value = "foldername") String foldername,
-                                   @RequestParam(value = "publicParentId") UUID publicParentId) {
+                                   @RequestParam(value = "publicParentId") UUID publicParentId) throws InvalidPermissionsException {
         return itemService.createDirectory(foldername, publicParentId);
     }
 
+    @GetMapping("/folder/root")
+    public ItemResponse getUserRoot() {
+        return itemService.getUserRoot();
+    }
+
     @DeleteMapping("/folder/{publicId}")
-    public ResponseEntity<Void> deleteFolder(@PathVariable UUID publicId) throws IOException {
+    public ResponseEntity<Void> deleteFolder(@PathVariable UUID publicId) throws IOException, InvalidPermissionsException {
         itemService.deleteDirectory(publicId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/item/{publicId}")
     public ResponseEntity<Void> patchItem(@PathVariable UUID publicId,
-                                          @RequestBody UpdateItemRequest request) {
+                                          @RequestBody UpdateItemRequest request) throws InvalidPermissionsException {
         itemService.updateItem(publicId, request.getName(), request.getPublicParentId());
         return ResponseEntity.noContent().build();
     }

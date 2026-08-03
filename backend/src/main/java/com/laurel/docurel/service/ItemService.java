@@ -5,8 +5,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.entity.ItemEntity;
+import com.laurel.docurel.entity.UserItemEntity;
 import com.laurel.docurel.enums.ItemType;
+import com.laurel.docurel.enums.PermissionType;
+import com.laurel.docurel.exception.InvalidPermissionsException;
 import com.laurel.docurel.repository.ItemRepository;
+import com.laurel.docurel.repository.UserItemRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +28,14 @@ import java.util.UUID;
 @Transactional
 public class ItemService {
     private static final String STORAGE_PATH = "C:\\CS\\docurel\\storage\\";
+    private static final Long GLOBAL_ROOT_ID = 0L;
 
     private final ItemRepository itemRepository;
+    private final UserItemRepository userItemRepository; // services can cross-call repositories
+    private final UserService userService;
 
     public List<ItemResponse> getDocuments() {
-        List<ItemEntity> entities = itemRepository.findAll();
+        List<ItemEntity> entities = userItemRepository.findItemsByUser(userService.getCurrentUserEntity());
 
         List<ItemResponse> responses = new ArrayList<>();
         for (ItemEntity entity : entities) {
@@ -37,8 +44,16 @@ public class ItemService {
         return responses;
     }
 
+    public ItemResponse getUserRoot() {
+        ItemEntity userRootItem = userItemRepository.findUserRootItemByUser(userService.getCurrentUserEntity(), GLOBAL_ROOT_ID).orElseThrow();
+        // abstract the global root, by setting the user root's parentId as null
+        return new ItemResponse(userRootItem, null);
+    }
+
     @SuppressWarnings("null")
-    public ItemResponse storeDocument(MultipartFile document, UUID publicParentId) throws IOException {
+    public ItemResponse storeDocument(MultipartFile document, UUID publicParentId) throws IOException, InvalidPermissionsException {
+        validateAccess(publicParentId);
+
         Long parentId = itemRepository.findIdByPublicId(publicParentId);
         String filename = Objects.requireNonNull(document.getOriginalFilename());
         
@@ -48,19 +63,25 @@ public class ItemService {
         ItemEntity entity = new ItemEntity(filename, parentId, ItemType.DOCUMENT, document.getSize());
         itemRepository.save(entity);
 
+        userItemRepository.save(new UserItemEntity(userService.getCurrentUserEntity(), entity, PermissionType.OWNER));
+
         Path dest = Path.of(STORAGE_PATH, entity.getId().toString());            
         document.transferTo(dest);
 
         return new ItemResponse(entity, itemRepository.findPublicIdById(parentId));
     }
 
-    public byte[] getFileBytes(UUID publicId) throws IOException {
+    public byte[] getFileBytes(UUID publicId) throws IOException, InvalidPermissionsException {
+        validateAccess(publicId);
+
         Long id = itemRepository.findIdByPublicId(publicId);
         Path loc = Path.of(STORAGE_PATH, id.toString());
         return Files.readAllBytes(loc); 
     }
 
-    public void deleteDocument(UUID publicId) throws IOException {
+    public void deleteDocument(UUID publicId) throws IOException, InvalidPermissionsException {
+        validateAccess(publicId);
+
         Long id = itemRepository.findIdByPublicId(publicId);
         Path loc = Path.of(STORAGE_PATH, id.toString());
         itemRepository.deleteById(id);
@@ -68,31 +89,42 @@ public class ItemService {
     }
 
     // only create a logical Folder entry on the DB
-    public ItemResponse createDirectory(String foldername, UUID publicParentId) {
+    public ItemResponse createDirectory(String foldername, UUID publicParentId) throws InvalidPermissionsException {
+        validateAccess(publicParentId);
+
         Long parentId = itemRepository.findIdByPublicId(publicParentId);
         if (itemRepository.existsByParentIdAndName(parentId, foldername))  {
             throw new IllegalArgumentException("An item with that name already exists in that location");
         }
 
         ItemEntity folderEntity = itemRepository.save(new ItemEntity(foldername, parentId, ItemType.FOLDER, null));
+
+        userItemRepository.save(new UserItemEntity(userService.getCurrentUserEntity(), folderEntity, PermissionType.OWNER));
         return new ItemResponse(folderEntity, itemRepository.findPublicIdById(parentId));
     }
 
     @SuppressWarnings("null")
-    public void deleteDirectory(UUID publicId) throws IOException {
+    public void deleteDirectory(UUID publicId) throws IOException, InvalidPermissionsException {
+        validateAccess(publicId);
+
         Long rootId = itemRepository.findIdByPublicId(publicId);
         List<Long> toDeleteIds = itemRepository.findDocumentIdsByAncestorId(rootId);
         for (Long id : toDeleteIds) {
             Path loc = Path.of(STORAGE_PATH, id.toString());
             Files.delete(loc);
         }
-        itemRepository.deleteById(rootId);
+        itemRepository.deleteById(rootId); // user_items already has ON DELETE CASCADE
     }
 
-    public void updateItem(UUID publicId, String newName, UUID newPublicParentId) {
+    @SuppressWarnings("null")
+    public void updateItem(UUID publicId, String newName, UUID newPublicParentId) throws InvalidPermissionsException {
+        validateAccess(publicId);
+        
         ItemEntity entityToUpdate = itemRepository.findByPublicId(publicId).orElseThrow();
         if           (newName != null) entityToUpdate.setName(newName);
         if (newPublicParentId != null) {
+            validateAccess(newPublicParentId);
+
             ItemEntity newParent = itemRepository.findByPublicId(newPublicParentId).orElseThrow();
             Long entityId = entityToUpdate.getId();
             Long oldParentId = entityToUpdate.getParentId();
@@ -116,6 +148,16 @@ public class ItemService {
 
     public String getItemContentType(UUID publicId) {
         return itemRepository.findContentTypeByPublicId(publicId);
+    }
+
+    public UUID getItemPublicId(Long id) {
+        return itemRepository.findPublicIdById(id);
+    }
+
+    public void validateAccess(UUID publicId) throws InvalidPermissionsException {
+        ItemEntity item = itemRepository.findByPublicId(publicId).orElseThrow(() -> new IllegalArgumentException("Item does not exist."));
+        userItemRepository.findByUserIdAndItemId(userService.getCurrentUserEntity().getId(), item.getId())
+                        .orElseThrow(() -> new InvalidPermissionsException("You don't have access to this item."));
     }
 
     // @SuppressWarnings("null")

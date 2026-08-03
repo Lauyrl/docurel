@@ -79,7 +79,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         SELECT STRING_AGG(name, '/' ORDER BY depth DESC)
         FROM path;
     """, nativeQuery = true)
-    String getPath(@Param("destId") Long destId);
+    public String getPath(@Param("destId") Long destId);
 
     @Query(value = """
         WITH RECURSIVE tree AS (
@@ -95,5 +95,5 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         )
         SELECT id FROM tree WHERE type != 'FOLDER';        
     """, nativeQuery = true)
-    List<Long> findDocumentIdsByAncestorId(@Param("rootId") Long rootId);
+    List<Long> findDocumentIdsByAncestorId(@Param("rootId") Long rootId); // inclusive of ancestor/root
 }

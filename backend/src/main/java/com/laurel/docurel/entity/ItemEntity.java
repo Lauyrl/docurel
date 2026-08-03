@@ -2,6 +2,7 @@ package com.laurel.docurel.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
@@ -20,8 +21,8 @@ import com.laurel.docurel.enums.ItemType;
 // jpa annotations
 @Entity
 @Table(name = "items")
+@NoArgsConstructor
 public class ItemEntity {
-    protected ItemEntity() {}
 
     public ItemEntity(String name, Long parent_id, ItemType type, Long sizeBytes) {
         this.name = name;

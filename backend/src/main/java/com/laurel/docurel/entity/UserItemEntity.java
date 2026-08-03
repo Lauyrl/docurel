@@ -18,18 +18,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "user_items")
+@NoArgsConstructor
 public class UserItemEntity {
     
-    public UserItemEntity(UserEntity user, ItemEntity item, PermissionType permissionType) {
+    public UserItemEntity(UserEntity user, ItemEntity item, PermissionType permission) {
         this.user = user;
         this.item = item;
-        this.permissionType = permissionType;
+        this.permission = permission;
         starred = false;
     }
 
@@ -53,8 +55,7 @@ public class UserItemEntity {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "permission_type")
-    private PermissionType permissionType;
+    private PermissionType permission;
 
     private boolean starred;
 

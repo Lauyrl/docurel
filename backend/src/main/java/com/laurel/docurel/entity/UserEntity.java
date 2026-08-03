@@ -6,15 +6,16 @@ import java.util.UUID;
 
 import org.hibernate.annotations.Generated;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
 public class UserEntity {
-    protected UserEntity() {}
-
+    
     public UserEntity(String username, String email, String passwordHash) {
         this.username = username;
         this.email = email;

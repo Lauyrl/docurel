@@ -25,7 +25,7 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
         SELECT ui.item
         FROM UserItemEntity ui
         WHERE ui.user = :user 
-          AND ui.item.parent_id = :globalRootId        
+          AND ui.item.parentId = :globalRootId        
     """)
     public Optional<ItemEntity> findUserRootItemByUser(UserEntity user, Long globalRootId);
 }

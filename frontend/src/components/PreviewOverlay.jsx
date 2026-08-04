@@ -1,7 +1,7 @@
 import "./css/PreviewOverlay.css";
 import { useEffect, useState } from "react";
 import { useExplorer } from "../ExplorerContext";
-import { API } from "../constants";
+import { api } from "../api";
 import Preview from "./Preview";
 
 function PreviewOverlay() {
@@ -17,7 +17,7 @@ function PreviewOverlay() {
     if (!previewItem) return;
 
     let url = null;
-    fetch(API + "document/" + previewItem.publicId, {
+    api("/document/" + previewItem.publicId, {
       headers: { "Authorization": "Bearer " + token }
     })
       .then((response) => response.blob())

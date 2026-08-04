@@ -3,7 +3,7 @@ import "./css/MainScreen.css";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
 import Workspace from "./components/Workspace"
-import { API } from "./constants";
+import { api } from "./api";
 import { ExplorerContext } from "./ExplorerContext";
 import Breadcrumbs from "./components/Breadcrumbs";
 
@@ -11,7 +11,7 @@ function initializeFolderUIState(item) {
     return { ...item, isExpanded: false };
 }
 
-function MainScreen({ token }) {
+function MainScreen() {
 	// Creates a *state* variable with the initial value null, and a function to update that variable
 	//   React stores the state of state variables across renders, a render happens whenever the state changes
 	//    Render: a function call to the parent component (App() in this case)
@@ -35,14 +35,8 @@ function MainScreen({ token }) {
 	useEffect(() => {
 		Promise.all([ // wraps multiple Promises (fetches return Promises) inside a composite Promise that only resolves when all its' members do
 									// .then() takes the result of a resolved Promise and returns another Promise
-			fetch(API + "folder/root", {
-				headers: { "Authorization": "Bearer " + token }
-			})
-				.then(response => response.json()),
-			fetch(API + "document", {
-				headers: { "Authorization": "Bearer " + token }
-			})
-				.then(response => response.json())
+			api("/folder/root").then(response => response.json()),
+			api("/document").then(response => response.json())
 		]).then(([root, items]) => {
 				const itemMapTemp = new Map;
 
@@ -57,7 +51,7 @@ function MainScreen({ token }) {
 				})
 				setItemMap(itemMapTemp);
 			})
-	}, [token]);
+	}, []);
 
 	function uploadDocument(file) {
 		if (!file) return;
@@ -66,9 +60,8 @@ function MainScreen({ token }) {
 		formData.append("document", file); // name has to match the field name that Spring expects
 		formData.append("publicParentId", currentFolderId);
 
-		fetch(API + "document", {
+		api("/document", {
 			method: "POST",
-			headers: { "Authorization": "Bearer " + token },
 			body: formData
 		})
 			.then((response) => response.json()) // response.json() doesnt return a json, but a 'Promise' that a json will be returned
@@ -93,9 +86,8 @@ function MainScreen({ token }) {
 		formData.append("foldername", foldername);
 		formData.append("publicParentId", currentFolderId);
 
-		fetch(API + "folder", {
+		api("/folder", {
 			method: "POST",
-			headers: { "Authorization": "Bearer " + token },
 			body: formData,
 		})
 			.then((response) => response.json())
@@ -115,10 +107,7 @@ function MainScreen({ token }) {
 
 	function deleteItem(item) {
 		const type = (item.type === "DOCUMENT" ? "document" : "folder");
-		fetch(API + type + "/" + item.publicId, { 
-			method: "DELETE", 
-			headers: { "Authorization": "Bearer " + token }
-		})
+		api("/" + type + "/" + item.publicId, { method: "DELETE" })
 			.then(() => {
 				let next = new Map(itemMap);
 				if (item.type === "FOLDER") deleteDescendants(next, item);
@@ -132,12 +121,9 @@ function MainScreen({ token }) {
 	}
 
 	function patchItem(item, newName, newParentPublicId) {
-		fetch(API + "item/" + item.publicId, {
+		api("/item/" + item.publicId, {
 			method: "PATCH",
-			headers: { 
-				"Content-Type": "application/json", 
-				"Authorization": "Bearer " + token 
-			},
+			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				name: newName,
 				publicParentId: newParentPublicId
@@ -157,14 +143,23 @@ function MainScreen({ token }) {
 	return (
 		<ExplorerContext.Provider
 			value={{
-				childrenIndex, root, currentFolder, previewItem, token,
+				childrenIndex, root, currentFolder, previewItem,
 				setRootId, setCurrentFolderId, setPreviewItemId,
 				uploadDocument, selectItem, deleteItem, patchItem,
 				getItem, createFolder
 			}}
 		>
 			<div className="app">
-				<h1 className="logo"> Docurel </h1>
+				<div>
+					<h1 className="logo"> Docurel </h1>
+					<button onClick={() => {
+						localStorage.removeItem("jwt");  
+						window.location.href = "/"      // reloads the page, which resets state variables and
+																						// reruns const [isLoggedIn, setIsLoggedIn] = useState(token != null) to reset isLoggedIn accordingly
+					}}>
+						Logout
+					</button>
+				</div>
 
 				<div className="ribbon">
 					<FileUpload />

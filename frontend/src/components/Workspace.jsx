@@ -4,7 +4,6 @@ import FolderContentsView from "./FolderContentsView";
 import ContextMenu from "./ContextMenu";
 import PreviewOverlay from "./PreviewOverlay";
 import { useEffect, useState } from "react";
-import { API } from "../constants";
 import { useExplorer } from "../ExplorerContext";
 
 function Workspace() {
@@ -37,7 +36,7 @@ function Workspace() {
 
   function downloadDocumentRedirect(item) {
     /* window.location: Location object of the browser window, window.location.href: the full URL the browser is displaying */
-    window.open(API + "document/" + item.publicId + "/download");
+    window.open("http://localhost:8080/document/" + item.publicId + "/download");
   }
 
   function isDescendant(potentialDescendantItem, potentialAncestorItem) {

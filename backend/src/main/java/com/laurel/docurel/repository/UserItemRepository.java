@@ -22,6 +22,13 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
     public List<ItemEntity> findItemsByUser(UserEntity user);
 
     @Query(value = """
+        SELECT ui
+        FROM UserItemEntity ui
+        WHERE ui.item = :item        
+    """)
+    public List<UserItemEntity> findByItem(ItemEntity item);
+
+    @Query(value = """
         SELECT ui.item
         FROM UserItemEntity ui
         WHERE ui.user = :user 

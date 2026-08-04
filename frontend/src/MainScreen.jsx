@@ -35,7 +35,7 @@ function MainScreen({ token }) {
 	useEffect(() => {
 		Promise.all([ // wraps multiple Promises (fetches return Promises) inside a composite Promise that only resolves when all its' members do
 									// .then() takes the result of a resolved Promise and returns another Promise
-			fetch(API + "root", {
+			fetch(API + "folder/root", {
 				headers: { "Authorization": "Bearer " + token }
 			})
 				.then(response => response.json()),

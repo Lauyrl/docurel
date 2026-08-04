@@ -2,6 +2,7 @@ package com.laurel.docurel.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,8 @@ public class SecurityConfig {
         // put the JwtAuthenticationFilter before Spring's default HTML UsernamePasswordAuthenticationFilter
         
         http
+            // when a specialized CORS preflight from the browser is detected, let the CORS config handle it, else SPring Security will treat it as a normal request  
+            .cors(Customizer.withDefaults())
             // Disable CSRF protection because we don't rely on server-side sessions or browser cookies.
             // Instead, our REST API authenticates with JWTs tokens in an Authorization header,
             .csrf(csrf -> csrf.disable())

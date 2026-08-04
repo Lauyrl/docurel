@@ -1,6 +1,6 @@
 import "./css/ContextMenu.css";
 
-function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete, onItemRename }) {
+function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete, onItemRename, onItemEditPermissions }) {
   
   function renderContextButton(label, contextAction) {
     return (
@@ -27,19 +27,12 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
         top: contextMenu.y,
       }}
     >
-      {contextMenu.item?.type === "DOCUMENT" && (
-        <div>
-          { renderContextButton("Download", onItemDownload) }
-          { renderContextButton("Delete"  , onItemDelete  ) }
-          { renderContextButton("Rename"  , onItemRename  ) }
-        </div>
-      )}
-      {contextMenu.item?.type === "FOLDER" && (
-        <div>
-          { renderContextButton("Delete"  , onItemDelete) }
-          { renderContextButton("Rename"  , onItemRename) }
-        </div>
-      )}
+      <div>
+        { contextMenu.item?.type === "DOCUMENT" && renderContextButton("Download", onItemDownload) }
+        { renderContextButton("Delete"          , onItemDelete          ) }
+        { renderContextButton("Rename"          , onItemRename          ) }
+        { renderContextButton("Edit Permissions", onItemEditPermissions ) }
+      </div>
     </div>
   );
 }

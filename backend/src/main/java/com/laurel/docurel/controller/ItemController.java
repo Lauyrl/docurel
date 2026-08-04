@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.laurel.docurel.dto.request.SetPermissionsRequest;
 import com.laurel.docurel.dto.request.UpdateItemRequest;
 import com.laurel.docurel.dto.response.ItemResponse;
+import com.laurel.docurel.enums.PermissionType;
 import com.laurel.docurel.exception.InvalidPermissionsException;
 import com.laurel.docurel.service.ItemService;
 
@@ -92,6 +95,12 @@ public class ItemController {
     public ResponseEntity<Void> patchItem(@PathVariable UUID publicId,
                                           @RequestBody UpdateItemRequest request) throws InvalidPermissionsException {
         itemService.updateItem(publicId, request.getName(), request.getPublicParentId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/item/{publicId}/permission")
+    public ResponseEntity<Void> setUserPermissionsForItem(@PathVariable UUID publicId, @RequestBody SetPermissionsRequest request) {
+        itemService.setUserPermissionsForItem(request.getUsernameOrEmail(), publicId, PermissionType.valueOf(request.getPermissionString()));
         return ResponseEntity.noContent().build();
     }
 }

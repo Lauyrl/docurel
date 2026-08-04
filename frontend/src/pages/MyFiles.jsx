@@ -138,6 +138,14 @@ function MyFiles() {
 			});
 	}
 
+  function editUserPermissionsForItem(item, newPermissionsInfo) {
+    api("/item/" + item.publicId + "/permission", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newPermissionsInfo)
+    })
+  }
+
 	function getItem(publicId) { return itemMap.get(publicId); }
 	const root = getItem(rootId);
 	const currentFolder = getItem(currentFolderId);
@@ -148,7 +156,7 @@ function MyFiles() {
 			value={{
 				childrenIndex, root, currentFolder, previewItem,
 				setRootId, setCurrentFolderId, setPreviewItemId,
-				uploadDocument, selectItem, deleteItem, patchItem,
+				uploadDocument, selectItem, deleteItem, patchItem, editUserPermissionsForItem,
 				getItem, createFolder
 			}}
 		>

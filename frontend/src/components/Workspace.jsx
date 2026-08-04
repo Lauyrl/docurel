@@ -3,15 +3,12 @@ import ItemTreeView from "./ItemTreeView";
 import FolderContentsView from "./FolderContentsView";
 import ContextMenu from "./ContextMenu";
 import PreviewOverlay from "./PreviewOverlay";
+import PermissionsEdit from "./PermissionsEdit";
 import { useEffect, useState } from "react";
 import { useExplorer } from "../ExplorerContext";
 
 function Workspace() {
-  const {childrenIndex, selectItem, deleteItem, patchItem} = useExplorer();
-  function onItemClick(item) {
-    selectItem(item);
-    setContextMenu(null);
-  }
+  const {childrenIndex, selectItem, deleteItem, patchItem, editUserPermissionsForItem} = useExplorer();
 
   const [contextMenu, setContextMenu] = useState({
     item: null,
@@ -19,12 +16,19 @@ function Workspace() {
     y: null,
   });
 
+  const [itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf] = useState(null);
+
   const [itemRename, setItemRename] = useState({
     item: null,
     newName: null,
   });
 
   const [draggedItem, setDraggedItem] = useState(null);
+
+  function onItemClick(item) {
+    selectItem(item);
+    setContextMenu(null);
+  }
 
   function makeContextMenu(eventObject, item) {
     setContextMenu({
@@ -132,13 +136,23 @@ function Workspace() {
 
   return (
     <>
-      {contextMenu && contextMenu.item &&
+      {
+        contextMenu && contextMenu.item &&
         <ContextMenu 
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           onItemDownload={downloadDocumentRedirect}
           onItemDelete={deleteItem}
           onItemRename={(item) => {setItemRename({item: item, newName: item.name})}}
+          onItemEditPermissions={(item) => {setItemToEditUserPermissionsOf(item)}}
+        />
+      }
+      {
+        itemToEditUserPermissionsOf && 
+        <PermissionsEdit
+          itemToEditPermissionsOf={itemToEditUserPermissionsOf}
+          setItemToEditUserPermissionsOf={setItemToEditUserPermissionsOf}
+          onConfirmPermissions={editUserPermissionsForItem}
         />
       }
       <div className="workspace">

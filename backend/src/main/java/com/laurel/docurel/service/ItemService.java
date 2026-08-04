@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.entity.ItemEntity;
+import com.laurel.docurel.entity.UserEntity;
 import com.laurel.docurel.entity.UserItemEntity;
 import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
@@ -140,6 +141,19 @@ public class ItemService {
             entityToUpdate.setParentId(newParentId);
         } 
         itemRepository.save(entityToUpdate);
+    }
+
+    public void setUserPermissionsForItem(String usernameOrEmail, UUID itemPublicId, PermissionType permission) {
+        UserEntity user = userService.getUserByUsernameOrEmail(usernameOrEmail);
+        ItemEntity item = itemRepository.findByPublicId(itemPublicId).orElseThrow();
+
+        if (user.getId().equals(userService.getCurrentUserEntity().getId())) return; // avoid setting permissions for self
+
+        UserItemEntity userItem = userItemRepository
+            .findByUserIdAndItemId(user.getId(), item.getId())
+            .orElse(new UserItemEntity(user, item, permission));
+        userItem.setPermission(permission);
+        userItemRepository.save(userItem);
     }
 
 //-----helpers

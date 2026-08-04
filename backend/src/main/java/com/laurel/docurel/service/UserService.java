@@ -66,4 +66,8 @@ public class UserService {
     public UserEntity getCurrentUserEntity() {
         return (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal(); // JwtAuthenticationFilter already checks the principal (user) != null
     }
+
+    public UserEntity getUserByUsernameOrEmail(String usernameOrEmail) {
+        return userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow();
+    }
 }

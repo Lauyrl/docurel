@@ -1,5 +1,7 @@
 package com.laurel.docurel.service;
 
+import java.util.Random;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,21 +31,32 @@ public class UserService {
     private final ItemRepository itemRepository;
     private final JwtService jwtService;
 
+    // need logic for validating emails
     public LoginResponse registerUser(String username, String email, String password) {
-        UserEntity user = new UserEntity(username, email, passwordEncoder.encode(password));
-
         if (username != null && userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username is taken");
         }
         if (email != null && userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email is taken");
         }
+
+        if (username == null && email != null) {
+            String autoUsername = email.split("@")[0] + "-";                 
+
+            String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+            Random random = new Random();
+    
+            while (userRepository.existsByUsername(autoUsername)) {
+                char randomChar = chars.charAt(random.nextInt(chars.length()));
+                autoUsername = autoUsername + randomChar;
+            }
+            username = autoUsername;
+        }  
+        UserEntity user = new UserEntity(username, email, passwordEncoder.encode(password));
         user = userRepository.save(user);
 
-        String identifier = (username == null ? email : username);
-
         // above already checks duplicate folder name (identifier can't be duplicate since username and email can't)
-        ItemEntity userRootFolder = itemRepository.save(new ItemEntity(identifier, GLOBAL_ROOT_ID, ItemType.FOLDER, null));
+        ItemEntity userRootFolder = itemRepository.save(new ItemEntity(username, GLOBAL_ROOT_ID, ItemType.FOLDER, null));
         // can't use getCurrentUser, since if user is trying to register, they probably don't have a JWT token yet, 
         // meaning the request falls past JwtAuthenticationFilter, and no UserEntity would have been loaded into SecurityContextHolder
         userItemRepository.save(new UserItemEntity(user, userRootFolder, PermissionType.OWNER));

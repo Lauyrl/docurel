@@ -21,13 +21,12 @@ public class JwtService {
     private Long expiration;
 
     public String generateToken(UserEntity entity) {
-        String subject = entity.getUsername() != null ? entity.getUsername() : entity.getEmail();
-        return Jwts.builder()          // creates an empty token to "fill in"
-            .subject(subject)          // specifies who/what the token identifies: username or email
-            .issuedAt(new Date())      // token creation time
+        return Jwts.builder()              // creates an empty token to "fill in"
+            .subject(entity.getUsername()) // specifies who/what the token identifies: username or email
+            .issuedAt(new Date())          // token creation time
             .expiration(new Date(System.currentTimeMillis() + expiration))
-            .signWith(getSigningKey()) // "sign" token with a "secret" only the server knows, to validate valid tokens, and detect forged/tampered with tokens
-            .compact();                // using the provided information, serializes the builder into a String
+            .signWith(getSigningKey())     // "sign" token with a "secret" only the server knows, to validate valid tokens, and detect forged/tampered with tokens
+            .compact();                    // using the provided information, serializes the builder into a String
     }
 
     public SecretKey getSigningKey() {

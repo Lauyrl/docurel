@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useExplorer } from "../ExplorerContext";
 
 function Workspace() {
-  const {childrenIndex, selectItem, deleteItem, patchItem, editUserPermissionsForItem} = useExplorer();
+  const {childrenIndex, selectItem, deleteItem, patchItem} = useExplorer();
 
   const [contextMenu, setContextMenu] = useState({
     item: null,
@@ -150,9 +150,8 @@ function Workspace() {
       {
         itemToEditUserPermissionsOf && 
         <PermissionsEdit
-          itemToEditPermissionsOf={itemToEditUserPermissionsOf}
+          itemToEditUserPermissionsOf={itemToEditUserPermissionsOf}
           setItemToEditUserPermissionsOf={setItemToEditUserPermissionsOf}
-          onConfirmPermissions={editUserPermissionsForItem}
         />
       }
       <div className="workspace">

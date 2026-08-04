@@ -139,11 +139,24 @@ function MyFiles() {
 	}
 
   function editUserPermissionsForItem(item, newPermissionsInfo) {
-    api("/item/" + item.publicId + "/permission", {
+    return api("/item/" + item.publicId + "/permission", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newPermissionsInfo)
     })
+      .then(response => response.json());
+  }
+
+  async function getUsersWithPermissionsForItem(item) {
+    let map = new Map;
+    await api("/item/" + item.publicId + "/permission")
+      .then(response => response.json())
+      .then(users => {
+        for (const user of users) {
+          map.set(user.username, user.permission);
+        }
+      });
+    return map
   }
 
 	function getItem(publicId) { return itemMap.get(publicId); }
@@ -156,7 +169,7 @@ function MyFiles() {
 			value={{
 				childrenIndex, root, currentFolder, previewItem,
 				setRootId, setCurrentFolderId, setPreviewItemId,
-				uploadDocument, selectItem, deleteItem, patchItem, editUserPermissionsForItem,
+				uploadDocument, selectItem, deleteItem, patchItem, editUserPermissionsForItem, getUsersWithPermissionsForItem,
 				getItem, createFolder
 			}}
 		>

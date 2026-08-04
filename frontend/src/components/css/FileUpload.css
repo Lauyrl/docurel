@@ -1,0 +1,19 @@
+.upload-button {
+    width: 90px;
+    height: 90px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: 1px solid #141218;
+    border-radius: 10px;
+
+    background: rgb(27, 25, 41);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.upload-button:hover {
+    background: #221f1f;
+}

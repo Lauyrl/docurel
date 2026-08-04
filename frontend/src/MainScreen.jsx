@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import "./App.css";
+import "./css/MainScreen.css";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
 import Workspace from "./components/Workspace"
@@ -68,6 +68,7 @@ function MainScreen({ token }) {
 
 		fetch(API + "document", {
 			method: "POST",
+			headers: { "Authorization": "Bearer " + token },
 			body: formData
 		})
 			.then((response) => response.json()) // response.json() doesnt return a json, but a 'Promise' that a json will be returned
@@ -94,6 +95,7 @@ function MainScreen({ token }) {
 
 		fetch(API + "folder", {
 			method: "POST",
+			headers: { "Authorization": "Bearer " + token },
 			body: formData,
 		})
 			.then((response) => response.json())
@@ -113,7 +115,10 @@ function MainScreen({ token }) {
 
 	function deleteItem(item) {
 		const type = (item.type === "DOCUMENT" ? "document" : "folder");
-		fetch(API + type + "/" + item.publicId, { method: "DELETE" })
+		fetch(API + type + "/" + item.publicId, { 
+			method: "DELETE", 
+			headers: { "Authorization": "Bearer " + token }
+		})
 			.then(() => {
 				let next = new Map(itemMap);
 				if (item.type === "FOLDER") deleteDescendants(next, item);
@@ -129,7 +134,10 @@ function MainScreen({ token }) {
 	function patchItem(item, newName, newParentPublicId) {
 		fetch(API + "item/" + item.publicId, {
 			method: "PATCH",
-			headers: { "Content-Type": "application/json" },
+			headers: { 
+				"Content-Type": "application/json", 
+				"Authorization": "Bearer " + token 
+			},
 			body: JSON.stringify({
 				name: newName,
 				publicParentId: newParentPublicId
@@ -149,7 +157,7 @@ function MainScreen({ token }) {
 	return (
 		<ExplorerContext.Provider
 			value={{
-				childrenIndex, root, currentFolder, previewItem,
+				childrenIndex, root, currentFolder, previewItem, token,
 				setRootId, setCurrentFolderId, setPreviewItemId,
 				uploadDocument, selectItem, deleteItem, patchItem,
 				getItem, createFolder

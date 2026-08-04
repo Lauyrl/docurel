@@ -1,4 +1,5 @@
-import "./css/FolderUpload.css"
+import "./css/common.css";
+import "./css/FolderUpload.css";
 import { useState } from "react";
 import { useExplorer } from "../ExplorerContext";
 
@@ -22,8 +23,8 @@ function FolderUpload() {
           e.stopPropagation();
           setCreatingFolder(false);
         }}>
-          <div className="create-folder-modal" onClick={(e) => {e.stopPropagation()}}>
-            <div> Enter Folder name </div>
+          <div className="modal" onClick={(e) => {e.stopPropagation()}}>
+            <div> Create a Folder </div>
             <input
               type="text"
               value={foldernameToCreate}

@@ -1,8 +1,8 @@
 import "./css/AuthScreen.css"
 import { useState } from "react";
-import { API } from "./constants";
+import { api } from "./api";
 
-function AuthScreen({ setToken }) {
+function AuthScreen({ setIsLoggedIn }) {
   const [isRegister, setIsRegister] = useState(false);
   const [registerInfo, setRegisterInfo] = useState({
     username: "",
@@ -21,23 +21,29 @@ function AuthScreen({ setToken }) {
   }
 
   function registerUser() {
-    fetch(API + "auth/register", {
+    api("/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(registerInfo)
     })
       .then(response => response.json())
-      .then(json => setToken(json.jwtToken));
+      .then(json => {
+        localStorage.setItem("jwt", json.jwtToken);
+        setIsLoggedIn(true);
+      });
   }
 
   function loginUser() {
-    fetch(API + "auth/login", {
+    api("/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(loginInfo)
     })
       .then(response => response.json())
-      .then(json => setToken(json.jwtToken));
+      .then(json => {
+        localStorage.setItem("jwt", json.jwtToken);
+        setIsLoggedIn(true);
+      });
   }
 
   return (

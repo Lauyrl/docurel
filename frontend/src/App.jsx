@@ -3,11 +3,13 @@ import AuthScreen from "./AuthScreen";
 import MainScreen from "./MainScreen";
 
 function App() {
-  const [token, setToken] = useState(null);
+  const token = localStorage.getItem("jwt")
+  const [isLoggedIn, setIsLoggedIn] = useState(token != null)
+
   return (
     <>
-      { !token ? 
-          <AuthScreen setToken={setToken} /> : <MainScreen token={token} /> }
+      { !isLoggedIn ? 
+          <AuthScreen setIsLoggedIn={setIsLoggedIn} /> : <MainScreen /> }
     </>
   )
 }

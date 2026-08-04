@@ -35,8 +35,8 @@ function PreviewOverlay() {
     setPreview({ publicId: null, url: null });
   }
   
-  /* previewItem.name === preview.name: avoid trying to render an older previewItem's URL with an element meant for the current previewItem's contentType,
-  can happen because previewItem changes before the new blob fetch finishes */
+  /* previewItem.name === preview.name: avoid trying to render an older previewItem's URL with an element meant for 
+  the current previewItem's contentType, can happen because previewItem changes before the new blob fetch finishes */
   return (
     <>
       {previewItem?.publicId && previewItem?.publicId === preview.publicId && (  // if previewItem is null, previewItem?.publicId returns undefined, undefined !== null

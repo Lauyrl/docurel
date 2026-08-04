@@ -34,11 +34,12 @@ public class ItemService {
     private final UserItemRepository userItemRepository; // services can cross-call repositories
     private final UserService userService;
 
-    public List<ItemResponse> getDocuments() {
+    public List<ItemResponse> getDocumentsExceptUserRoot() {
         List<ItemEntity> entities = userItemRepository.findItemsByUser(userService.getCurrentUserEntity());
 
         List<ItemResponse> responses = new ArrayList<>();
         for (ItemEntity entity : entities) {
+            if (entity.getParentId() == GLOBAL_ROOT_ID) continue; // skip user root
             responses.add(new ItemResponse(entity, itemRepository.findPublicIdById(entity.getParentId())));
         }
         return responses;
@@ -46,7 +47,7 @@ public class ItemService {
 
     public ItemResponse getUserRoot() {
         ItemEntity userRootItem = userItemRepository.findUserRootItemByUser(userService.getCurrentUserEntity(), GLOBAL_ROOT_ID).orElseThrow();
-        // abstract the global root, by setting the user root's parentId as null
+        // abstract the global root by setting the user root's parentId as null
         return new ItemResponse(userRootItem, null);
     }
 

@@ -31,7 +31,7 @@ public class ItemController {
 
     @GetMapping("/document")
     public List<ItemResponse> getDocuments() {
-        return itemService.getDocuments();
+        return itemService.getDocumentsExceptUserRoot();
     }
     
     @PostMapping("/document")

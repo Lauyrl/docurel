@@ -1,3 +1,4 @@
+import "./css/Breadcrumbs.css"
 import { useExplorer } from "../ExplorerContext";
 
 function Breadcrumbs() {
@@ -14,10 +15,11 @@ function Breadcrumbs() {
     return(
       <div className="breadcrumb">
         { "Path: " }
-        { path.map((item, i) => (
+        { 
+          path.map((item, i) => (
             <span key={item.publicId} onClick={() => selectItem(item)}>
               {(i > 0) && " > "}
-              {item.name} 
+              <span className="breadcrumbs"> {item.name} </span> 
             </span>
           )) 
         }

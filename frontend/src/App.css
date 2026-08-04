@@ -182,26 +182,3 @@
     border-right-color: var(--border);
   }
 }
-
-.app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
-/* in App */
-.ribbon {
-  background: rgb(43, 42, 41);
-  display: flex;
-  gap: 50px;
-  border: rgb(16, 16, 16)
-}
-
-.breadcrumb {
-  text-align: left;
-  margin-left: 10px;
-}
-
-.logo {
-  text-align: left;
-}

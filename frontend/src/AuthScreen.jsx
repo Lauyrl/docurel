@@ -1,4 +1,4 @@
-import "./AuthScreen.css"
+import "./css/AuthScreen.css"
 import { useState } from "react";
 import { API } from "./constants";
 

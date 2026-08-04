@@ -3,7 +3,7 @@
 }
 
 .vertical-item-listing {
-  background: rgb(43, 42, 41);
+  background: rgb(30, 30, 22);
 
   width: 300px;
   min-width: 200px;
@@ -13,6 +13,8 @@
   overflow: auto;
 
   flex-shrink: 0;
+
+  padding-top: 10px;
 }
 
 .item-arrow {

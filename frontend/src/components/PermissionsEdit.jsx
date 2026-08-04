@@ -1,23 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./css/common.css"
+import { useExplorer } from "../ExplorerContext";
 
-function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf, onConfirmPermissions }) {
+function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf }) {
+  const { editUserPermissionsForItem, getUsersWithPermissionsForItem } = useExplorer();
+
   const [newPermissionsInfo, setNewPermissionsInfo] = useState({
     usernameOrEmail: "",
-    permissionString: ""
+    permissionString: "VIEWER"
   })
+  
+  const [usersWithPermissionsForItem, setUsersWithPermissionsForItem] = useState(new Map);
+
+  useEffect(() => {
+    async function loadUsersWithPermissionsForItem() { 
+      setUsersWithPermissionsForItem(await getUsersWithPermissionsForItem(itemToEditUserPermissionsOf));
+    }
+    loadUsersWithPermissionsForItem();
+  }, [itemToEditUserPermissionsOf, getUsersWithPermissionsForItem])
 
   function cleanupPermissionEditStates() {
     setItemToEditUserPermissionsOf(null);
-    setNewPermissionsInfo({usernameOrEmail: "", permissionString: ""});
+    setNewPermissionsInfo({usernameOrEmail: "", permissionString: "VIEWER"});
+    setUsersWithPermissionsForItem(new Map);
   }
-
+  
   return (
     <div className="overlay" onClick={cleanupPermissionEditStates}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div> Edit permissions </div>
+        <h2> Edit permissions </h2>
+
+        <div> Add new permission </div>
         <input
           type="text"
+          value={newPermissionsInfo.usernameOrEmail}
           placeholder="Enter user's name or email"
           onChange={(e) => setNewPermissionsInfo({...newPermissionsInfo, usernameOrEmail: e.target.value})}
         />
@@ -29,19 +45,46 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
           <option value="SHARER">Sharer</option>
           <option value="EDITOR">Editor</option>
         </select>
-
-        <div className="modal-buttons">
-          <button onClick={cleanupPermissionEditStates}> 
-            Cancel 
-          </button>
-          <button onClick={() => {
+        <button onClick={async () => {
             if (newPermissionsInfo.usernameOrEmail.trim() === "") return;
-            onConfirmPermissions(itemToEditUserPermissionsOf, newPermissionsInfo);
-            cleanupPermissionEditStates();
+            let editPermissionData = await editUserPermissionsForItem(itemToEditUserPermissionsOf, newPermissionsInfo);
+            setUsersWithPermissionsForItem(current => new Map(current).set(editPermissionData.username, editPermissionData.permission));
+            setNewPermissionsInfo({usernameOrEmail: "", permissionString: "VIEWER"});
           }}> 
-            Confirm 
-          </button>
-        </div>
+            Add 
+        </button>
+
+        <div> Existing permissions </div>
+        { 
+          usersWithPermissionsForItem &&
+          // [...usersWithPermissionsForItem.entries()] returns and array of arrays [ [key1, value1], [key2, value2],... ]
+          [...usersWithPermissionsForItem.entries()].map(([username, permission]) => (
+            <div style={{display: "flex", justifyContent: "space-between"}}>
+              <span> {username} </span>
+              { permission === "OWNER" && ("Owner") }
+              {
+                permission !== "OWNER" &&
+                <select
+                  value={permission}
+                  onChange={async (e) => {
+                    let editPermissionData = 
+                      await editUserPermissionsForItem(itemToEditUserPermissionsOf, {
+                        usernameOrEmail: username, permissionString: e.target.value
+                      });
+                    setUsersWithPermissionsForItem(current => new Map(current).set(editPermissionData.username, editPermissionData.permission));
+                  }}   
+                >
+                  <option value="VIEWER">Viewer</option>
+                  <option value="SHARER">Sharer</option>
+                  <option value="EDITOR">Editor</option>
+                </select>
+              }
+            </div>
+          )) 
+        }
+        <button onClick={cleanupPermissionEditStates}> 
+          Done 
+        </button>
       </div>
     </div>  
   )

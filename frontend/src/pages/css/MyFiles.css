@@ -1,0 +1,12 @@
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.ribbon {
+    background: rgb(43, 42, 41);
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+}

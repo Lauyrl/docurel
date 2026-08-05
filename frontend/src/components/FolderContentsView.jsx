@@ -1,8 +1,10 @@
 import "./css/FolderContentsView.css";
 import { useExplorer } from "../context/ExplorerContext";
+import useExplorerOperations from "../context/useExplorerOperations";
 
 function FolderContentsView({draggedItem, renderItemListing}) {
-  const {childrenIndex, currentFolder, selectItem, patchItem} = useExplorer(); 
+  const {childrenIndex, currentFolder} = useExplorer(); 
+  const {selectItem, patchItem} = useExplorerOperations(0);
 
   function displayItem(item) {
     return (

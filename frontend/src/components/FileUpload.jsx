@@ -1,9 +1,9 @@
-import { useExplorer } from "../context/ExplorerContext";
+import useExplorerOperations from "../context/useExplorerOperations";
 import "./css/FileUpload.css"
 import { useRef } from "react";
 
-function FileUpload() {
-  const {uploadDocument} = useExplorer();
+function FileUpload({ currentPageIdx }) {
+  const {uploadDocument} = useExplorerOperations(currentPageIdx);
   const fileInputRef = useRef(null);
 
   return (

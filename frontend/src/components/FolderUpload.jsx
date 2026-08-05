@@ -1,10 +1,10 @@
 import "./css/common.css";
 import "./css/FolderUpload.css";
 import { useState } from "react";
-import { useExplorer } from "../context/ExplorerContext";
+import useExplorerOperations from "../context/useExplorerOperations";
 
-function FolderUpload() {
-  const {createFolder} = useExplorer();
+function FolderUpload({ currentPageIdx }) {
+  const {createFolder} = useExplorerOperations(currentPageIdx);
 
   const [creatingFolder, setCreatingFolder] = useState(false);
   const [foldernameToCreate, setFoldernameToCreate] = useState("");

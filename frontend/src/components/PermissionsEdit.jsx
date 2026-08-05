@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import "./css/common.css"
-import { useExplorer } from "../context/ExplorerContext";
+import useExplorerOperations from "../context/useExplorerOperations";
 
 function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf }) {
-  const { editUserPermissionsForItem, getUsersWithPermissionsForItem } = useExplorer();
+  const { editUserPermissionsForItem, getUsersWithPermissionsForItem } = useExplorerOperations(0);
 
   const [newPermissionsInfo, setNewPermissionsInfo] = useState({
     usernameOrEmail: "",

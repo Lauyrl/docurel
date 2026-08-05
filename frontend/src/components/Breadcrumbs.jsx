@@ -1,8 +1,11 @@
 import "./css/Breadcrumbs.css"
 import { useExplorer } from "../context/ExplorerContext";
+import useExplorerOperations from "../context/useExplorerOperations";
 
-function Breadcrumbs() {
-    const {currentFolder, getItem, selectItem} = useExplorer();
+function Breadcrumbs({ currentPageIdx }) {
+    const {currentFolder, getItem} = useExplorer();
+    const {selectItem} = useExplorerOperations(currentPageIdx)
+    
     if (!currentFolder) return null;
     
     let path = [];

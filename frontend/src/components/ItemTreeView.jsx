@@ -1,8 +1,10 @@
 import { useExplorer } from "../context/ExplorerContext";
+import useExplorerOperations from "../context/useExplorerOperations";
 import "./css/ItemTreeView.css";
 
 function ItemTreeView({root, draggedItem, renderItemListing}) {
-  const {childrenIndex, selectItem, patchItem} = useExplorer();
+  const {childrenIndex} = useExplorer();
+  const {selectItem, patchItem} = useExplorerOperations(0);
 
   function displayItem(item) {
     return (

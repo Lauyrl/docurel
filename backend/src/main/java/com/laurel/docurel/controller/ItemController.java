@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.laurel.docurel.dto.request.SetPermissionsRequest;
 import com.laurel.docurel.dto.request.UpdateItemRequest;
 import com.laurel.docurel.dto.response.ItemResponse;
+import com.laurel.docurel.dto.response.SharedItemResponse;
 import com.laurel.docurel.dto.response.UserPermissionsForItemResponse;
 import com.laurel.docurel.enums.PermissionType;
 import com.laurel.docurel.exception.InvalidPermissionsException;
@@ -107,5 +108,10 @@ public class ItemController {
     @GetMapping("/item/{publicId}/permission")
     public List<UserPermissionsForItemResponse> getUserPermissionsForItem(@PathVariable UUID publicId) {
         return itemService.getUserPermissionsForItem(publicId);
+    }
+
+    @GetMapping("/shared")
+    public List<SharedItemResponse> getItemsSharedWithCurrentUser() {
+        return itemService.getItemsUserCanAccessExceptOwned();
     }
 }

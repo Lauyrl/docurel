@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.laurel.docurel.dto.response.ItemResponse;
+import com.laurel.docurel.dto.response.SharedItemResponse;
 import com.laurel.docurel.dto.response.UserPermissionsForItemResponse;
 import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.entity.UserEntity;
@@ -21,7 +22,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -167,6 +170,43 @@ public class ItemService {
             responses.add(new UserPermissionsForItemResponse(userItemEntity.getUser().getUsername(), userItemEntity.getPermission()));
         }
         return responses;
+    }
+
+    /**
+     * Firstly, build a map of all accessible items for the current user, 
+     * and a map of all items with explicit UserItem permission entries.
+     * 
+     * For each accessible item, walk up to the highest accessible ancestor, 
+     * storing the highest-level, explicit (not implicitly through inheritence) 
+     * permission along the path.
+     * 
+     * @return A list of accessible items paired with their explicitly defined, or inherited, permissions
+     */
+    public List<SharedItemResponse> getItemsUserCanAccessExceptOwned() {
+        List<ItemEntity> sharedItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(userService.getCurrentUserEntity().getId());
+        Map<Long, ItemEntity> sharedItemsMap = new HashMap<>();
+        for (ItemEntity item : sharedItems) {
+            sharedItemsMap.put(item.getId(), item);
+        }
+
+        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(userService.getCurrentUserEntity());
+        Map<Long, PermissionType> explicitPermissionsMap = new HashMap<>();
+        for (UserItemEntity ui : explicitPermissions) {
+            explicitPermissionsMap.put(ui.getItem().getId(), ui.getPermission());
+        }
+
+        List<SharedItemResponse> sharedItemResponses = new ArrayList<>();
+        for (ItemEntity item : sharedItems) {
+            PermissionType maxPermission = explicitPermissionsMap.get(item.getId());
+            ItemEntity sharedAncestor = sharedItemsMap.get(item.getParentId());
+
+            while (sharedAncestor != null) { // stop at the last accessible ancestor (until an ancestor that isn't "shared"), who holds the root permission
+                maxPermission = PermissionType.max(maxPermission, explicitPermissionsMap.get(sharedAncestor.getId()));
+                sharedAncestor = sharedItemsMap.get(sharedAncestor.getParentId());
+            }
+            sharedItemResponses.add(new SharedItemResponse(item, maxPermission));
+        }
+        return sharedItemResponses;
     }
 
 //-----helpers

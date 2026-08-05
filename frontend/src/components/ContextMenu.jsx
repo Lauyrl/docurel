@@ -20,9 +20,19 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
   }
 
   return (
-    <div className="overlay" onClick={() => setContextMenu(null)}>
+    <div className="overlay" 
+      onClick={() => setContextMenu(null)}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setContextMenu(null);
+      }}
+    >
       <div
         className="context-menu"
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         style={{
           position: "fixed",
           left: contextMenu.x,

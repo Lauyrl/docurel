@@ -1,17 +1,17 @@
 import "./css/common.css";
 import "./css/FolderUpload.css";
 import { useState } from "react";
-import { useExplorer } from "../ExplorerContext";
+import { useExplorer } from "../context/ExplorerContext";
 
 function FolderUpload() {
-  const {createFolderInMyFiles} = useExplorer();
+  const {createFolder} = useExplorer();
 
   const [creatingFolder, setCreatingFolder] = useState(false);
   const [foldernameToCreate, setFoldernameToCreate] = useState("");
   
   function uploadFolderToCreate() {
     if (!foldernameToCreate || foldernameToCreate === "") return;
-    createFolderInMyFiles(foldernameToCreate);
+    createFolder(foldernameToCreate);
     setFoldernameToCreate("");
   }
 

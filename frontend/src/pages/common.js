@@ -12,7 +12,7 @@ export async function downloadDocumentRedirect(item) {
   URL.revokeObjectURL(url);
 }
 
-export function uploadDocument(file, currentFolderId) {
+export function uploadDocumentCommon(file, currentFolderId) {
   // uploading into current folder
   if (!file) return;
 
@@ -27,7 +27,7 @@ export function uploadDocument(file, currentFolderId) {
 }
 
 // CHANGE THIS TO SEND RAW JSON
-export function createFolder(foldername, currentFolderId) {
+export function createFolderCommon(foldername, currentFolderId) {
   const formData = new FormData();
   formData.append("foldername", foldername);
   formData.append("publicParentId", currentFolderId);
@@ -38,7 +38,7 @@ export function createFolder(foldername, currentFolderId) {
   }).then((response) => response.json());
 }
 
-export function deleteDescendants(next, rootFolder, childrenIndex) {
+function deleteDescendants(next, rootFolder, childrenIndex) {
   if (rootFolder.type !== "FOLDER") return;
   for (const child of childrenIndex.get(rootFolder.publicId) ?? []) {
     deleteDescendants(next, child);
@@ -49,7 +49,7 @@ export function deleteDescendants(next, rootFolder, childrenIndex) {
 /**
  * Returns new itemMap with the specified items deleted.
  */
-export async function deleteItem(item, itemMap, childrenIndex) {
+export async function deleteItemCommon(item, itemMap, childrenIndex) {
   let next = new Map(itemMap);
 
   const type = item.type === "DOCUMENT" ? "document" : "folder";
@@ -61,7 +61,7 @@ export async function deleteItem(item, itemMap, childrenIndex) {
   return next;
 }
 
-export async function patchItem(item, newName, newParentPublicId) {
+export async function patchItemCommon(item, newName, newParentPublicId) {
   if (newName === null && newParentPublicId === null) return null;
 
   try {
@@ -83,7 +83,7 @@ export async function patchItem(item, newName, newParentPublicId) {
     return { ...item, publicParentId: newParentPublicId };
 }
 
-export function editUserPermissionsForItem(item, newPermissionsInfo) {
+export function editUserPermissionsForItemCommon(item, newPermissionsInfo) {
   return api("/item/" + item.publicId + "/permission", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -91,7 +91,7 @@ export function editUserPermissionsForItem(item, newPermissionsInfo) {
   }).then((response) => response.json());
 }
 
-export async function getUsersWithPermissionsForItem(item) {
+export async function getUsersWithPermissionsForItemCommon(item) {
   let map = new Map();
 
   let users = await api("/item/" + item.publicId + "/permission").then((response) => response.json()) // should be a list of jsons

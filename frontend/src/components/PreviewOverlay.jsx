@@ -1,11 +1,11 @@
 import "./css/PreviewOverlay.css";
 import { useEffect, useState } from "react";
-import { useExplorer } from "../ExplorerContext";
+import { useExplorer } from "../context/ExplorerContext";
 import { api } from "../api";
 import Preview from "./Preview";
 
 function PreviewOverlay() {
-  const {previewItem, setPreviewItemId, token} = useExplorer(); 
+  const {previewItem, setPreviewItemId} = useExplorer(); 
 
   const [preview, setPreview] = useState({
     publicId: null,
@@ -31,7 +31,7 @@ function PreviewOverlay() {
     return () => {
       if (url) URL.revokeObjectURL(url);
     }
-  }, [previewItem, token]);
+  }, [previewItem]);
 
   function closePreview() {
     setPreviewItemId(null);

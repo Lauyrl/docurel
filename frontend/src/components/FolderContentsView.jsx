@@ -1,8 +1,8 @@
 import "./css/FolderContentsView.css";
-import { useExplorer } from "../ExplorerContext";
+import { useExplorer } from "../context/ExplorerContext";
 
 function FolderContentsView({draggedItem, renderItemListing}) {
-  const {childrenIndex, currentFolder, selectItemInMyFiles, patchItemInMyFiles} = useExplorer(); 
+  const {childrenIndex, currentFolder, selectItem, patchItem} = useExplorer(); 
 
   function displayItem(item) {
     return (
@@ -22,8 +22,8 @@ function FolderContentsView({draggedItem, renderItemListing}) {
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
-        selectItemInMyFiles(currentFolder);
-        if (draggedItem) patchItemInMyFiles(draggedItem, null, currentFolder.publicId);
+        selectItem(currentFolder);
+        if (draggedItem) patchItem(draggedItem, null, currentFolder.publicId);
       }}
     >
       {currentFolderChildren.length === 0 && <> This folder is empty. </>}

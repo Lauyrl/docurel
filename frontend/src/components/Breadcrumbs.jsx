@@ -1,8 +1,8 @@
 import "./css/Breadcrumbs.css"
-import { useExplorer } from "../ExplorerContext";
+import { useExplorer } from "../context/ExplorerContext";
 
 function Breadcrumbs() {
-    const {currentFolder, getItem, selectItemInMyFiles} = useExplorer();
+    const {currentFolder, getItem, selectItem} = useExplorer();
     if (!currentFolder) return null;
     
     let path = [];
@@ -17,7 +17,7 @@ function Breadcrumbs() {
         { "Path: " }
         { 
           path.map((item, i) => (
-            <span key={item.publicId} onClick={() => selectItemInMyFiles(item)}>
+            <span key={item.publicId} onClick={() => selectItem(item)}>
               {(i > 0) && " > "}
               <span className="breadcrumbs"> {item.name} </span> 
             </span>

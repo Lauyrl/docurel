@@ -61,6 +61,4 @@ public class UserItemEntity {
 
     @Column(name = "last_opened", insertable = false)
 	private Instant lastOpened;
-
-
 }

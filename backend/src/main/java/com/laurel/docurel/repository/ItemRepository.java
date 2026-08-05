@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -51,6 +52,10 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         )
     """, nativeQuery = true)
     public boolean isDescendant(Long potentialAncestorId, Long potentialDescendantId); 
+
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM ItemEntity i WHERE i.id = :id")
+    void deleteById(@Param("id") Long id);
 
     @Query(value = """
         WITH RECURSIVE path AS (

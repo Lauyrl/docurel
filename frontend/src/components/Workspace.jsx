@@ -1,16 +1,17 @@
 import "./css/Workspace.css";
 import "./css/common.css";
-import ItemTreeView from "./ItemTreeView";
-import FolderContentsView from "./FolderContentsView";
 import ContextMenu from "./ContextMenu";
 import PreviewOverlay from "./PreviewOverlay";
 import PermissionsEdit from "./PermissionsEdit";
 import { useEffect, useState } from "react";
-import { useExplorer } from "../ExplorerContext";
+import { useExplorer } from "../context/ExplorerContext";
 import { downloadDocumentRedirect } from "../pages/common";
+import useExplorerOperations from "../context/useExplorerOperations";
+import MyFiles from "../pages/MyFiles";
 
-function Workspace() {
-  const {childrenIndex, selectItemInMyFiles, deleteItemInMyFiles, patchItemInMyFiles} = useExplorer();
+function Workspace({ currentPageIdx }) {
+  const {childrenIndex} = useExplorer();
+  const {selectItem, patchItem, deleteItem} = useExplorerOperations(currentPageIdx);
 
   const [contextMenu, setContextMenu] = useState({
     item: null,
@@ -77,7 +78,7 @@ function Workspace() {
       <div
         onClick={(e) => {
           e.stopPropagation();
-          selectItemInMyFiles(item);
+          selectItem(item);
         }}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -94,8 +95,8 @@ function Workspace() {
           e.preventDefault();
           e.stopPropagation();
           if (canDropInto(item)) {
-            selectItemInMyFiles(item);
-            patchItemInMyFiles(draggedItem, null, item.publicId);
+            selectItem(item);
+            patchItem(draggedItem, null, item.publicId);
           }
         }}
       >
@@ -116,7 +117,7 @@ function Workspace() {
                 if (e.key === "Enter") {
                   const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
                   if (newName && newName != "") {
-                    patchItemInMyFiles(itemRename.item, newName, null);
+                    patchItem(itemRename.item, newName, null);
                     setItemRename(null);
                   }
                 }
@@ -136,7 +137,7 @@ function Workspace() {
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           onItemDownload={downloadDocumentRedirect}
-          onItemDelete={deleteItemInMyFiles}
+          onItemDelete={deleteItem}
           onItemRename={(item) => {setItemRename({item: item, newName: item.name})}}
           onItemEditPermissions={(item) => {setItemToEditUserPermissionsOf(item)}}
         />
@@ -149,13 +150,9 @@ function Workspace() {
         />
       }
       <div className="workspace">
-        <ItemTreeView
-          draggedItem={draggedItem}
-          renderItemListing={renderItemListing}
-        />
-        <FolderContentsView 
-          draggedItem={draggedItem}
-          renderItemListing={renderItemListing}
+        <MyFiles 
+          draggedItem={draggedItem} 
+          renderItemListing={renderItemListing} 
         />
         <PreviewOverlay />
       </div>

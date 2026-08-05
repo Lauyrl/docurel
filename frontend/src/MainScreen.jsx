@@ -1,10 +1,16 @@
 import { useState } from "react";
 import "./css/MainScreen.css"
-import MyFiles from "./pages/MyFiles";
+import "./pages/css/MyFiles.css";
 import PagesPanel from "./pages/PagesPanel";
-import SharedWithMe from "./pages/SharedWithMe";
+import FileUpload from "./components/FileUpload";
+import FolderUpload from "./components/FolderUpload";
+import Breadcrumbs from "./components/Breadcrumbs";
+import Workspace from "./components/Workspace";
+import { ExplorerProvider } from "./context/ExplorerProvider";
 
 function MainScreen() {
+	// React stores the state of state variables across renders, a render happens whenever the state changes
+	// Render: a function call to the parent component (App() in this case)
 	const [currentPageIdx, setCurrentPageIdx] = useState(0);
 
 	return (
@@ -12,18 +18,25 @@ function MainScreen() {
 			<button onClick={() => {
 				localStorage.removeItem("jwt");
 				window.location.href = "/"      // reloads the page, which resets state variables and
-																				// reruns const [isLoggedIn, setIsLoggedIn] = useState(token != null) to reset isLoggedIn accordingly
+												// reruns const [isLoggedIn, setIsLoggedIn] = useState(token != null) to reset isLoggedIn accordingly
 			}}>
 				Logout
 			</button>
+						
+			<ExplorerProvider>
+				<div className="app-layout">
+					<PagesPanel setCurrentPageIdx={setCurrentPageIdx} />
+					<div className="app">
+						<div className="ribbon">
+							<FileUpload currentPageIdx={currentPageIdx}/>
+							<FolderUpload currentPageIdx={currentPageIdx}/>
+						</div>
 
-			<div className="app-layout">
-				<PagesPanel setCurrentPageIdx={setCurrentPageIdx} />
-				<div className="page-view">
-					{currentPageIdx === 0 && <MyFiles      />}
-					{currentPageIdx === 1 && <SharedWithMe />}
+						<Breadcrumbs currentPageIdx={currentPageIdx}/>
+						<Workspace currentPageIdx={currentPageIdx} />
+					</div>
 				</div>
-			</div>
+			</ExplorerProvider>
 		</>
 	)
 }

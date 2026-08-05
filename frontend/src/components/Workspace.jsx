@@ -5,7 +5,7 @@ import FolderContentsView from "./FolderContentsView";
 import ContextMenu from "./ContextMenu";
 import PreviewOverlay from "./PreviewOverlay";
 import PermissionsEdit from "./PermissionsEdit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useExplorer } from "../ExplorerContext";
 import { downloadDocumentRedirect } from "../pages/common";
 
@@ -26,6 +26,15 @@ function Workspace() {
   });
 
   const [draggedItem, setDraggedItem] = useState(null);
+  
+  function exitRename() {
+    setItemRename(null);
+  }
+
+  useEffect(() => {
+    window.addEventListener("click", exitRename);
+    return () => window.removeEventListener("click", exitRename)
+  }, []);
 
   function makeContextMenu(eventObject, item) {
     setContextMenu({
@@ -75,7 +84,7 @@ function Workspace() {
           makeContextMenu(e, item);
         }}
 
-        draggable
+        draggable={!(itemRename?.item?.publicId === item.publicId)} // if item is being renamed dont let it be draggable
         onDragStart={() => setDraggedItem(item)}
         onDragEnd={() => setDraggedItem(null)}
         onDragOver={(e) => {
@@ -83,8 +92,8 @@ function Workspace() {
         }}
         onDrop={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           if (canDropInto(item)) {
-            e.stopPropagation();
             selectItemInMyFiles(item);
             patchItemInMyFiles(draggedItem, null, item.publicId);
           }
@@ -92,35 +101,28 @@ function Workspace() {
       >
         {itemRename?.item?.publicId !== item.publicId && displayItem(item) }
         {itemRename?.item?.publicId === item.publicId && (
-          <>
-            <div className="in-place-overlay" onClick={(e) => {
-              e.stopPropagation();
-              setItemRename(null);
-            }}> </div>
-
-            <div 
-              onClick={(e) => e.stopPropagation()}
-              style={{zIndex: 1100, position: "relative"}}
-            >
-              <input
-                autoFocus
-                type="text"
-                value={itemRename.newName}
-                onChange={(e) =>
-                  setItemRename({ item: item, newName: e.target.value })
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
-                    if (newName && newName != "") {
-                      patchItemInMyFiles(itemRename.item, newName, null);
-                      setItemRename(null);
-                    }
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{zIndex: 1100, position: "relative"}}
+          >
+            <input
+              autoFocus
+              type="text"
+              value={itemRename.newName}
+              onChange={(e) =>
+                setItemRename({ item: item, newName: e.target.value })
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
+                  if (newName && newName != "") {
+                    patchItemInMyFiles(itemRename.item, newName, null);
+                    setItemRename(null);
                   }
-                }}
-              />
-            </div>
-          </>
+                }
+              }}
+            />
+          </div>
         )}
       </div>
     );

@@ -31,7 +31,10 @@ function FolderUpload() {
               placeholder="Enter Folder name here"
               onChange={(e) => setFoldernameToCreate(e.target.value.trim())}
               onKeyDown={(e) => {
-                if (e.key === "Enter") uploadFolderToCreate();
+                if (e.key === "Enter") {
+                  uploadFolderToCreate();
+                  setCreatingFolder(false);
+                }  
               }}
             />
             <div className="modal-buttons">

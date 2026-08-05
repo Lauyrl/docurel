@@ -1,11 +1,13 @@
 import "./css/Workspace.css";
+import "./css/common.css";
 import ItemTreeView from "./ItemTreeView";
 import FolderContentsView from "./FolderContentsView";
 import ContextMenu from "./ContextMenu";
 import PreviewOverlay from "./PreviewOverlay";
 import PermissionsEdit from "./PermissionsEdit";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useExplorer } from "../ExplorerContext";
+import { downloadDocumentRedirect } from "./common";
 
 function Workspace() {
   const {childrenIndex, selectItem, deleteItem, patchItem} = useExplorer();
@@ -25,22 +27,12 @@ function Workspace() {
 
   const [draggedItem, setDraggedItem] = useState(null);
 
-  function onItemClick(item) {
-    selectItem(item);
-    setContextMenu(null);
-  }
-
   function makeContextMenu(eventObject, item) {
     setContextMenu({
       item: item,
       x: eventObject.clientX,
       y: eventObject.clientY,
     });
-  }
-
-  function downloadDocumentRedirect(item) {
-    /* window.location: Location object of the browser window, window.location.href: the full URL the browser is displaying */
-    window.open("http://localhost:8080/document/" + item.publicId + "/download");
   }
 
   function isDescendant(potentialDescendantItem, potentialAncestorItem) {
@@ -71,22 +63,12 @@ function Workspace() {
     /* deny dragging a folder into one of its' descendant folders, causing a cyclic relationship */
   }
 
-  useEffect(() => {
-    const close = () => {
-      setContextMenu(null);
-      setItemRename(null);
-    };
-    window.addEventListener("click", close);
-    return () => window.removeEventListener("click", close);
-  }, []);
-
   function renderItemListing(item, displayItem) {
     return (
       <div
         onClick={(e) => {
           e.stopPropagation();
-          setContextMenu(null);
-          onItemClick(item);
+          selectItem(item);
         }}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -103,32 +85,42 @@ function Workspace() {
           e.preventDefault();
           if (canDropInto(item)) {
             e.stopPropagation();
-            onItemClick(item);
+            selectItem(item);
             patchItem(draggedItem, null, item.publicId);
           }
         }}
       >
         {itemRename?.item?.publicId !== item.publicId && displayItem(item) }
         {itemRename?.item?.publicId === item.publicId && (
-          <div onClick={(e) => e.stopPropagation()}>
-            <input
-              autoFocus
-              type="text"
-              value={itemRename.newName}
-              onChange={(e) =>
-                setItemRename({ item: item, newName: e.target.value })
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
-                  if (newName && newName != "") {
-                    patchItem(itemRename.item, newName, null);
-                    setItemRename(null);
-                  }
+          <>
+            <div className="in-place-overlay" onClick={(e) => {
+              e.stopPropagation();
+              setItemRename(null);
+            }}> </div>
+
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              style={{zIndex: 1100, position: "relative"}}
+            >
+              <input
+                autoFocus
+                type="text"
+                value={itemRename.newName}
+                onChange={(e) =>
+                  setItemRename({ item: item, newName: e.target.value })
                 }
-              }}
-            />
-          </div>
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
+                    if (newName && newName != "") {
+                      patchItem(itemRename.item, newName, null);
+                      setItemRename(null);
+                    }
+                  }
+                }}
+              />
+            </div>
+          </>
         )}
       </div>
     );

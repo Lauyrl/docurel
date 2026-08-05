@@ -11,6 +11,12 @@
     z-index: 1000;
 }
 
+.in-place-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
 .modal {
     width: 350px;
     padding: 24px;

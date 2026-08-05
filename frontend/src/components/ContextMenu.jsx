@@ -1,4 +1,5 @@
 import "./css/ContextMenu.css";
+import "./css/common.css";
 
 function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete, onItemRename, onItemEditPermissions }) {
   
@@ -19,19 +20,21 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
   }
 
   return (
-    <div
-      className="context-menu"
-      style={{
-        position: "fixed",
-        left: contextMenu.x,
-        top: contextMenu.y,
-      }}
-    >
-      <div>
-        { contextMenu.item?.type === "DOCUMENT" && renderContextButton("Download", onItemDownload) }
-        { renderContextButton("Delete"          , onItemDelete          ) }
-        { renderContextButton("Rename"          , onItemRename          ) }
-        { renderContextButton("Edit Permissions", onItemEditPermissions ) }
+    <div className="overlay" onClick={() => setContextMenu(null)}>
+      <div
+        className="context-menu"
+        style={{
+          position: "fixed",
+          left: contextMenu.x,
+          top: contextMenu.y,
+        }}
+      >
+        <div>
+          { contextMenu.item?.type === "DOCUMENT" && renderContextButton("Download", onItemDownload) }
+          { renderContextButton("Delete"          , onItemDelete          ) }
+          { renderContextButton("Rename"          , onItemRename          ) }
+          { renderContextButton("Edit Permissions", onItemEditPermissions ) }
+        </div>
       </div>
     </div>
   );

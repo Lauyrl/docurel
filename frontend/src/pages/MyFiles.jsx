@@ -12,7 +12,6 @@ function initializeFolderUIState(item) {
 }
 
 function MyFiles() {
-  // Creates a *state* variable with the initial value null, and a function to update that variable
 	// React stores the state of state variables across renders, a render happens whenever the state changes
 	// Render: a function call to the parent component (App() in this case)
 	const [itemMap, setItemMap] = useState(new Map);
@@ -160,9 +159,9 @@ function MyFiles() {
   }
 
 	function getItem(publicId) { return itemMap.get(publicId); }
-	const root = getItem(rootId);
+	const root          = getItem(rootId);
 	const currentFolder = getItem(currentFolderId);
-	const previewItem = getItem(previewItemId);
+	const previewItem   = getItem(previewItemId);
 
 	return (
 		<ExplorerContext.Provider

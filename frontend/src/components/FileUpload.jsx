@@ -3,7 +3,7 @@ import { useExplorer } from "../ExplorerContext";
 import { useRef } from "react";
 
 function FileUpload() {
-  const {uploadDocument} = useExplorer();
+  const {uploadDocumentInMyFiles} = useExplorer();
   const fileInputRef = useRef(null);
 
   return (
@@ -18,7 +18,7 @@ function FileUpload() {
         */
         onChange={(e) => {
           const file = e.target.files[0];
-          if (file) uploadDocument(file);
+          if (file) uploadDocumentInMyFiles(file);
           e.target.value = ""; // reset this because e.target.files is immutable, resetting lets onChange trigger more reliably later
         }}
       />

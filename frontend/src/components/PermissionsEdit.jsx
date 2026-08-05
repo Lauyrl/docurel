@@ -3,7 +3,7 @@ import "./css/common.css"
 import { useExplorer } from "../ExplorerContext";
 
 function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf }) {
-  const { editUserPermissionsForItem, getUsersWithPermissionsForItem } = useExplorer();
+  const { editUserPermissionsForItemInMyFiles, getUsersWithPermissionsForItemInMyFiles } = useExplorer();
 
   const [newPermissionsInfo, setNewPermissionsInfo] = useState({
     usernameOrEmail: "",
@@ -14,10 +14,10 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
 
   useEffect(() => {
     async function loadUsersWithPermissionsForItem() { 
-      setUsersWithPermissionsForItem(await getUsersWithPermissionsForItem(itemToEditUserPermissionsOf));
+      setUsersWithPermissionsForItem(await getUsersWithPermissionsForItemInMyFiles(itemToEditUserPermissionsOf));
     }
     loadUsersWithPermissionsForItem();
-  }, [itemToEditUserPermissionsOf, getUsersWithPermissionsForItem])
+  }, [itemToEditUserPermissionsOf, getUsersWithPermissionsForItemInMyFiles])
 
   function cleanupPermissionEditStates() {
     setItemToEditUserPermissionsOf(null);
@@ -47,7 +47,7 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
         </select>
         <button onClick={async () => {
             if (newPermissionsInfo.usernameOrEmail.trim() === "") return;
-            let editPermissionData = await editUserPermissionsForItem(itemToEditUserPermissionsOf, newPermissionsInfo);
+            let editPermissionData = await editUserPermissionsForItemInMyFiles(itemToEditUserPermissionsOf, newPermissionsInfo);
             setUsersWithPermissionsForItem(current => new Map(current).set(editPermissionData.username, editPermissionData.permission));
             setNewPermissionsInfo({usernameOrEmail: "", permissionString: "VIEWER"});
           }}> 
@@ -68,7 +68,7 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
                   value={permission}
                   onChange={async (e) => {
                     let editPermissionData = 
-                      await editUserPermissionsForItem(itemToEditUserPermissionsOf, {
+                      await editUserPermissionsForItemInMyFiles(itemToEditUserPermissionsOf, {
                         usernameOrEmail: username, permissionString: e.target.value
                       });
                     setUsersWithPermissionsForItem(current => new Map(current).set(editPermissionData.username, editPermissionData.permission));

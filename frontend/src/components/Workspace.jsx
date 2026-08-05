@@ -7,10 +7,10 @@ import PreviewOverlay from "./PreviewOverlay";
 import PermissionsEdit from "./PermissionsEdit";
 import { useState } from "react";
 import { useExplorer } from "../ExplorerContext";
-import { downloadDocumentRedirect } from "./common";
+import { downloadDocumentRedirect } from "../pages/common";
 
 function Workspace() {
-  const {childrenIndex, selectItem, deleteItem, patchItem} = useExplorer();
+  const {childrenIndex, selectItemInMyFiles, deleteItemInMyFiles, patchItemInMyFiles} = useExplorer();
 
   const [contextMenu, setContextMenu] = useState({
     item: null,
@@ -68,7 +68,7 @@ function Workspace() {
       <div
         onClick={(e) => {
           e.stopPropagation();
-          selectItem(item);
+          selectItemInMyFiles(item);
         }}
         onContextMenu={(e) => {
           e.preventDefault();
@@ -85,8 +85,8 @@ function Workspace() {
           e.preventDefault();
           if (canDropInto(item)) {
             e.stopPropagation();
-            selectItem(item);
-            patchItem(draggedItem, null, item.publicId);
+            selectItemInMyFiles(item);
+            patchItemInMyFiles(draggedItem, null, item.publicId);
           }
         }}
       >
@@ -113,7 +113,7 @@ function Workspace() {
                   if (e.key === "Enter") {
                     const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
                     if (newName && newName != "") {
-                      patchItem(itemRename.item, newName, null);
+                      patchItemInMyFiles(itemRename.item, newName, null);
                       setItemRename(null);
                     }
                   }
@@ -134,7 +134,7 @@ function Workspace() {
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           onItemDownload={downloadDocumentRedirect}
-          onItemDelete={deleteItem}
+          onItemDelete={deleteItemInMyFiles}
           onItemRename={(item) => {setItemRename({item: item, newName: item.name})}}
           onItemEditPermissions={(item) => {setItemToEditUserPermissionsOf(item)}}
         />

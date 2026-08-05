@@ -2,7 +2,7 @@ import "./css/Breadcrumbs.css"
 import { useExplorer } from "../ExplorerContext";
 
 function Breadcrumbs() {
-    const {currentFolder, getItem, selectItem} = useExplorer();
+    const {currentFolder, getItem, selectItemInMyFiles} = useExplorer();
     if (!currentFolder) return null;
     
     let path = [];
@@ -17,7 +17,7 @@ function Breadcrumbs() {
         { "Path: " }
         { 
           path.map((item, i) => (
-            <span key={item.publicId} onClick={() => selectItem(item)}>
+            <span key={item.publicId} onClick={() => selectItemInMyFiles(item)}>
               {(i > 0) && " > "}
               <span className="breadcrumbs"> {item.name} </span> 
             </span>

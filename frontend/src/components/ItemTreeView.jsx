@@ -2,7 +2,7 @@ import { useExplorer } from "../ExplorerContext";
 import "./css/ItemTreeView.css";
 
 function ItemTreeView({draggedItem, renderItemListing}) {
-  const {root, childrenIndex, selectItem, patchItem} = useExplorer();
+  const {root, childrenIndex, selectItemInMyFiles, patchItemInMyFiles} = useExplorer();
 
   function displayItem(item) {
     return (
@@ -42,12 +42,12 @@ function ItemTreeView({draggedItem, renderItemListing}) {
   return (
     <div
       className="vertical-item-listing" 
-      onClick={() => selectItem(root)}
+      onClick={() => selectItemInMyFiles(root)}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
-        selectItem(root);
-        if (draggedItem) patchItem(draggedItem, null, root.publicId);
+        selectItemInMyFiles(root);
+        if (draggedItem) patchItemInMyFiles(draggedItem, null, root.publicId);
       }}
     > 
       { rootChildren === 0 && <h2> Upload a file </h2> }

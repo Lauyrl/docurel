@@ -6,6 +6,7 @@ import FileUpload from "../components/FileUpload";
 import FolderUpload from "../components/FolderUpload";
 import Workspace from "../components/Workspace"
 import Breadcrumbs from "../components/Breadcrumbs";
+import { createFolder, deleteItem, editUserPermissionsForItem, getUsersWithPermissionsForItem, patchItem, selectItem, uploadDocument } from "./common";
 
 function initializeFolderUIState(item) {
     return { ...item, isExpanded: false };
@@ -52,110 +53,48 @@ function MyFiles() {
 			})
 	}, []);
 
-	function uploadDocument(file) {
-		if (!file) return;
-
-		const formData = new FormData();   // files sent to Spring as FormData
-		formData.append("document", file); // name has to match the field name that Spring expects
-		formData.append("publicParentId", currentFolderId);
-
-		api("/document", {
-			method: "POST",
-			body: formData
-		})
-			.then((response) => response.json()) // response.json() doesnt return a json, but a 'Promise' that a json will be returned
-			.then((item) => {
-				setItemMap(current => new Map(current).set(item.publicId, item)); // implicit return
-			});
+  
+	async function uploadDocumentInMyFiles(file) {
+		let document = await uploadDocument(file, currentFolder, setItemMap);
+    setItemMap(current => new Map(current).set(document.publicId, document)); // implicit return
 	}
 
-	function selectItem(item) {
-		setPreviewItemId(null);
-		if (item.type === "DOCUMENT") setPreviewItemId(item.publicId);
-		if (item.type === "FOLDER") {
-			const itemTemp = { ...item, isExpanded: !item.isExpanded };
-			setItemMap(current => new Map(current).set(item.publicId, itemTemp)) // make new map with new entry to avoid mutating state
-			setCurrentFolderId(item.publicId);
-		}
+	async function createFolderInMyFiles(foldername) {
+		let folder = await createFolder(foldername, currentFolderId);
+    if (folder.type === 'FOLDER') folder = initializeFolderUIState(folder);
+    setItemMap(current => new Map(current).set(folder.publicId, folder))
 	}
 
-	// CHANGE THIS TO SEND RAW JSON
-	function createFolder(foldername) {
-		const formData = new FormData();
-		formData.append("foldername", foldername);
-		formData.append("publicParentId", currentFolderId);
-
-		api("/folder", {
-			method: "POST",
-			body: formData,
-		})
-			.then((response) => response.json())
-			.then((item) => {
-				if (item.type === 'FOLDER') item = initializeFolderUIState(item);
-				setItemMap(current => new Map(current).set(item.publicId, item))
-			});
+	function selectItemInMyFiles(item) {
+		selectItem(
+      () => setPreviewItemId(item.publicId),
+      () => {
+        const itemTemp = { ...item, isExpanded: !item.isExpanded };
+        setItemMap(current => new Map(current).set(item.publicId, itemTemp)) // make new map with new entry to avoid mutating state
+        setCurrentFolderId(item.publicId);
+        setPreviewItemId(null);
+      }
+    )
 	}
 
-	function deleteDescendants(next, rootFolder) {
-		if (rootFolder.type !== "FOLDER") return;
-		for (const child of (childrenIndex.get(rootFolder.publicId) ?? [])) {
-			deleteDescendants(next, child);
-			next.delete(child.publicId);
-		}
+	async function deleteItemInMyFiles(item) {
+		setItemMap(await deleteItem(item, itemMap, childrenIndex));
+    selectItem(itemMap.get(item.publicParentId));
 	}
 
-	function deleteItem(item) {
-		const type = (item.type === "DOCUMENT" ? "document" : "folder");
-		api("/" + type + "/" + item.publicId, { method: "DELETE" })
-			.then(() => {
-				let next = new Map(itemMap);
-				if (item.type === "FOLDER") deleteDescendants(next, item);
-				setItemMap(() => {
-					next.delete(item.publicId);
-					return next;
-				});
-
-				selectItem(itemMap.get(item.publicParentId));
-			});
+	async function patchItemInMyFiles(item, newName, newParentPublicId) {
+		let patchedItem = await patchItem(item, newName, newParentPublicId);
+    if (patchedItem != null) {
+      setItemMap(current => new Map(current).set(item.publicId, patchedItem));
+    }
 	}
 
-	function patchItem(item, newName, newParentPublicId) {
-		api("/item/" + item.publicId, {
-			method: "PATCH",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				name: newName,
-				publicParentId: newParentPublicId
-			})
-		})
-			.then(response => {
-				if (response.status !== 204) return null;
-				setItemMap(current => {
-					if (newParentPublicId == null) return new Map(current).set(item.publicId, { ...item, name: newName })
-					else if (newName == null) return new Map(current).set(item.publicId, { ...item, publicParentId: newParentPublicId })
-				});
-			});
-	}
-
-  function editUserPermissionsForItem(item, newPermissionsInfo) {
-    return api("/item/" + item.publicId + "/permission", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newPermissionsInfo)
-    })
-      .then(response => response.json());
+  async function editUserPermissionsForItemInMyFiles(item, newPermissionsInfo) {
+    return await editUserPermissionsForItem(item, newPermissionsInfo);
   }
 
-  async function getUsersWithPermissionsForItem(item) {
-    let map = new Map;
-    await api("/item/" + item.publicId + "/permission")
-      .then(response => response.json())
-      .then(users => {
-        for (const user of users) {
-          map.set(user.username, user.permission);
-        }
-      });
-    return map
+  async function getUsersWithPermissionsForItemInMyFiles(item) {
+    return await getUsersWithPermissionsForItem(item);
   }
 
 	function getItem(publicId) { return itemMap.get(publicId); }
@@ -167,9 +106,13 @@ function MyFiles() {
 		<ExplorerContext.Provider
 			value={{
 				childrenIndex, root, currentFolder, previewItem,
+
 				setRootId, setCurrentFolderId, setPreviewItemId,
-				uploadDocument, selectItem, deleteItem, patchItem, editUserPermissionsForItem, getUsersWithPermissionsForItem,
-				getItem, createFolder
+
+				uploadDocumentInMyFiles, createFolderInMyFiles, selectItemInMyFiles, deleteItemInMyFiles, patchItemInMyFiles, 
+        editUserPermissionsForItemInMyFiles, getUsersWithPermissionsForItemInMyFiles,
+
+        getItem
 			}}
 		>
 			<div className="app">

@@ -4,14 +4,14 @@ import { useState } from "react";
 import { useExplorer } from "../ExplorerContext";
 
 function FolderUpload() {
-  const {createFolder} = useExplorer();
+  const {createFolderInMyFiles} = useExplorer();
 
   const [creatingFolder, setCreatingFolder] = useState(false);
   const [foldernameToCreate, setFoldernameToCreate] = useState("");
   
   function uploadFolderToCreate() {
     if (!foldernameToCreate || foldernameToCreate === "") return;
-    createFolder(foldernameToCreate);
+    createFolderInMyFiles(foldernameToCreate);
     setFoldernameToCreate("");
   }
 

@@ -16,10 +16,9 @@ function PreviewOverlay() {
   useEffect(() => {
     if (!previewItem) return;
 
-    let url = null;
-    api("/document/" + previewItem.publicId, {
-      headers: { "Authorization": "Bearer " + token }
-    })
+    let url;
+
+    api("/document/" + previewItem.publicId)
       .then((response) => response.blob())
       .then((blob) => {
         url = URL.createObjectURL(blob);
@@ -29,7 +28,9 @@ function PreviewOverlay() {
         });
       });
     // a 'return () => {}' in a useEffect() is a special *cleanup function* that doesnt run at the end of the current effect, but at the beginning of the next
-    return () => URL.revokeObjectURL(url);
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    }
   }, [previewItem, token]);
 
   function closePreview() {

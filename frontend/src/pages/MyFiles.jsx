@@ -6,10 +6,10 @@ import FileUpload from "../components/FileUpload";
 import FolderUpload from "../components/FolderUpload";
 import Workspace from "../components/Workspace"
 import Breadcrumbs from "../components/Breadcrumbs";
-import { createFolder, deleteItem, editUserPermissionsForItem, getUsersWithPermissionsForItem, patchItem, selectItem, uploadDocument } from "./common";
+import { createFolder, deleteItem, editUserPermissionsForItem, getUsersWithPermissionsForItem, patchItem, uploadDocument } from "./common";
 
 function initializeFolderUIState(item) {
-    return { ...item, isExpanded: false };
+	return { ...item, isExpanded: false };
 }
 
 function MyFiles() {
@@ -38,69 +38,67 @@ function MyFiles() {
 			api("/folder/root").then(response => response.json()),
 			api("/document").then(response => response.json())
 		]).then(([root, items]) => {
-				const itemMapTemp = new Map;
+			const itemMapTemp = new Map;
 
-				root = initializeFolderUIState(root);
-				setRootId(root.publicId);
-				setCurrentFolderId(root.publicId);
-				itemMapTemp.set(root.publicId, root);
+			root = initializeFolderUIState(root);
+			setRootId(root.publicId);
+			setCurrentFolderId(root.publicId);
+			itemMapTemp.set(root.publicId, root);
 
-				items.forEach(item => { // non-inclusive of the user root, see backend
-					if (item.type === "FOLDER") item = initializeFolderUIState(item);
-					itemMapTemp.set(item.publicId, item)
-				})
-				setItemMap(itemMapTemp);
+			items.forEach(item => { // non-inclusive of the user root, see backend
+				if (item.type === "FOLDER") item = initializeFolderUIState(item);
+				itemMapTemp.set(item.publicId, item)
 			})
+			setItemMap(itemMapTemp);
+		})
 	}, []);
 
-  
 	async function uploadDocumentInMyFiles(file) {
-		let document = await uploadDocument(file, currentFolder, setItemMap);
-    setItemMap(current => new Map(current).set(document.publicId, document)); // implicit return
+		let document = await uploadDocument(file, currentFolderId);
+		setItemMap(current => new Map(current).set(document.publicId, document)); // implicit return
 	}
 
 	async function createFolderInMyFiles(foldername) {
 		let folder = await createFolder(foldername, currentFolderId);
-    if (folder.type === 'FOLDER') folder = initializeFolderUIState(folder);
-    setItemMap(current => new Map(current).set(folder.publicId, folder))
+		if (folder.type === 'FOLDER') folder = initializeFolderUIState(folder);
+		setItemMap(current => new Map(current).set(folder.publicId, folder))
 	}
 
 	function selectItemInMyFiles(item) {
-		selectItem(
-      () => setPreviewItemId(item.publicId),
-      () => {
-        const itemTemp = { ...item, isExpanded: !item.isExpanded };
-        setItemMap(current => new Map(current).set(item.publicId, itemTemp)) // make new map with new entry to avoid mutating state
-        setCurrentFolderId(item.publicId);
-        setPreviewItemId(null);
-      }
-    )
+		setPreviewItemId(null);
+		if (item.type === "DOCUMENT") setPreviewItemId(item.publicId);
+		if (item.type === "FOLDER") {
+			const itemTemp = { ...item, isExpanded: !item.isExpanded };
+			setItemMap(current => new Map(current).set(item.publicId, itemTemp)) // make new map with new entry to avoid mutating state
+			setCurrentFolderId(item.publicId);
+		}
 	}
 
 	async function deleteItemInMyFiles(item) {
-		setItemMap(await deleteItem(item, itemMap, childrenIndex));
-    selectItem(itemMap.get(item.publicParentId));
+		const newItemMap = await deleteItem(item, itemMap, childrenIndex);
+		setItemMap(newItemMap);
+		selectItemInMyFiles(newItemMap.get(item.publicParentId)); // avoid itemMap.get() since itemMap could be stale? 
 	}
 
 	async function patchItemInMyFiles(item, newName, newParentPublicId) {
 		let patchedItem = await patchItem(item, newName, newParentPublicId);
-    if (patchedItem != null) {
-      setItemMap(current => new Map(current).set(item.publicId, patchedItem));
-    }
+		if (patchedItem != null) {
+			setItemMap(current => new Map(current).set(item.publicId, patchedItem));
+		}
 	}
 
-  async function editUserPermissionsForItemInMyFiles(item, newPermissionsInfo) {
-    return await editUserPermissionsForItem(item, newPermissionsInfo);
-  }
+	async function editUserPermissionsForItemInMyFiles(item, newPermissionsInfo) {
+		return await editUserPermissionsForItem(item, newPermissionsInfo);
+	}
 
-  async function getUsersWithPermissionsForItemInMyFiles(item) {
-    return await getUsersWithPermissionsForItem(item);
-  }
+	async function getUsersWithPermissionsForItemInMyFiles(item) {
+		return await getUsersWithPermissionsForItem(item);
+	}
 
 	function getItem(publicId) { return itemMap.get(publicId); }
-	const root          = getItem(rootId);
+	const root = getItem(rootId);
 	const currentFolder = getItem(currentFolderId);
-	const previewItem   = getItem(previewItemId);
+	const previewItem = getItem(previewItemId);
 
 	return (
 		<ExplorerContext.Provider
@@ -109,10 +107,10 @@ function MyFiles() {
 
 				setRootId, setCurrentFolderId, setPreviewItemId,
 
-				uploadDocumentInMyFiles, createFolderInMyFiles, selectItemInMyFiles, deleteItemInMyFiles, patchItemInMyFiles, 
-        editUserPermissionsForItemInMyFiles, getUsersWithPermissionsForItemInMyFiles,
+				uploadDocumentInMyFiles, createFolderInMyFiles, selectItemInMyFiles, deleteItemInMyFiles, patchItemInMyFiles,
+				editUserPermissionsForItemInMyFiles, getUsersWithPermissionsForItemInMyFiles,
 
-        getItem
+				getItem
 			}}
 		>
 			<div className="app">

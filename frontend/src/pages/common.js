@@ -1,8 +1,15 @@
 import { api } from "../api";
 
-export function downloadDocumentRedirect(item) {
-  /* window.location: Location object of the browser window, window.location.href: the full URL the browser is displaying */
-  window.open("http://localhost:8080/document/" + item.publicId + "/download");
+export async function downloadDocumentRedirect(item) {
+  const blob = await api("/document/" + item.publicId + "/download").then(response => response.blob()); // extract byte[] from response
+  const url = URL.createObjectURL(blob); // browser temp url for blob
+
+  const a = document.createElement("a"); // simulate an element <a />
+  a.href = url;                          // <a href={url}/>
+  a.download = item.name;                // <a href={url} download={item.name}/>: tells the browser that the link should trigger a download
+  a.click();                             // simulate clicking the link
+
+  URL.revokeObjectURL(url);
 }
 
 export function uploadDocument(file, currentFolderId) {
@@ -29,11 +36,6 @@ export function createFolder(foldername, currentFolderId) {
     method: "POST",
     body: formData,
   }).then((response) => response.json());
-}
-
-export function selectItem(item, ifIsDocument, ifIsFolder) {
-  if (item.type === "DOCUMENT") ifIsDocument();
-  if (item.type === "FOLDER") ifIsFolder();
 }
 
 export function deleteDescendants(next, rootFolder, childrenIndex) {

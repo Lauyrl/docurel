@@ -180,7 +180,7 @@ public class ItemService {
      * storing the highest-level, explicit (not implicitly through inheritence) 
      * permission along the path.
      * 
-     * @return A list of accessible items paired with their explicitly defined, or inherited, permissions
+     * @return A list of accessible items paired with their explicitly defined, or inherited, permissions, and their publicParentId
      */
     public List<SharedItemResponse> getItemsUserCanAccessExceptOwned() {
         List<ItemEntity> sharedItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(userService.getCurrentUserEntity().getId());
@@ -204,7 +204,12 @@ public class ItemService {
                 maxPermission = PermissionType.max(maxPermission, explicitPermissionsMap.get(sharedAncestor.getId()));
                 sharedAncestor = sharedItemsMap.get(sharedAncestor.getParentId());
             }
-            sharedItemResponses.add(new SharedItemResponse(item, maxPermission));
+
+            ItemEntity sharedParent = sharedItemsMap.get(item.getParentId());
+            // needed to build ItemResponse inside SharedItemResponse 
+            // if the parent is not shared/accessible to the current user, abstract its' publicId as null
+            UUID publicParentId = sharedParent != null ? sharedParent.getPublicId() : null;
+            sharedItemResponses.add(new SharedItemResponse(item, publicParentId, maxPermission));
         }
         return sharedItemResponses;
     }

@@ -1,7 +1,7 @@
 import "./css/PreviewOverlay.css";
 import { useEffect, useState } from "react";
-import { useExplorer } from "../context/ExplorerContext";
-import { api } from "../api";
+import { useExplorer } from "../../context/ExplorerContext";
+import { api } from "../../api";
 import Preview from "./Preview";
 
 function PreviewOverlay() {

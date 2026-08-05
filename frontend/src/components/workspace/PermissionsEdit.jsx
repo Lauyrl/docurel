@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import "./css/common.css"
-import useExplorerOperations from "../context/useExplorerOperations";
+import "../../css/common.css";
+import useExplorerOperations from "../../context/useExplorerOperations";
 
 function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf }) {
   const { editUserPermissionsForItem, getUsersWithPermissionsForItem } = useExplorerOperations(0);

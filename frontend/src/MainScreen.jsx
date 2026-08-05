@@ -1,11 +1,11 @@
 import { useState } from "react";
 import "./css/MainScreen.css"
-import "./pages/css/MyFiles.css";
-import PagesPanel from "./pages/PagesPanel";
+import "./components/workspace/pages/css/MyFiles.css";
+import PagesPanel from "./components/workspace/pages/PagesPanel";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
 import Breadcrumbs from "./components/Breadcrumbs";
-import Workspace from "./components/Workspace";
+import Workspace from "./components/workspace/Workspace";
 import { ExplorerProvider } from "./context/ExplorerProvider";
 
 function MainScreen() {

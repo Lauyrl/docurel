@@ -1,10 +1,10 @@
 import "./css/MyFiles.css";
 import { useEffect, useState } from "react";
-import { api } from "../api";
-import ItemTreeView from "../components/ItemTreeView";
-import FolderContentsView from "../components/FolderContentsView";
-import { useExplorer } from "../context/ExplorerContext";
-import { initializeFolderUIState } from "../context/useExplorerOperations";
+import { api } from "../../../api";
+import ItemTreeView from "./MyFiles components/ItemTreeView";
+import FolderContentsView from "./MyFiles components/FolderContentsView";
+import { useExplorer } from "../../../context/ExplorerContext";
+import { initializeFolderUIState } from "../../../context/useExplorerOperations";
 
 
 function MyFiles({ draggedItem, renderItemListing }) {

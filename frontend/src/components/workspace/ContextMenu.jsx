@@ -1,5 +1,5 @@
 import "./css/ContextMenu.css";
-import "./css/common.css";
+import "../../css/common.css";
 
 function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete, onItemRename, onItemEditPermissions }) {
   

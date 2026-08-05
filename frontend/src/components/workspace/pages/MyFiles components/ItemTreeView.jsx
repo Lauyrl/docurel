@@ -1,6 +1,6 @@
-import { useExplorer } from "../context/ExplorerContext";
-import useExplorerOperations from "../context/useExplorerOperations";
-import "./css/ItemTreeView.css";
+import { useExplorer } from "../../../../context/ExplorerContext";
+import useExplorerOperations from "../../../../context/useExplorerOperations";
+import "../css/ItemTreeView.css";
 
 function ItemTreeView({root, draggedItem, renderItemListing}) {
   const {childrenIndex} = useExplorer();

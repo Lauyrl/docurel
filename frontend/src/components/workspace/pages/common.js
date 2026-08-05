@@ -1,4 +1,4 @@
-import { api } from "../api";
+import { api } from "../../../api";
 
 export async function downloadDocumentRedirect(item) {
   const blob = await api("/document/" + item.publicId + "/download").then(response => response.blob()); // extract byte[] from response

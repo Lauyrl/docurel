@@ -1,4 +1,4 @@
-import "./css/common.css";
+import "../css/common.css";
 import "./css/FolderUpload.css";
 import { useState } from "react";
 import useExplorerOperations from "../context/useExplorerOperations";

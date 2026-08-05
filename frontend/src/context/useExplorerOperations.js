@@ -1,4 +1,4 @@
-import { createFolderCommon, deleteItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, uploadDocumentCommon } from "../pages/common";
+import { createFolderCommon, deleteItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, uploadDocumentCommon } from "../components/workspace/pages/common";
 import { useExplorer } from "./ExplorerContext";
 
 export function initializeFolderUIState(item) {

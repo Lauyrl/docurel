@@ -1,13 +1,13 @@
 import "./css/Workspace.css";
-import "./css/common.css";
+import "../../css/common.css";
 import ContextMenu from "./ContextMenu";
 import PreviewOverlay from "./PreviewOverlay";
 import PermissionsEdit from "./PermissionsEdit";
 import { useEffect, useState } from "react";
-import { useExplorer } from "../context/ExplorerContext";
-import { downloadDocumentRedirect } from "../pages/common";
-import useExplorerOperations from "../context/useExplorerOperations";
-import MyFiles from "../pages/MyFiles";
+import { useExplorer } from "../../context/ExplorerContext";
+import { downloadDocumentRedirect } from "./pages/common";
+import useExplorerOperations from "../../context/useExplorerOperations";
+import MyFiles from "./pages/MyFiles";
 
 function Workspace({ currentPageIdx }) {
   const {childrenIndex} = useExplorer();

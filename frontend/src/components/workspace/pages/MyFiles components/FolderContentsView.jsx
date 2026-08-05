@@ -1,6 +1,6 @@
-import "./css/FolderContentsView.css";
-import { useExplorer } from "../context/ExplorerContext";
-import useExplorerOperations from "../context/useExplorerOperations";
+import "../css/FolderContentsView.css";
+import { useExplorer } from "../../../../context/ExplorerContext";
+import useExplorerOperations from "../../../../context/useExplorerOperations";
 
 function FolderContentsView({draggedItem, renderItemListing}) {
   const {childrenIndex, currentFolder} = useExplorer(); 

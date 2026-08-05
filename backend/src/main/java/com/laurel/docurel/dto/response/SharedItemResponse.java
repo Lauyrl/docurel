@@ -10,13 +10,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SharedItemResponse {
-    private ItemResponse item;
+public class SharedItemResponse extends ItemResponse {
     // private String ownerUsername;
     private PermissionType permission;
 
     public SharedItemResponse(ItemEntity item, UUID publicParentId, PermissionType permission) {
-        this.item = new ItemResponse(item, publicParentId);
+        super(item, publicParentId);
         this.permission = permission;
     }
 }

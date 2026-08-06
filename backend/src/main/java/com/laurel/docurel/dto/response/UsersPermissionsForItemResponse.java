@@ -7,11 +7,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserPermissionsForItemResponse {
+public class UsersPermissionsForItemResponse {
     private String username;
     private PermissionType permission;
 
-    public UserPermissionsForItemResponse(String username, PermissionType permission) {
+    public UsersPermissionsForItemResponse(String username, PermissionType permission) {
         this.username = username;
         this.permission = permission;
     }

@@ -21,7 +21,7 @@ import com.laurel.docurel.dto.request.SetPermissionsRequest;
 import com.laurel.docurel.dto.request.UpdateItemRequest;
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.dto.response.SharedItemResponse;
-import com.laurel.docurel.dto.response.UserPermissionsForItemResponse;
+import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
 import com.laurel.docurel.enums.PermissionType;
 import com.laurel.docurel.exception.InvalidPermissionsException;
 import com.laurel.docurel.service.ItemService;
@@ -101,13 +101,13 @@ public class ItemController {
     }
 
     @PutMapping("/item/{publicId}/permission")
-    public UserPermissionsForItemResponse setUserPermissionsForItem(@PathVariable UUID publicId, @RequestBody SetPermissionsRequest request) {
+    public UsersPermissionsForItemResponse setUserPermissionsForItem(@PathVariable UUID publicId, @RequestBody SetPermissionsRequest request) throws InvalidPermissionsException {
         return itemService.setUserPermissionsForItem(request.getUsernameOrEmail(), publicId, PermissionType.valueOf(request.getPermissionString()));
     }
 
     @GetMapping("/item/{publicId}/permission")
-    public List<UserPermissionsForItemResponse> getUserPermissionsForItem(@PathVariable UUID publicId) {
-        return itemService.getUserPermissionsForItem(publicId);
+    public List<UsersPermissionsForItemResponse> getUsersWithPermissionsForItem(@PathVariable UUID publicId) throws InvalidPermissionsException {
+        return itemService.getUsersWithPermissionsForItem(publicId);
     }
 
     @GetMapping("/shared")

@@ -23,12 +23,12 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
     public List<ItemEntity> findItemsByUser(UserEntity user);
 
     @Query(value = """
-        SELECT ui
-        FROM UserItemEntity ui
-        WHERE ui.user = :user
-          AND ui.permission != com.laurel.docurel.enums.PermissionType.OWNER
-    """)
-    public List<UserItemEntity> findByUserExceptOwned(UserEntity user);
+        SELECT *
+        FROM user_items ui
+        WHERE ui.user_id = :userId
+          AND ui.permission != 'OWNER'
+    """, nativeQuery = true)
+    public List<UserItemEntity> findByUserExceptOwned(@Param("userId") Long userId);
 
     @Query(value = """
         WITH RECURSIVE shared AS (

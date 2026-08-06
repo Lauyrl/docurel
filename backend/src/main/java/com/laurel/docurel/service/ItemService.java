@@ -189,7 +189,7 @@ public class ItemService {
             sharedItemsMap.put(item.getId(), item);
         }
 
-        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(userService.getCurrentUserEntity());
+        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(userService.getCurrentUserEntity().getId());
         Map<Long, PermissionType> explicitPermissionsMap = new HashMap<>();
         for (UserItemEntity ui : explicitPermissions) {
             explicitPermissionsMap.put(ui.getItem().getId(), ui.getPermission());

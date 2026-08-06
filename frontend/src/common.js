@@ -91,6 +91,14 @@ export function editUserPermissionsForItemCommon(item, newPermissionsInfo) {
   }).then((response) => response.json());
 }
 
+export function deleteUserPermissionsForItemCommon(item, username) {
+  return api("/item/" + item.publicId + "/permission", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username }),
+  })
+}
+
 export async function getUsersWithPermissionsForItemCommon(item) {
   let map = new Map();
 

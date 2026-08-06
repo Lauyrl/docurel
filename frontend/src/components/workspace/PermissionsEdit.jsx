@@ -3,14 +3,14 @@ import "../../css/common.css";
 import useExplorerOperations from "../../context/useExplorerOperations";
 
 function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf }) {
-  const { editUserPermissionsForItem, getUsersWithPermissionsForItem } = useExplorerOperations(0);
+  const { editUserPermissionsForItem, getUsersWithPermissionsForItem, deleteUserPermissionsForItem } = useExplorerOperations(0);
 
   const [newPermissionsInfo, setNewPermissionsInfo] = useState({
     usernameOrEmail: "",
     permissionString: "VIEWER"
   })
   
-  const [usersWithPermissionsForItem, setUsersWithPermissionsForItem] = useState(new Map);
+  const [usersWithPermissionsForItem, setUsersWithPermissionsForItem] = useState(new Map); // key: username, value: permission
 
   useEffect(() => {
     async function loadUsersWithPermissionsForItem() { 
@@ -64,20 +64,35 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
               { permission === "OWNER" && ("Owner") }
               {
                 permission !== "OWNER" &&
-                <select
-                  value={permission}
-                  onChange={async (e) => {
-                    let editPermissionData = 
-                      await editUserPermissionsForItem(itemToEditUserPermissionsOf, {
-                        usernameOrEmail: username, permissionString: e.target.value
-                      });
-                    setUsersWithPermissionsForItem(current => new Map(current).set(editPermissionData.username, editPermissionData.permission));
-                  }}   
-                >
-                  <option value="VIEWER">Viewer</option>
-                  <option value="SHARER">Sharer</option>
-                  <option value="EDITOR">Editor</option>
-                </select>
+                <span style={{ display: "flex", gap: "10px" }}>
+                  <select
+                    value={permission}
+                    onChange={async (e) => {
+                      let editPermissionData = 
+                        await editUserPermissionsForItem(itemToEditUserPermissionsOf, {
+                          usernameOrEmail: username, permissionString: e.target.value
+                        });
+                      setUsersWithPermissionsForItem(current => new Map(current).set(editPermissionData.username, editPermissionData.permission));
+                    }}   
+                  >
+                    <option value="VIEWER">Viewer</option>
+                    <option value="SHARER">Sharer</option>
+                    <option value="EDITOR">Editor</option>
+                  </select>
+                  <span 
+                    style={{userSelect: "none"}} 
+                    onClick={() => {
+                      deleteUserPermissionsForItem(itemToEditUserPermissionsOf, username);
+                      setUsersWithPermissionsForItem(() => {
+                        let map = new Map(usersWithPermissionsForItem);
+                        map.delete(username);
+                        return map;
+                      })
+                    }}
+                  > 
+                    X 
+                  </span>
+                </span>
               }
             </div>
           )) 

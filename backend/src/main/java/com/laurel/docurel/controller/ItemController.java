@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.laurel.docurel.dto.request.DeletePermissionRequest;
 import com.laurel.docurel.dto.request.SetPermissionsRequest;
 import com.laurel.docurel.dto.request.UpdateItemRequest;
 import com.laurel.docurel.dto.response.ItemResponse;
@@ -108,6 +109,12 @@ public class ItemController {
     @GetMapping("/item/{publicId}/permission")
     public List<UsersPermissionsForItemResponse> getUsersWithPermissionsForItem(@PathVariable UUID publicId) throws InvalidPermissionsException {
         return itemService.getUsersWithPermissionsForItem(publicId);
+    }
+
+    @DeleteMapping("/item/{itemPublicId}/permission")
+    public ResponseEntity<Void> deleteUserPermissionForItem(@PathVariable UUID itemPublicId, @RequestBody DeletePermissionRequest request) throws InvalidPermissionsException {
+        itemService.deleteUserPermissionForItem(itemPublicId, request.getUsername());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/shared")

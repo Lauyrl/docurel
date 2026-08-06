@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { createFolderCommon, deleteItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, uploadDocumentCommon } from "../common";
+import { createFolderCommon, deleteItemCommon, deleteUserPermissionsForItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, uploadDocumentCommon } from "../common";
 import { useExplorer } from "./ExplorerContext";
 
 export function initializeFolderUIState(item) {
@@ -49,12 +49,16 @@ function useMyFilesOperations() {
     return await editUserPermissionsForItemCommon(item, newPermissionsInfo);
   }
 
+  async function deleteUserPermissionsForItem(item, username) {
+    deleteUserPermissionsForItemCommon(item, username)
+  }
+
   async function getUsersWithPermissionsForItem(item) {
     return await getUsersWithPermissionsForItemCommon(item);
   }
 
   return {
-    initializeFolderUIState, selectItem, uploadDocument, createFolder, deleteItem, patchItem, editUserPermissionsForItem, getUsersWithPermissionsForItem
+    initializeFolderUIState, selectItem, uploadDocument, createFolder, deleteItem, patchItem, editUserPermissionsForItem, deleteUserPermissionsForItem, getUsersWithPermissionsForItem
   }
 }
 

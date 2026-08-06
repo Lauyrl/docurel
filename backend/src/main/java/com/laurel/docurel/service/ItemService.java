@@ -178,6 +178,13 @@ public class ItemService {
         return responses;
     }
 
+    public void deleteUserPermissionForItem(UUID itemPublicId, String username) throws InvalidPermissionsException {
+        validateOwnership(itemPublicId);
+
+        UserEntity user = userService.getUserByUsernameOrEmail(username);
+        ItemEntity item = itemRepository.findByPublicId(itemPublicId).orElseThrow();
+        userItemRepository.deleteByUserAndItem(user, item);
+    }
     /**
      * Firstly, build a map of all accessible items for the current user, 
      * and a map of all items with explicit UserItem permission entries.

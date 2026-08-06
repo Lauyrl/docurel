@@ -1,5 +1,6 @@
 package com.laurel.docurel.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.entity.UserEntity;
 import com.laurel.docurel.entity.UserItemEntity;
+import com.laurel.docurel.enums.PermissionType;
 
 public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> {
     
@@ -30,6 +32,14 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
     """, nativeQuery = true)
     public List<UserItemEntity> findByUserExceptOwned(@Param("userId") Long userId);
 
+    @Query(value = """
+        SELECT ui.permission
+        FROM UserItemEntity ui
+        WHERE ui.item IN :items
+          AND ui.user = :user
+    """)
+    public List<PermissionType> findPermissionsByItemsAndUser(@Param("items") Collection<ItemEntity> items, @Param("user") UserEntity user);
+    
     @Query(value = """
         WITH RECURSIVE shared AS (
             SELECT i.*

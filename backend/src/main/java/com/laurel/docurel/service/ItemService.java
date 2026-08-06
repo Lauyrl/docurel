@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.dto.response.SharedItemResponse;
-import com.laurel.docurel.dto.response.UserPermissionsForItemResponse;
+import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
 import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.entity.UserEntity;
 import com.laurel.docurel.entity.UserItemEntity;
@@ -58,7 +58,7 @@ public class ItemService {
 
     @SuppressWarnings("null")
     public ItemResponse storeDocument(MultipartFile document, UUID publicParentId) throws IOException, InvalidPermissionsException {
-        validateAccess(publicParentId);
+        validateModifyFolderContents(publicParentId);
 
         Long parentId = itemRepository.findIdByPublicId(publicParentId);
         String filename = Objects.requireNonNull(document.getOriginalFilename());
@@ -78,7 +78,7 @@ public class ItemService {
     }
 
     public byte[] getFileBytes(UUID publicId) throws IOException, InvalidPermissionsException {
-        validateAccess(publicId);
+        validateViewing(publicId);
 
         Long id = itemRepository.findIdByPublicId(publicId);
         Path loc = Path.of(STORAGE_PATH, id.toString());
@@ -86,7 +86,7 @@ public class ItemService {
     }
 
     public void deleteDocument(UUID publicId) throws IOException, InvalidPermissionsException {
-        validateAccess(publicId);
+        validateModifyFolderContents(itemRepository.findPublicParentIdByPublicId(publicId));
 
         Long id = itemRepository.findIdByPublicId(publicId);
         Path loc = Path.of(STORAGE_PATH, id.toString());
@@ -96,7 +96,7 @@ public class ItemService {
 
     // only create a logical Folder entry on the DB
     public ItemResponse createDirectory(String foldername, UUID publicParentId) throws InvalidPermissionsException {
-        validateAccess(publicParentId);
+        validateModifyFolderContents(publicParentId);
 
         Long parentId = itemRepository.findIdByPublicId(publicParentId);
         if (itemRepository.existsByParentIdAndName(parentId, foldername))  {
@@ -111,7 +111,7 @@ public class ItemService {
 
     @SuppressWarnings("null")
     public void deleteDirectory(UUID publicId) throws IOException, InvalidPermissionsException {
-        validateAccess(publicId);
+        validateModifyFolderContents(itemRepository.findPublicParentIdByPublicId(publicId));
 
         Long rootId = itemRepository.findIdByPublicId(publicId);
         List<Long> toDeleteIds = itemRepository.findDocumentIdsByAncestorId(rootId);
@@ -123,13 +123,15 @@ public class ItemService {
     }
 
     @SuppressWarnings("null")
-    public void updateItem(UUID publicId, String newName, UUID newPublicParentId) throws InvalidPermissionsException {
-        validateAccess(publicId);
-        
+    public void updateItem(UUID publicId, String newName, UUID newPublicParentId) throws InvalidPermissionsException {        
         ItemEntity entityToUpdate = itemRepository.findByPublicId(publicId).orElseThrow();
-        if           (newName != null) entityToUpdate.setName(newName);
+        if (newName != null) {
+            validateRename(publicId);
+            entityToUpdate.setName(newName);
+        }
         if (newPublicParentId != null) {
-            validateAccess(newPublicParentId);
+            validateModifyFolderContents(itemRepository.findPublicParentIdByPublicId(publicId)); // can 'delete' item from original folder
+            validateModifyFolderContents(newPublicParentId);                                     // can 'upload' item into new folder
 
             ItemEntity newParent = itemRepository.findByPublicId(newPublicParentId).orElseThrow();
             Long entityId = entityToUpdate.getId();
@@ -147,7 +149,9 @@ public class ItemService {
         itemRepository.save(entityToUpdate);
     }
 
-    public UserPermissionsForItemResponse setUserPermissionsForItem(String usernameOrEmail, UUID itemPublicId, PermissionType permission) {
+    public UsersPermissionsForItemResponse setUserPermissionsForItem(String usernameOrEmail, UUID itemPublicId, PermissionType permission) throws InvalidPermissionsException {
+        validateOwnership(itemPublicId);
+
         UserEntity user = userService.getUserByUsernameOrEmail(usernameOrEmail);
         ItemEntity item = itemRepository.findByPublicId(itemPublicId).orElseThrow();
 
@@ -159,15 +163,17 @@ public class ItemService {
         userItem.setPermission(permission);
         userItemRepository.save(userItem);
 
-        return new UserPermissionsForItemResponse(user.getUsername(), permission);
+        return new UsersPermissionsForItemResponse(user.getUsername(), permission);
     }
 
-    public List<UserPermissionsForItemResponse> getUserPermissionsForItem(UUID publicId) {
-        List<UserPermissionsForItemResponse> responses = new ArrayList<>();
+    public List<UsersPermissionsForItemResponse> getUsersWithPermissionsForItem(UUID publicId) throws InvalidPermissionsException {
+        validateOwnership(publicId);
+
+        List<UsersPermissionsForItemResponse> responses = new ArrayList<>();
 
         List<UserItemEntity> userItemEntities = userItemRepository.findByItem(itemRepository.findByPublicId(publicId).orElseThrow());
         for (UserItemEntity userItemEntity : userItemEntities) {
-            responses.add(new UserPermissionsForItemResponse(userItemEntity.getUser().getUsername(), userItemEntity.getPermission()));
+            responses.add(new UsersPermissionsForItemResponse(userItemEntity.getUser().getUsername(), userItemEntity.getPermission()));
         }
         return responses;
     }
@@ -183,13 +189,15 @@ public class ItemService {
      * @return A list of accessible items paired with their explicitly defined, or inherited, permissions, and their publicParentId
      */
     public List<SharedItemResponse> getItemsUserCanAccessExceptOwned() {
-        List<ItemEntity> sharedItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(userService.getCurrentUserEntity().getId());
+        UserEntity currentUser = userService.getCurrentUserEntity();
+
+        List<ItemEntity> sharedItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(currentUser.getId());
         Map<Long, ItemEntity> sharedItemsMap = new HashMap<>();
         for (ItemEntity item : sharedItems) {
             sharedItemsMap.put(item.getId(), item);
         }
 
-        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(userService.getCurrentUserEntity().getId());
+        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(currentUser.getId());
         Map<Long, PermissionType> explicitPermissionsMap = new HashMap<>();
         for (UserItemEntity ui : explicitPermissions) {
             explicitPermissionsMap.put(ui.getItem().getId(), ui.getPermission());
@@ -214,6 +222,35 @@ public class ItemService {
         return sharedItemResponses;
     }
 
+//-----validation
+    public void validateModifyFolderContents(UUID publicParentId) throws InvalidPermissionsException { 
+        if (!getEffectivePermissionLevel(publicParentId).greaterThanOrEqualTo(PermissionType.EDITOR)) {
+            throw new InvalidPermissionsException("You cannot change the contents of the current folder.");
+        }
+    }
+
+    public void validateRename(UUID publicId) throws InvalidPermissionsException {
+        if (!getEffectivePermissionLevel(publicId).greaterThanOrEqualTo(PermissionType.EDITOR)) {
+            throw new InvalidPermissionsException("You cannot rename this item.");
+        }
+    }
+
+    public void validateViewing(UUID publicId) throws InvalidPermissionsException {
+        if (!getEffectivePermissionLevel(publicId).greaterThanOrEqualTo(PermissionType.VIEWER)) {
+            throw new InvalidPermissionsException("You don't have access to this item.");
+        }
+    }
+
+    public void validateOwnership(UUID publicId) throws InvalidPermissionsException {
+        InvalidPermissionsException e = new InvalidPermissionsException("You can't access permissions for this item");
+        if (userItemRepository.findByUserIdAndItemId(
+                userService.getCurrentUserEntity().getId(),
+                itemRepository.findIdByPublicId(publicId)
+            ).orElseThrow(() -> e).getPermission() != PermissionType.OWNER) {
+                throw e;    
+            }
+    }
+
 //-----helpers
     public String getItemName(UUID publicId) {
         return itemRepository.findNameByPublicId(publicId);
@@ -227,10 +264,11 @@ public class ItemService {
         return itemRepository.findPublicIdById(id);
     }
 
-    public void validateAccess(UUID publicId) throws InvalidPermissionsException {
-        ItemEntity item = itemRepository.findByPublicId(publicId).orElseThrow(() -> new IllegalArgumentException("Item does not exist."));
-        userItemRepository.findByUserIdAndItemId(userService.getCurrentUserEntity().getId(), item.getId())
-                        .orElseThrow(() -> new InvalidPermissionsException("You don't have access to this item."));
+    public PermissionType getEffectivePermissionLevel(UUID publicId) {
+        List<ItemEntity> itemsOnPath = itemRepository.findItemsOnPath(publicId);
+        if (itemsOnPath.isEmpty()) return null;
+        List<PermissionType> permissionsOnPath = userItemRepository.findPermissionsByItemsAndUser(itemsOnPath, userService.getCurrentUserEntity());
+        return PermissionType.max(permissionsOnPath);
     }
 
     // @SuppressWarnings("null")

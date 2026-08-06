@@ -19,6 +19,15 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
     boolean existsByParentIdAndName(Long parentId, String name);
 
+    @Query("""
+        SELECT j.publicId
+        FROM ItemEntity i
+        JOIN ItemEntity j
+          ON i.parentId = j.id
+        WHERE i.publicId = :publicId
+    """)
+    UUID findPublicParentIdByPublicId(@Param("publicId") UUID publicId);
+
     @Query("SELECT i.id FROM ItemEntity i WHERE i.publicId = :publicId")
     Long findIdByPublicId(@Param("publicId") UUID publicId);
 
@@ -85,6 +94,22 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         FROM path;
     """, nativeQuery = true)
     public String getPath(@Param("destId") Long destId);
+    
+    @Query(value = """
+        WITH RECURSIVE path AS (
+            SELECT *
+            FROM items
+            WHERE public_id = :publicDestId
+
+            UNION ALL
+
+            SELECT i.*
+            FROM items i
+            JOIN path p ON i.id = p.parent_id
+        )
+        SELECT * FROM path
+    """, nativeQuery = true)
+    public List<ItemEntity> findItemsOnPath(@Param("publicDestId") UUID publicDestId);
 
     @Query(value = """
         WITH RECURSIVE tree AS (

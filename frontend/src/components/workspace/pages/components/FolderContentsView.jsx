@@ -27,7 +27,7 @@ function FolderContentsView({currentPageIdx, currentFolderChildren, draggedItem,
     >
       {currentFolderChildren.length === 0 && <> This folder is empty. </>}
       <div className="folder-grid-item-listing">
-        {currentFolderChildren.map((item) => (renderItemListing(item, displayItem)))}
+        {currentFolderChildren.map((item) => (renderItemListing(item, displayItem, false)))}
       </div>
     </div>
   );

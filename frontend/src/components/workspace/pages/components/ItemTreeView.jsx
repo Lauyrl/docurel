@@ -27,7 +27,7 @@ function ItemTreeView({root, draggedItem, renderItemListing}) {
             return (
               <>
                 <div style={{ marginLeft: 5 + depth * 20 }}>
-                  {renderItemListing(item, displayItem)}
+                  {renderItemListing(item, displayItem, true)}
                 </div>
                 {item.type === "FOLDER" && item.isExpanded && displayFolderContents(item, depth + 1)}
               </>

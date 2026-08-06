@@ -84,13 +84,17 @@ function Workspace({ currentPageIdx }) {
    * @param {*} displayItem 
    * @returns JSX representing the item as defined by displayItem, or the rename dialogue if the item is being renamed
    */  
-  function renderItemListing(item, displayItem) {
+  function renderItemListing(item, displayItem, selectOnSingleClick) {
     return (
-      <div
-        onClick={(e) => {
+      <div className="item-listing"
+        onClick={selectOnSingleClick ? (e) => {
           e.stopPropagation();
           selectItem(item);
-        }}
+        } : undefined}
+        onDoubleClick={!selectOnSingleClick ? (e) => {
+          e.stopPropagation();
+          selectItem(item);
+        } : undefined}
         onContextMenu={(e) => {
           e.stopPropagation();
           e.preventDefault();

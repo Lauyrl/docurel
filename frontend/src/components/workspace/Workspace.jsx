@@ -8,6 +8,7 @@ import { useExplorer } from "../../context/ExplorerContext";
 import { downloadDocumentRedirect } from "../../common";
 import useExplorerOperations from "../../context/useExplorerOperations";
 import MyFiles from "./pages/MyFiles";
+import SharedWithMe from "./pages/SharedWithMe";
 
 function Workspace({ currentPageIdx }) {
   const {childrenIndex} = useExplorer();
@@ -150,10 +151,20 @@ function Workspace({ currentPageIdx }) {
         />
       }
       <div className="workspace">
-        <MyFiles 
-          draggedItem={draggedItem} 
-          renderItemListing={renderItemListing} 
-        />
+        { 
+          currentPageIdx == 0 && 
+          <MyFiles 
+            draggedItem={draggedItem} 
+            renderItemListing={renderItemListing} 
+          /> 
+        }
+        { 
+          currentPageIdx == 1 && 
+          <SharedWithMe
+            draggedItem={draggedItem} 
+            renderItemListing={renderItemListing} 
+          /> 
+        }
         <PreviewOverlay />
       </div>
     </>

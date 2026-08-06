@@ -5,7 +5,7 @@ import PreviewOverlay from "./PreviewOverlay";
 import PermissionsEdit from "./PermissionsEdit";
 import { useEffect, useState } from "react";
 import { useExplorer } from "../../context/ExplorerContext";
-import { downloadDocumentRedirect } from "./pages/common";
+import { downloadDocumentRedirect } from "../../common";
 import useExplorerOperations from "../../context/useExplorerOperations";
 import MyFiles from "./pages/MyFiles";
 

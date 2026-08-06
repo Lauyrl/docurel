@@ -1,20 +1,20 @@
 import "./css/MyFiles.css";
 import { useEffect, useState } from "react";
 import { api } from "../../../api";
-import ItemTreeView from "./MyFiles components/ItemTreeView";
-import FolderContentsView from "./MyFiles components/FolderContentsView";
+import ItemTreeView from "./components/ItemTreeView";
+import FolderContentsView from "./components/FolderContentsView";
 import { useExplorer } from "../../../context/ExplorerContext";
 import { initializeFolderUIState } from "../../../context/useExplorerOperations";
 
 
 function MyFiles({ draggedItem, renderItemListing }) {
-	const {setItemMap, setCurrentFolderId, getItem} = useExplorer();
+	const { setItemMap, setCurrentFolderId, getItem } = useExplorer();
 
 	const [rootId, setRootId] = useState(null);
-	  // [] contains dependencies to 'watch'
+	// [] contains dependencies to 'watch'
 	useEffect(() => {
 		Promise.all([ // wraps multiple Promises (fetches return Promises) inside a composite Promise that only resolves when all its' members do
-									// .then() takes the result of a resolved Promise and returns another Promise
+			          // .then() takes the result of a resolved Promise and returns another Promise
 			api("/folder/root").then(response => response.json()),
 			api("/document").then(response => response.json())
 		]).then(([root, items]) => {
@@ -42,7 +42,7 @@ function MyFiles({ draggedItem, renderItemListing }) {
 				draggedItem={draggedItem}
 				renderItemListing={renderItemListing}
 			/>
-			<FolderContentsView 
+			<FolderContentsView
 				draggedItem={draggedItem}
 				renderItemListing={renderItemListing}
 			/>

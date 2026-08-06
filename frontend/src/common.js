@@ -1,4 +1,4 @@
-import { api } from "../../../api";
+import { api } from "./api";
 
 export async function downloadDocumentRedirect(item) {
   const blob = await api("/document/" + item.publicId + "/download").then(response => response.blob()); // extract byte[] from response
@@ -41,7 +41,7 @@ export function createFolderCommon(foldername, currentFolderId) {
 function deleteDescendants(next, rootFolder, childrenIndex) {
   if (rootFolder.type !== "FOLDER") return;
   for (const child of childrenIndex.get(rootFolder.publicId) ?? []) {
-    deleteDescendants(next, child);
+    deleteDescendants(next, child, childrenIndex);
     next.delete(child.publicId);
   }
 }

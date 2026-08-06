@@ -1,38 +1,37 @@
 import { useEffect } from "react";
 import { useExplorer } from "../../../context/ExplorerContext";
 import { api } from "../../../api";
+import "./css/FolderContentsView.css"
+import FolderContentsView from "./components/FolderContentsView";
 
-function SharedWithMe({ renderItemListing }) {
-  const {itemMap, setItemMap, childrenIndex, rootLevelItemsIndex, currentFolderId, previewItemId} = useExplorer();
+function SharedWithMe({ draggedItem, renderItemListing }) {
+  const {setItemMap, currentFolder, childrenIndex, rootLevelItemsIndex} = useExplorer();
 
   useEffect(() => {
     api("/shared")
       .then(response => response.json())
-      .then((itemPermissions) => {
+      .then((items) => {
         const itemMapTemp = new Map;
-        itemPermissions.forEach(itemPermission => itemMapTemp.set(itemPermission.item.publicId, itemPermission));
+        items.forEach(item => itemMapTemp.set(item.publicId, item));
         setItemMap(itemMapTemp);
       })
   }, [setItemMap]);
 
-  function displayItem(item) {
-    return (
-      <div>
-        <div> {item.type === "FOLDER" ? "📁" : "📄"} </div>
-        <div> {item.name} </div>
-      </div>
-    );
+  let currentFolderChildren;
+  if (currentFolder == null) {
+    currentFolderChildren = rootLevelItemsIndex;
+  }
+  else {
+    currentFolderChildren = (childrenIndex.get(currentFolder.publicId) ?? []);
   }
 
   return (
-    <div>
-      <div className="selected-item">
-        {(!itemMap || itemMap.size === 0) && <> No items have been shared with you. </>}
-        <div className="folder-grid-item-listing">
-          {rootLevelItemsIndex.map((item) => (renderItemListing(item, displayItem)))}
-        </div>
-      </div>
-    </div>
+    <FolderContentsView
+      currentPageIdx={1}
+      currentFolderChildren={currentFolderChildren}
+      draggedItem={draggedItem}
+      renderItemListing={renderItemListing}
+    />
   );
 }
 

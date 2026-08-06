@@ -2,9 +2,9 @@ import "../css/FolderContentsView.css";
 import { useExplorer } from "../../../../context/ExplorerContext";
 import useExplorerOperations from "../../../../context/useExplorerOperations";
 
-function FolderContentsView({draggedItem, renderItemListing}) {
-  const {childrenIndex, currentFolder} = useExplorer(); 
-  const {selectItem, patchItem} = useExplorerOperations(0);
+function FolderContentsView({currentPageIdx, currentFolderChildren, draggedItem, renderItemListing}) {
+  const {currentFolder} = useExplorer(); 
+  const {selectItem, patchItem} = useExplorerOperations(currentPageIdx);
 
   function displayItem(item) {
     return (
@@ -15,12 +15,9 @@ function FolderContentsView({draggedItem, renderItemListing}) {
     );
   }
 
-  if (!currentFolder) return null;
-
-  const currentFolderChildren = (childrenIndex.get(currentFolder.publicId) ?? []);
   return (
     <div 
-      className="selected-item"
+      className="selected-folder"
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();

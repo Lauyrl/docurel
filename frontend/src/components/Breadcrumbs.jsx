@@ -6,8 +6,6 @@ function Breadcrumbs({ currentPageIdx }) {
     const {itemMap, currentFolder} = useExplorer();
     const {selectItem} = useExplorerOperations(currentPageIdx)
     
-    if (!currentFolder) return null;
-    
     let path = [];
     let folder = currentFolder;
     while (folder) {
@@ -15,12 +13,16 @@ function Breadcrumbs({ currentPageIdx }) {
       folder = itemMap.get(folder.publicParentId);
     }
     path = path.reverse();
-    return(
+    return (
       <div className="breadcrumb">
-        { "Path: " }
+        { currentPageIdx === 0 && "My Files: " }
+        { currentPageIdx === 1 && "Shared with me: " }
         { 
           path.map((item, i) => (
-            <span key={item.publicId} onClick={() => selectItem(item)}>
+            <span 
+              key={item.publicId} 
+              onClick={() => selectItem(item)}
+            >
               {(i > 0) && " > "}
               <span className="breadcrumbs"> {item.name} </span> 
             </span>

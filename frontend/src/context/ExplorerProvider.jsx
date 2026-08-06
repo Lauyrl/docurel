@@ -6,6 +6,8 @@ import { ExplorerContext } from "./ExplorerContext";
  * for elements inside. Does not build/populate them
  */
 export function ExplorerProvider({ children }) {
+  // changing any state inside re-renders the ExplorerProvider (recomputes the values defined in it (currentFolder, previewItem,...), not the states themselves), 
+  // except memoized values, which are only re-computed when their dependencies change
   const [itemMap, setItemMap] = useState(new Map);
   const [currentFolderId, setCurrentFolderId] = useState(null);
   const [previewItemId, setPreviewItemId] = useState(null);

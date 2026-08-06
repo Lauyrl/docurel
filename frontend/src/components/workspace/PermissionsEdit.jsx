@@ -79,19 +79,19 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
                     <option value="SHARER">Sharer</option>
                     <option value="EDITOR">Editor</option>
                   </select>
-                  <span 
+                  <button 
                     style={{userSelect: "none"}} 
-                    onClick={() => {
-                      deleteUserPermissionsForItem(itemToEditUserPermissionsOf, username);
-                      setUsersWithPermissionsForItem(() => {
-                        let map = new Map(usersWithPermissionsForItem);
+                    onClick={async () => {
+                      await deleteUserPermissionsForItem(itemToEditUserPermissionsOf, username);
+                      setUsersWithPermissionsForItem(current => {
+                        let map = new Map(current);
                         map.delete(username);
                         return map;
                       })
                     }}
                   > 
-                    X 
-                  </span>
+                    ✕ 
+                  </button>
                 </span>
               }
             </div>

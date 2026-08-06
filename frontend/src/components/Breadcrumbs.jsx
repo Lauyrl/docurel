@@ -12,20 +12,22 @@ function Breadcrumbs({ currentPageIdx, renderItemListing }) {
 
     let path = [];
     let folder = currentFolder;
-    while (folder) {
+    while (folder?.publicParentId) {
       path.push(folder);
       folder = itemMap.get(folder.publicParentId);
     }
     path = path.reverse();
     return (
       <div className="breadcrumbs">
-        { currentPageIdx === 0 && "My Files: " }
-        { currentPageIdx === 1 && "Shared with me: " }
+        <span className="breadcrumb"> 
+          { currentPageIdx === 0 && "My Files" }
+          { currentPageIdx === 1 && "Shared with me" }
+        </span>
         { 
-          path.map((item, i) => (
+          path.map((item) => (
             <span key={item.publicId}>
-              {(i > 0) && " > "}
-              <span className="breadcrumb"> {renderItemListing(item, displayItem, true)} </span> 
+              {" > "}
+              <span className="breadcrumb"> {renderItemListing(item, displayItem, true, false)} </span> 
             </span>
           )) 
         }

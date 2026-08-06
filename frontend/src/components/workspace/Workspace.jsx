@@ -85,14 +85,14 @@ function Workspace({ currentPageIdx }) {
    * @param {*} displayItem 
    * @returns JSX representing the item as defined by displayItem, or the rename dialogue if the item is being renamed
    */  
-  function renderItemListing(item, displayItem, selectOnSingleClick) {
+  function renderItemListing(item, displayItem, isSelectOnSingleClick, isDraggable=true) {
     return (
       <div className="item-listing"
-        onClick={selectOnSingleClick ? (e) => {
+        onClick={isSelectOnSingleClick ? (e) => {
           e.stopPropagation();
           selectItem(item);
         } : undefined}
-        onDoubleClick={!selectOnSingleClick ? (e) => {
+        onDoubleClick={!isSelectOnSingleClick ? (e) => {
           e.stopPropagation();
           selectItem(item);
         } : undefined}
@@ -102,7 +102,7 @@ function Workspace({ currentPageIdx }) {
           makeContextMenu(e, item);
         }}
 
-        draggable={!(itemRename?.item?.publicId === item.publicId)} // if item is being renamed dont let it be draggable
+        draggable={isDraggable && !(itemRename?.item?.publicId === item.publicId)} // if item is being renamed dont let it be draggable
         onDragStart={() => setDraggedItem(item)}
         onDragEnd={() => setDraggedItem(null)}
         onDragOver={(e) => {

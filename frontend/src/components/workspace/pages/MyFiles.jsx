@@ -8,7 +8,7 @@ import { initializeFolderUIState } from "../../../context/useExplorerOperations"
 
 
 function MyFiles({ draggedItem, renderItemListing }) {
-	const { itemMap, childrenIndex, currentFolder, setItemMap, setCurrentFolderId } = useExplorer();
+	const { itemMap, childrenIndex, currentFolder, setItemMap, setCurrentFolderId, rebuildNavigationStacks } = useExplorer();
 
 	const [rootId, setRootId] = useState(null);
 	// [] contains dependencies to 'watch'
@@ -30,8 +30,9 @@ function MyFiles({ draggedItem, renderItemListing }) {
 				itemMapTemp.set(item.publicId, item)
 			})
 			setItemMap(itemMapTemp);
+			rebuildNavigationStacks(root.publicId)
 		})
-	}, [setItemMap, setCurrentFolderId]);
+	}, []);
 
 	if (!currentFolder) return;
 

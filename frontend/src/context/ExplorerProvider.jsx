@@ -11,6 +11,9 @@ export function ExplorerProvider({ children }) {
   const [itemMap, setItemMap] = useState(new Map);
   const [currentFolderId, setCurrentFolderId] = useState(null);
   const [previewItemId, setPreviewItemId] = useState(null);
+  
+  const [itemNavigationStackForward, setItemNavigationStackForward] = useState([]);
+  const [itemNavigationStackBackward, setItemNavigationStackBackward] = useState([]);
 
   const childrenIndex = useMemo(() => {
       const index = new Map();
@@ -32,12 +35,44 @@ export function ExplorerProvider({ children }) {
 	const currentFolder = itemMap.get(currentFolderId);
 	const previewItem   = itemMap.get(previewItemId);
 
+  function rebuildNavigationStacks(stackTopId) {
+    let path = []
+    let folder = itemMap.get(stackTopId);
+    while (folder) {
+      path.push(folder);
+      folder = itemMap.get(folder.publicParentId);
+    }
+    setItemNavigationStackBackward(path.reverse());
+    setItemNavigationStackForward([]);
+  }
+
+  function navigateItems(isBackward) {
+    let backward = [...itemNavigationStackBackward];
+    let forward = [...itemNavigationStackForward];
+    if (isBackward) {
+      if (backward.length === 0) return;
+      let popped = backward.pop();
+      forward.push(popped);
+    } else {
+      if (forward.length === 0) return;
+      let popped = forward.pop();
+      backward.push(popped);
+    }
+    setItemNavigationStackBackward(backward);
+    setItemNavigationStackForward(forward);
+    
+    if (backward.length === 0) setCurrentFolderId(null);
+    else setCurrentFolderId(backward[backward.length - 1].publicId);
+  }
+
   return (
     <ExplorerContext.Provider value={{
-      itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex,
+      itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex, itemNavigationStackForward, itemNavigationStackBackward,
       setItemMap, setCurrentFolderId, setPreviewItemId,
 
       currentFolder, previewItem,
+
+      rebuildNavigationStacks, navigateItems
     }}>
       {children}
     </ExplorerContext.Provider>

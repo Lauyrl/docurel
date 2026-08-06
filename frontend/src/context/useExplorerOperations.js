@@ -6,12 +6,14 @@ export function initializeFolderUIState(item) {
 }
 
 function useMyFilesOperations() {
-  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId } = useExplorer();  
+  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks } = useExplorer();  
 
   function selectItem(item) {
     setPreviewItemId(null);
     if (item.type === "DOCUMENT") setPreviewItemId(item.publicId);
     if (item.type === "FOLDER") {
+      if (item.publicId !== currentFolderId) rebuildNavigationStacks(item.publicId);
+
       const itemTemp = { ...item, isExpanded: !item.isExpanded };
       setItemMap((current) => new Map(current).set(item.publicId, itemTemp)); // make new map with new entry to avoid mutating state
       setCurrentFolderId(item.publicId);
@@ -56,12 +58,14 @@ function useMyFilesOperations() {
 }
 
 function useSharedOperations() {
-  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId } = useExplorer();
+  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks } = useExplorer();
 
     function selectItem(item) {
     setPreviewItemId(null);
     if (item.type === "DOCUMENT") setPreviewItemId(item.publicId);
     if (item.type === "FOLDER") {
+      if (item.publicId !== currentFolderId) rebuildNavigationStacks(item.publicId);
+      
       const itemTemp = { ...item, isExpanded: !item.isExpanded };
       setItemMap((current) => new Map(current).set(item.publicId, itemTemp)); // make new map with new entry to avoid mutating state
       setCurrentFolderId(item.publicId);

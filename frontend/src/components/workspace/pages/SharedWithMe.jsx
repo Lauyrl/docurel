@@ -5,7 +5,7 @@ import "./css/FolderContentsView.css"
 import FolderContentsView from "./components/FolderContentsView";
 
 function SharedWithMe({ draggedItem, renderItemListing }) {
-  const {setItemMap, currentFolder, childrenIndex, rootLevelItemsIndex} = useExplorer();
+  const {setItemMap, currentFolder, childrenIndex, rootLevelItemsIndex, rebuildNavigationStacks} = useExplorer();
 
   useEffect(() => {
     api("/shared")
@@ -14,8 +14,9 @@ function SharedWithMe({ draggedItem, renderItemListing }) {
         const itemMapTemp = new Map;
         items.forEach(item => itemMapTemp.set(item.publicId, item));
         setItemMap(itemMapTemp);
-      })
-  }, [setItemMap]);
+        rebuildNavigationStacks(null);
+      });
+  }, []);
 
   let currentFolderChildren;
   if (currentFolder == null) {

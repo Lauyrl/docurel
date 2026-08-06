@@ -26,10 +26,10 @@ function ItemTreeView({root, draggedItem, renderItemListing}) {
           (childrenIndex.get(folderRoot.publicId) ?? []).map(item => {
             return (
               <>
-                <div style={{ marginLeft: 5 + depth * 20 }}>
+                <div style={{ marginLeft: depth * 20 }}>
                   {renderItemListing(item, displayItem, true)}
                 </div>
-                {item.type === "FOLDER" && item.isExpanded && displayFolderContents(item, depth + 1)}
+                {item.type === "FOLDER" && item.isExpanded && (displayFolderContents(item, depth + 1))}
               </>
             );
           }) 

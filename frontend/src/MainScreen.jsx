@@ -4,7 +4,6 @@ import "./components/workspace/pages/css/MyFiles.css";
 import PagesPanel from "./components/workspace/pages/PagesPanel";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
-import Breadcrumbs from "./components/Breadcrumbs";
 import Workspace from "./components/workspace/Workspace";
 import { ExplorerProvider } from "./context/ExplorerProvider";
 
@@ -32,7 +31,6 @@ function MainScreen() {
 							<FolderUpload currentPageIdx={currentPageIdx}/>
 						</div>
 
-						<Breadcrumbs currentPageIdx={currentPageIdx}/>
 						<Workspace currentPageIdx={currentPageIdx} />
 					</div>
 				</div>

@@ -9,6 +9,7 @@ import { downloadDocumentRedirect } from "../../common";
 import useExplorerOperations from "../../context/useExplorerOperations";
 import MyFiles from "./pages/MyFiles";
 import SharedWithMe from "./pages/SharedWithMe";
+import Breadcrumbs from "../Breadcrumbs";
 
 function Workspace({ currentPageIdx }) {
   const {childrenIndex} = useExplorer();
@@ -169,6 +170,10 @@ function Workspace({ currentPageIdx }) {
           setItemToEditUserPermissionsOf={setItemToEditUserPermissionsOf}
         />
       }
+      <Breadcrumbs 
+        currentPageIdx={currentPageIdx}
+        renderItemListing={renderItemListing}
+      />
       <div className="workspace">
         { 
           currentPageIdx == 0 && 

@@ -1,4 +1,5 @@
 import { useExplorer } from "../context/ExplorerContext";
+import "./css/ItemNavigation.css";
 
 function ItemNavigation({ currentPageIdx }) {
   const {itemNavigationStackBackward, itemNavigationStackForward, navigateItems} = useExplorer();
@@ -11,10 +12,10 @@ function ItemNavigation({ currentPageIdx }) {
 
   return (
     <>
-      <button style={{ opacity: canGoBackward ? 1.0 : 0.2 }} onClick={canGoBackward ? () => { navigateItems(true) } : undefined }>
+      <button className="nav-button" style={{ opacity: canGoBackward ? 1.0 : 0.2 }} onClick={canGoBackward ? () => { navigateItems(true) } : undefined }>
         {"<"}
       </button>
-      <button style={{ opacity: canGoForward ? 1.0 : 0.2 }} onClick={canGoForward ? () => { navigateItems(false) } : undefined }>
+      <button className="nav-button" style={{ opacity: canGoForward ? 1.0 : 0.2 }} onClick={canGoForward ? () => { navigateItems(false) } : undefined }>
         {">"}
       </button>
     </>

@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
 .pages-panel {
     width: fit-content;
 
     display: flex;
     flex-direction: column;
     gap: 10px;
-
+    background-color: rgb(43, 42, 41);
     padding: 10px;
 }
 
@@ -12,13 +14,23 @@
     width: 110px;
     height: 40px;
 
-    border: 1px solid #444;
+    background-color: #1a120c;
+    border: 1px solid #1f1d1d;
     border-radius: 8px;
 
     cursor: pointer;
 }
 
 .logo {
+    height: 70px;
+
+    display: flex;
+    justify-content: center; /* horizontal */
+    align-items: center;     /* vertical */
+
     font-size: 30px;
-    text-align: center;
+
+    font-family: "Inter", sans-serif;
+    font-weight: bold;
+    color: rgb(201, 120, 76);
 }

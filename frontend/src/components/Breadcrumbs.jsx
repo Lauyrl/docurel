@@ -11,21 +11,23 @@ function Breadcrumbs({ currentPageIdx, renderItemListing }) {
     }
 
     return (
-      <div className="breadcrumbs">
+      <div className="mini-ribbon">
         <ItemNavigation currentPageIdx={currentPageIdx}/> 
-        { currentPageIdx === 0 && "My Files" }
-        { currentPageIdx === 1 && "Shared with me" }
-        { 
-          itemNavigationStackBackward.map((item, i) => {
-            if (currentPageIdx === 0 && i === 0) return null; // if on MyFiles page, dont display user root
-            return (
-              <span style={{display: "flex", alignItems: "center", gap: "4px"}}>
-                {" > "} 
-                {renderItemListing(item, displayItem, true, false)} 
-              </span>
-            );
-          }) 
-        }
+        <div className="breadcrumbs">
+          { currentPageIdx === 0 && "My Files" }
+          { currentPageIdx === 1 && "Shared with me" }
+          { 
+            itemNavigationStackBackward.map((item, i) => {
+              if (currentPageIdx === 0 && i === 0) return null; // if on MyFiles page, dont display user root
+              return (
+                <span style={{display: "flex", alignItems: "center", gap: "4px"}}>
+                  {" > "} 
+                  {renderItemListing(item, displayItem, true, false)} 
+                </span>
+              );
+            }) 
+          }
+        </div>
       </div>
     );
 }

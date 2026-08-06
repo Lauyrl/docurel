@@ -1,5 +1,5 @@
 import "../css/common.css";
-import "./css/FolderUpload.css";
+import "./css/ribbon.css";
 import { useState } from "react";
 import useExplorerOperations from "../context/useExplorerOperations";
 
@@ -50,7 +50,7 @@ function FolderUpload({ currentPageIdx }) {
         </div>
       }
       <button 
-        className="create-folder-button"
+        className="ribbon-button"
         onClick={(e) => {
           e.stopPropagation();
           setCreatingFolder(true);

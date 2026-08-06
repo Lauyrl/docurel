@@ -1,5 +1,5 @@
 import useExplorerOperations from "../context/useExplorerOperations";
-import "./css/FileUpload.css"
+import "./css/ribbon.css"
 import { useRef } from "react";
 
 function FileUpload({ currentPageIdx }) {
@@ -24,7 +24,7 @@ function FileUpload({ currentPageIdx }) {
       />
 
       <button
-        className="upload-button"
+        className="ribbon-button"
         onClick={() => fileInputRef.current.click()} // since the <input/> is hidden, simulate the click through the Ref
       >
         Upload File

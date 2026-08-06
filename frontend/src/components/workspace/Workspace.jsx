@@ -35,7 +35,11 @@ function Workspace({ currentPageIdx }) {
 
   useEffect(() => {
     window.addEventListener("click", exitRename);
-    return () => window.removeEventListener("click", exitRename)
+    window.addEventListener("contextmenu", exitRename);
+    return () => {
+      window.removeEventListener("click", exitRename);
+      window.removeEventListener("contextmenu", exitRename);
+    }
   }, []);
 
   function makeContextMenu(eventObject, item) {
@@ -74,6 +78,12 @@ function Workspace({ currentPageIdx }) {
     /* deny dragging a folder into one of its' descendant folders, causing a cyclic relationship */
   }
 
+  /**
+   * Provides context menu logic, item renaming logic and item dragging logic
+   * @param {*} item 
+   * @param {*} displayItem 
+   * @returns JSX representing the item as defined by displayItem, or the rename dialogue if the item is being renamed
+   */  
   function renderItemListing(item, displayItem) {
     return (
       <div
@@ -82,6 +92,7 @@ function Workspace({ currentPageIdx }) {
           selectItem(item);
         }}
         onContextMenu={(e) => {
+          e.stopPropagation();
           e.preventDefault();
           makeContextMenu(e, item);
         }}
@@ -105,6 +116,10 @@ function Workspace({ currentPageIdx }) {
         {itemRename?.item?.publicId === item.publicId && (
           <div 
             onClick={(e) => e.stopPropagation()}
+            onContextMenu={(e) => {
+              e.stopPropagation(); 
+              e.preventDefault();
+            }}
             style={{zIndex: 1100, position: "relative"}}
           >
             <input

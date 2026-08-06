@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { createFolderCommon, deleteItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, uploadDocumentCommon } from "../common";
 import { useExplorer } from "./ExplorerContext";
 
@@ -100,9 +101,10 @@ function useSharedOperations() {
     return await editUserPermissionsForItemCommon(item, newPermissionsInfo);
   }
 
-  async function getUsersWithPermissionsForItem(item) {
+  // useCallback prevents functions from being redefined on every re-render (useMyFilesOperations was re-rendering since it depended on values from useExplorer(), which were re-rendering because states were being updated) 
+  const getUsersWithPermissionsForItem = useCallback(async (item) => {
     return await getUsersWithPermissionsForItemCommon(item);
-  }
+  }, []);
 
   return {
     selectItem, uploadDocument, createFolder, deleteItem, patchItem, editUserPermissionsForItem, getUsersWithPermissionsForItem

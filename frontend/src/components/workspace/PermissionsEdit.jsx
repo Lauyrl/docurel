@@ -17,7 +17,7 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
       setUsersWithPermissionsForItem(await getUsersWithPermissionsForItem(itemToEditUserPermissionsOf));
     }
     loadUsersWithPermissionsForItem();
-  }, [itemToEditUserPermissionsOf, getUsersWithPermissionsForItem])
+  }, [itemToEditUserPermissionsOf])
 
   function cleanupPermissionEditStates() {
     setItemToEditUserPermissionsOf(null);

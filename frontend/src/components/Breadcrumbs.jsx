@@ -3,7 +3,7 @@ import { useExplorer } from "../context/ExplorerContext";
 import useExplorerOperations from "../context/useExplorerOperations";
 
 function Breadcrumbs({ currentPageIdx }) {
-    const {currentFolder, getItem} = useExplorer();
+    const {itemMap, currentFolder} = useExplorer();
     const {selectItem} = useExplorerOperations(currentPageIdx)
     
     if (!currentFolder) return null;
@@ -12,7 +12,7 @@ function Breadcrumbs({ currentPageIdx }) {
     let folder = currentFolder;
     while (folder) {
       path.push(folder);
-      folder = getItem(folder.publicParentId);
+      folder = itemMap.get(folder.publicParentId);
     }
     path = path.reverse();
     return(

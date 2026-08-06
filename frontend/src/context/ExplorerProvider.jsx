@@ -27,18 +27,15 @@ export function ExplorerProvider({ children }) {
       return index
     }, [itemMap])
 
-  function getItem(publicId) { return itemMap.get(publicId); }
-	const currentFolder = getItem(currentFolderId);
-	const previewItem   = getItem(previewItemId);
+	const currentFolder = itemMap.get(currentFolderId);
+	const previewItem   = itemMap.get(previewItemId);
 
   return (
     <ExplorerContext.Provider value={{
-      currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex,
+      itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex,
       setItemMap, setCurrentFolderId, setPreviewItemId,
 
       currentFolder, previewItem,
-
-      getItem
     }}>
       {children}
     </ExplorerContext.Provider>

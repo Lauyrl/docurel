@@ -98,19 +98,21 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     
     @Query(value = """
         WITH RECURSIVE path AS (
-            SELECT *
+            SELECT *, 0 AS depth
             FROM items
             WHERE public_id = :publicDestId
 
             UNION ALL
 
-            SELECT i.*
+            SELECT i.*, p.depth + 1
             FROM items i
             JOIN path p ON i.id = p.parent_id
         )
-        SELECT * FROM path
+        SELECT id, parent_id, name, type, size_bytes, content_type, created_at, updated_at, public_id 
+        FROM path
+        ORDER BY depth ASC
     """, nativeQuery = true)
-    public List<ItemEntity> findItemsOnPath(@Param("destPublicId") UUID publicDestId);
+    public List<ItemEntity> findItemsOnPath(@Param("publicDestId") UUID publicDestId);
 
     @Query(value = """
         WITH RECURSIVE first_permission AS (

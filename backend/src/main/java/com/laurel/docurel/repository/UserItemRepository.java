@@ -18,7 +18,14 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
     public Optional<UserItemEntity> findByUserIdAndItemId(Long userId, Long itemId);
 
     public void deleteByUserAndItem(UserEntity user, ItemEntity item);
-    
+
+    @Query("""
+        SELECT ui 
+        FROM UserItemEntity ui
+        WHERE ui.item IN (:items)
+    """)
+    public List<UserItemEntity> findByItems(List<ItemEntity> items);
+
     @Query(value = """
         SELECT ui.item
         FROM UserItemEntity ui

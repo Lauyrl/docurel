@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,13 +170,30 @@ public class ItemService {
     public List<UsersPermissionsForItemResponse> getUsersWithPermissionsForItem(UUID publicId) throws InvalidPermissionsException {
         validateOwnership(publicId);
 
+        List<ItemEntity> itemsOnPath = itemRepository.findItemsOnPath(publicId);
+        
+        List<UserItemEntity> userItemEntities = userItemRepository.findByItems(itemsOnPath);
+        Map<Long, List<UserItemEntity>> permissionMap = new HashMap<>();
+        for (UserItemEntity ui : userItemEntities) {
+            permissionMap.computeIfAbsent(ui.getItem().getId(), e -> new ArrayList<UserItemEntity>()).add(ui);
+        }
+
+        Map<Long, UsersPermissionsForItemResponse> userFirstPermissionResponses = new HashMap<>();
+        for (ItemEntity item : itemsOnPath) {
+            List<UserItemEntity> usersWithPermissions = permissionMap.getOrDefault(item.getId(), Collections.emptyList());
+            for (UserItemEntity ui : usersWithPermissions) {
+                userFirstPermissionResponses.putIfAbsent(ui.getUser().getId(), new UsersPermissionsForItemResponse(ui.getUser().getUsername(), ui.getPermission()));
+            }
+        }
+
         List<UsersPermissionsForItemResponse> responses = new ArrayList<>();
 
-        List<UserItemEntity> userItemEntities = userItemRepository.findByItem(itemRepository.findByPublicId(publicId).orElseThrow());
-        for (UserItemEntity userItemEntity : userItemEntities) {
-            if (userItemEntity.getPermission() == PermissionType.NO_PERMISSION) continue;
-            responses.add(new UsersPermissionsForItemResponse(userItemEntity.getUser().getUsername(), userItemEntity.getPermission()));
+        for (UsersPermissionsForItemResponse response : userFirstPermissionResponses.values()) {
+            if (response.getPermission() != PermissionType.NO_PERMISSION) {
+                responses.add(response);
+            }
         }
+
         return responses;
     }
 

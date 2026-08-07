@@ -117,6 +117,11 @@ public class ItemController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/item/search")
+    public List<ItemResponse> searchItems(@RequestParam String query) {
+        return itemService.searchItems(query);
+    }
+
     @GetMapping("/shared")
     public List<SharedItemResponse> getItemsSharedWithCurrentUser() {
         return itemService.getItemsUserCanAccessExceptOwned();

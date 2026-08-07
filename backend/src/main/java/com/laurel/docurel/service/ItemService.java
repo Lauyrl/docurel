@@ -291,6 +291,16 @@ public class ItemService {
         return sharedItemResponses;
     }
 
+    public List<ItemResponse> searchItems(String query) {
+        List<ItemEntity> results = itemRepository.findMatchingItems(
+            userService.getCurrentUserEntity().getId(), 
+            query
+        );
+        List<ItemResponse> responses = new ArrayList<>();
+        for (ItemEntity i : results) responses.add(new ItemResponse(i, itemRepository.findPublicIdById(i.getParentId())));
+        return responses;
+    }
+    
 //-----validation
     public void validateModifyFolderContents(UUID publicParentId) throws InvalidPermissionsException { 
         if (!PermissionType.greaterThanOrEqualTo(getEffectivePermissionLevel(publicParentId), PermissionType.EDITOR)) {

@@ -44,6 +44,18 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     List<ItemEntity> findByParentId(Long parentId);
 
     @Query(value = """
+        SELECT * 
+        FROM items i
+        JOIN user_items ui ON i.id = ui.item_id 
+        WHERE ui.user_id = :userId
+          AND ui.permission = 'OWNER'
+          AND i.parent_id != 0
+          AND similarity(i.name, :query) > 0.25
+        ORDER BY similarity(i.name, :query) DESC
+    """, nativeQuery = true)
+    List<ItemEntity> findMatchingItems(@Param("userId") Long userId, @Param("query") String query);
+
+    @Query(value = """
         WITH RECURSIVE family AS (
             SELECT id, parent_id
             FROM items

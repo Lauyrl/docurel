@@ -3,6 +3,7 @@ package com.laurel.docurel.repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,6 +22,15 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
     public Optional<UserItemEntity> findByUserAndItem(UserEntity user, ItemEntity item);
 
     public void deleteByUserAndItem(UserEntity user, ItemEntity item);
+
+    @Query("""
+       SELECT u
+       FROM UserEntity u
+       JOIN UserItemEntity ui ON ui.user = u 
+       WHERE ui.item.publicId = :publicId
+         AND ui.permission = com.laurel.docurel.enums.PermissionType.OWNER
+    """)
+    Optional<UserEntity> findOwnerByItemPublicId(UUID publicId);
 
     @Modifying(clearAutomatically = true)
     @Query("""

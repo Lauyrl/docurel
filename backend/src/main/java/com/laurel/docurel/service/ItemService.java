@@ -67,15 +67,22 @@ public class ItemService {
         if (itemRepository.existsByParentIdAndName(parentId, filename))  {
             throw new IllegalArgumentException("An item with that name already exists in that location");
         }
-        ItemEntity entity = new ItemEntity(filename, parentId, ItemType.DOCUMENT, document.getSize());
-        itemRepository.save(entity);
+        ItemEntity item = new ItemEntity(filename, parentId, ItemType.DOCUMENT, document.getSize());
+        itemRepository.save(item);
 
-        userItemRepository.save(new UserItemEntity(userService.getCurrentUserEntity(), entity, PermissionType.OWNER));
+        UserEntity uploader = userService.getCurrentUserEntity();
+        // any folder added to this directory before would have been uploaded into the owner's root folder, of a folder whose parent is the root folder,
+        // therefore the owner of any folder being uploaded into would be the owner of the entire tree
+        UserEntity directoryOwner = userItemRepository.findOwnerByItemPublicId(publicParentId).orElseThrow(); 
+        if (!uploader.getId().equals(directoryOwner.getId())) {
+            userItemRepository.save(new UserItemEntity(uploader, item, PermissionType.EDITOR));
+        } 
+        userItemRepository.save(new UserItemEntity(directoryOwner, item, PermissionType.OWNER));
 
-        Path dest = Path.of(STORAGE_PATH, entity.getId().toString());            
+        Path dest = Path.of(STORAGE_PATH, item.getId().toString());            
         document.transferTo(dest);
 
-        return new ItemResponse(entity, itemRepository.findPublicIdById(parentId));
+        return new ItemResponse(item, publicParentId);
     }
 
     public byte[] getFileBytes(UUID publicId) throws IOException, InvalidPermissionsException {
@@ -104,10 +111,15 @@ public class ItemService {
             throw new IllegalArgumentException("An item with that name already exists in that location");
         }
 
-        ItemEntity folderEntity = itemRepository.save(new ItemEntity(foldername, parentId, ItemType.FOLDER, null));
+        ItemEntity folder = itemRepository.save(new ItemEntity(foldername, parentId, ItemType.FOLDER, null));
 
-        userItemRepository.save(new UserItemEntity(userService.getCurrentUserEntity(), folderEntity, PermissionType.OWNER));
-        return new ItemResponse(folderEntity, itemRepository.findPublicIdById(parentId));
+        UserEntity uploader = userService.getCurrentUserEntity();
+        UserEntity directoryOwner = userItemRepository.findOwnerByItemPublicId(publicParentId).orElseThrow(); 
+        if (!uploader.getId().equals(directoryOwner.getId())) {
+            userItemRepository.save(new UserItemEntity(uploader, folder, PermissionType.EDITOR));
+        } 
+        userItemRepository.save(new UserItemEntity(directoryOwner, folder, PermissionType.OWNER));
+        return new ItemResponse(folder, publicParentId);
     }
 
     @SuppressWarnings("null")
@@ -131,11 +143,17 @@ public class ItemService {
             entityToUpdate.setName(newName);
         }
         if (newPublicParentId != null) {
+            validateOwnership(publicId);                                                         // must own an item to move it away
             validateModifyFolderContents(itemRepository.findPublicParentIdByPublicId(publicId)); // can 'delete' item from original folder
             validateModifyFolderContents(newPublicParentId);                                     // can 'upload' item into new folder
 
             ItemEntity newParent = itemRepository.findByPublicId(newPublicParentId).orElseThrow();
-            Long entityId = entityToUpdate.getId();
+
+            if (itemRepository.existsByParentIdAndName(newParent.getId(), entityToUpdate.getName()))  {
+                throw new IllegalArgumentException("An item with that name already exists in that location");
+            }
+
+            Long entityId    = entityToUpdate.getId();
             Long oldParentId = entityToUpdate.getParentId();
             Long newParentId = newParent.getId();
             if (newParent.getType() != ItemType.FOLDER ||
@@ -146,6 +164,22 @@ public class ItemService {
                     throw new IllegalArgumentException("Cannot move a folder into one of its' descendants");
                 }
             entityToUpdate.setParentId(newParentId);
+
+            UserEntity oldOwner = userService.getCurrentUserEntity();
+            UserEntity newOwner = userItemRepository.findOwnerByItemPublicId(newPublicParentId).orElseThrow();
+            if (!oldOwner.getId().equals(newOwner.getId())) {
+                List<ItemEntity> selfAndDescendants = itemRepository.findSelfAndDescendants(publicId);
+                for (ItemEntity i : selfAndDescendants) { 
+                    UserItemEntity oldOwnerPermissions = userItemRepository.findByUserAndItem(oldOwner, i).orElseThrow();
+                    oldOwnerPermissions.setPermission(PermissionType.EDITOR);
+
+                    UserItemEntity newOwnerPermissions = userItemRepository.findByUserAndItem(newOwner, i).orElse(new UserItemEntity(newOwner, i, PermissionType.OWNER));
+                    newOwnerPermissions.setPermission(PermissionType.OWNER);
+
+                    userItemRepository.save(oldOwnerPermissions);
+                    userItemRepository.save(newOwnerPermissions);
+                }
+            }
         } 
         itemRepository.save(entityToUpdate);
     }
@@ -276,12 +310,8 @@ public class ItemService {
 
     public void validateOwnership(UUID publicId) throws InvalidPermissionsException {
         InvalidPermissionsException e = new InvalidPermissionsException("You can't access permissions for this item");
-        if (userItemRepository.findByUserIdAndItemId(
-                userService.getCurrentUserEntity().getId(),
-                itemRepository.findIdByPublicId(publicId)
-            ).orElseThrow(() -> e).getPermission() != PermissionType.OWNER) {
-                throw e;    
-            }
+        if (userItemRepository.findByUserAndItem(userService.getCurrentUserEntity(), itemRepository.findByPublicId(publicId).orElseThrow())
+            .orElseThrow(() -> e).getPermission() != PermissionType.OWNER) throw e;    
     }
 
 //-----helpers

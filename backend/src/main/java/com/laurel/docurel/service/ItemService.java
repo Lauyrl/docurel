@@ -173,6 +173,7 @@ public class ItemService {
 
         List<UserItemEntity> userItemEntities = userItemRepository.findByItem(itemRepository.findByPublicId(publicId).orElseThrow());
         for (UserItemEntity userItemEntity : userItemEntities) {
+            if (userItemEntity.getPermission() == PermissionType.NO_PERMISSION) continue;
             responses.add(new UsersPermissionsForItemResponse(userItemEntity.getUser().getUsername(), userItemEntity.getPermission()));
         }
         return responses;
@@ -198,52 +199,54 @@ public class ItemService {
     public List<SharedItemResponse> getItemsUserCanAccessExceptOwned() {
         UserEntity currentUser = userService.getCurrentUserEntity();
 
-        List<ItemEntity> sharedItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(currentUser.getId());
-        Map<Long, ItemEntity> sharedItemsMap = new HashMap<>();
-        for (ItemEntity item : sharedItems) {
-            sharedItemsMap.put(item.getId(), item);
+        List<ItemEntity> accessibleItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(currentUser.getId()); 
+        Map<Long, ItemEntity> accessibleItemsMap = new HashMap<>();
+        for (ItemEntity item : accessibleItems) {
+            accessibleItemsMap.put(item.getId(), item);
         }
 
-        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(currentUser.getId());
+        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(currentUser.getId()); // include NO_PERMISSIONS to block walk ups
         Map<Long, PermissionType> explicitPermissionsMap = new HashMap<>();
         for (UserItemEntity ui : explicitPermissions) {
             explicitPermissionsMap.put(ui.getItem().getId(), ui.getPermission());
         }
 
         List<SharedItemResponse> sharedItemResponses = new ArrayList<>();
-        for (ItemEntity item : sharedItems) {
-            PermissionType maxPermission = explicitPermissionsMap.get(item.getId());
-            ItemEntity sharedAncestor = sharedItemsMap.get(item.getParentId());
+        for (ItemEntity item : accessibleItems) {
+            PermissionType firstPermission = explicitPermissionsMap.get(item.getId());
+            ItemEntity accessibleAncestor = accessibleItemsMap.get(item.getParentId());
 
-            while (sharedAncestor != null) { // stop at the last accessible ancestor (until an ancestor that isn't "shared"), who holds the root permission
-                maxPermission = PermissionType.max(maxPermission, explicitPermissionsMap.get(sharedAncestor.getId()));
-                sharedAncestor = sharedItemsMap.get(sharedAncestor.getParentId());
+            while (accessibleAncestor != null && firstPermission == null) { // stop at the last accessible ancestor (until an ancestor that isn't "shared"), who holds the root permission
+                firstPermission = explicitPermissionsMap.get(accessibleAncestor.getId());
+                accessibleAncestor = accessibleItemsMap.get(accessibleAncestor.getParentId());
             }
 
-            ItemEntity sharedParent = sharedItemsMap.get(item.getParentId());
+            if (!PermissionType.greaterThanOrEqualTo(firstPermission, PermissionType.VIEWER)) continue;
+
+            ItemEntity accessibleParent = accessibleItemsMap.get(item.getParentId());
             // needed to build ItemResponse inside SharedItemResponse 
             // if the parent is not shared/accessible to the current user, abstract its' publicId as null
-            UUID publicParentId = sharedParent != null ? sharedParent.getPublicId() : null;
-            sharedItemResponses.add(new SharedItemResponse(item, publicParentId, maxPermission));
+            UUID publicParentId = accessibleParent != null ? accessibleParent.getPublicId() : null;
+            sharedItemResponses.add(new SharedItemResponse(item, publicParentId, firstPermission));
         }
         return sharedItemResponses;
     }
 
 //-----validation
     public void validateModifyFolderContents(UUID publicParentId) throws InvalidPermissionsException { 
-        if (!getEffectivePermissionLevel(publicParentId).greaterThanOrEqualTo(PermissionType.EDITOR)) {
+        if (!PermissionType.greaterThanOrEqualTo(getEffectivePermissionLevel(publicParentId), PermissionType.EDITOR)) {
             throw new InvalidPermissionsException("You cannot change the contents of the current folder.");
         }
     }
 
     public void validateRename(UUID publicId) throws InvalidPermissionsException {
-        if (!getEffectivePermissionLevel(publicId).greaterThanOrEqualTo(PermissionType.EDITOR)) {
+        if (!PermissionType.greaterThanOrEqualTo(getEffectivePermissionLevel(publicId), PermissionType.EDITOR)) {
             throw new InvalidPermissionsException("You cannot rename this item.");
         }
     }
 
     public void validateViewing(UUID publicId) throws InvalidPermissionsException {
-        if (!getEffectivePermissionLevel(publicId).greaterThanOrEqualTo(PermissionType.VIEWER)) {
+        if (!PermissionType.greaterThanOrEqualTo(getEffectivePermissionLevel(publicId), PermissionType.VIEWER)) {
             throw new InvalidPermissionsException("You don't have access to this item.");
         }
     }
@@ -272,11 +275,15 @@ public class ItemService {
     }
 
     public PermissionType getEffectivePermissionLevel(UUID publicId) {
-        List<ItemEntity> itemsOnPath = itemRepository.findItemsOnPath(publicId);
-        if (itemsOnPath.isEmpty()) return null;
-        List<PermissionType> permissionsOnPath = userItemRepository.findPermissionsByItemsAndUser(itemsOnPath, userService.getCurrentUserEntity());
-        return PermissionType.max(permissionsOnPath);
+        return itemRepository.findFirstPermissionOnPath(itemRepository.findIdByPublicId(publicId), userService.getCurrentUserEntity().getId());
     }
+
+    // public PermissionType getEffectivePermissionLevel(UUID publicId) {
+    //     List<ItemEntity> itemsOnPath = itemRepository.findItemsOnPath(publicId);
+    //     if (itemsOnPath.isEmpty()) return null;
+    //     List<PermissionType> permissionsOnPath = userItemRepository.findPermissionsByItemsAndUser(itemsOnPath, userService.getCurrentUserEntity());
+    //     return PermissionType.max(permissionsOnPath);
+    // }
 
     // @SuppressWarnings("null")
     // // + throw proper exception from .orElseThrow();
@@ -318,5 +325,49 @@ public class ItemService {
     //         parentResponse.getChildren().add(itemResponses.get(id));
     //     }
     //     return rootResponse;
+    // }
+
+    // /**
+    //  * Firstly, build a map of all accessible items for the current user, 
+    //  * and a map of all items with explicit UserItem permission entries.
+    //  * 
+    //  * For each accessible item, walk up to the highest accessible ancestor, 
+    //  * storing the highest-level, explicit (not implicitly through inheritence) 
+    //  * permission along the path.
+    //  * 
+    //  * @return A list of accessible items paired with their explicitly defined, or inherited, permissions, and their publicParentId
+    //  */
+    // public List<SharedItemResponse> getItemsUserCanAccessExceptOwned() {
+    //     UserEntity currentUser = userService.getCurrentUserEntity();
+
+    //     List<ItemEntity> sharedItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(currentUser.getId());
+    //     Map<Long, ItemEntity> sharedItemsMap = new HashMap<>();
+    //     for (ItemEntity item : sharedItems) {
+    //         sharedItemsMap.put(item.getId(), item);
+    //     }
+
+    //     List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(currentUser.getId());
+    //     Map<Long, PermissionType> explicitPermissionsMap = new HashMap<>();
+    //     for (UserItemEntity ui : explicitPermissions) {
+    //         explicitPermissionsMap.put(ui.getItem().getId(), ui.getPermission());
+    //     }
+
+    //     List<SharedItemResponse> sharedItemResponses = new ArrayList<>();
+    //     for (ItemEntity item : sharedItems) {
+    //         PermissionType maxPermission = explicitPermissionsMap.get(item.getId());
+    //         ItemEntity sharedAncestor = sharedItemsMap.get(item.getParentId());
+
+    //         while (sharedAncestor != null) { // stop at the last accessible ancestor (until an ancestor that isn't "shared"), who holds the root permission
+    //             maxPermission = PermissionType.max(maxPermission, explicitPermissionsMap.get(sharedAncestor.getId()));
+    //             sharedAncestor = sharedItemsMap.get(sharedAncestor.getParentId());
+    //         }
+
+    //         ItemEntity sharedParent = sharedItemsMap.get(item.getParentId());
+    //         // needed to build ItemResponse inside SharedItemResponse 
+    //         // if the parent is not shared/accessible to the current user, abstract its' publicId as null
+    //         UUID publicParentId = sharedParent != null ? sharedParent.getPublicId() : null;
+    //         sharedItemResponses.add(new SharedItemResponse(item, publicParentId, maxPermission));
+    //     }
+    //     return sharedItemResponses;
     // }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.laurel.docurel.entity.ItemEntity;
+import com.laurel.docurel.enums.PermissionType;
 
 /* this repo is attached to the same table("items") that ItemEntity is attached to,
    Spring creates basic methods and implentations for querying that table automatically */
@@ -109,7 +110,29 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         )
         SELECT * FROM path
     """, nativeQuery = true)
-    public List<ItemEntity> findItemsOnPath(@Param("publicDestId") UUID publicDestId);
+    public List<ItemEntity> findItemsOnPath(@Param("destPublicId") UUID publicDestId);
+
+    @Query(value = """
+        WITH RECURSIVE first_permission AS (
+            SELECT i.*, ui.permission
+            FROM items i
+            LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :userId
+            WHERE i.id = :itemId
+
+            UNION ALL
+        
+            SELECT i.*, ui.permission
+            FROM items i
+            JOIN first_permission p ON i.id = p.parent_id 
+            LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :userId
+            WHERE p.permission IS NULL      --- if the working table contains an item with a permission entry, this condition becomes false, 
+                                            --- and nothing can be added on this iteration, working table becomes empty and recursion stops 
+        )
+        SELECT permission FROM first_permission
+        WHERE permission IS NOT NULL
+        LIMIT 1
+    """, nativeQuery = true)
+    public PermissionType findFirstPermissionOnPath(@Param("itemId") Long itemId, @Param("userId") Long userId);
 
     @Query(value = """
         WITH RECURSIVE tree AS (

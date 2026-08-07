@@ -11,7 +11,8 @@ export function ExplorerProvider({ children }) {
   const [itemMap, setItemMap] = useState(new Map);
   const [currentFolderId, setCurrentFolderId] = useState(null);
   const [previewItemId, setPreviewItemId] = useState(null);
-  
+  const [filteredItemIdSet, setFilteredItemIdSet] = useState(new Set);
+
   const [itemNavigationStackForward, setItemNavigationStackForward] = useState([]);
   const [itemNavigationStackBackward, setItemNavigationStackBackward] = useState([]);
 
@@ -67,8 +68,8 @@ export function ExplorerProvider({ children }) {
 
   return (
     <ExplorerContext.Provider value={{
-      itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex, itemNavigationStackForward, itemNavigationStackBackward,
-      setItemMap, setCurrentFolderId, setPreviewItemId,
+      itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex, itemNavigationStackForward, itemNavigationStackBackward, filteredItemIdSet,
+      setItemMap, setCurrentFolderId, setPreviewItemId, setFilteredItemIdSet,
 
       currentFolder, previewItem,
 

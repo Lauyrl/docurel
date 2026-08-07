@@ -109,3 +109,7 @@ export async function getUsersWithPermissionsForItemCommon(item) {
   
   return map;
 }
+// assume only search owned items for now, must fix
+export async function searchItemsCommon(searchQuery) {
+  return api("/item/search?query=" + encodeURIComponent(searchQuery)).then(response => response.json());
+}

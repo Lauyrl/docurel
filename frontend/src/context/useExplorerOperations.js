@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { createFolderCommon, deleteItemCommon, deleteUserPermissionsForItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, uploadDocumentCommon } from "../common";
+import { createFolderCommon, deleteItemCommon, deleteUserPermissionsForItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, searchItemsCommon, uploadDocumentCommon } from "../common";
 import { useExplorer } from "./ExplorerContext";
 
 export function initializeFolderUIState(item) {
@@ -7,7 +7,7 @@ export function initializeFolderUIState(item) {
 }
 
 function useMyFilesOperations() {
-  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks } = useExplorer();  
+  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks, setFilteredItemIdSet } = useExplorer();  
 
   function selectItem(item) {
     setPreviewItemId(null);
@@ -57,8 +57,17 @@ function useMyFilesOperations() {
     return await getUsersWithPermissionsForItemCommon(item);
   }
 
+  async function searchItems(searchQuery) {
+    const filteredItems = await searchItemsCommon(searchQuery);
+    const ids = new Set;
+    for (const item of filteredItems) ids.add(item.publicId); 
+    setFilteredItemIdSet(ids);
+  }
+
   return {
-    initializeFolderUIState, selectItem, uploadDocument, createFolder, deleteItem, patchItem, editUserPermissionsForItem, deleteUserPermissionsForItem, getUsersWithPermissionsForItem
+    initializeFolderUIState, selectItem, uploadDocument, createFolder, deleteItem, patchItem, 
+    editUserPermissionsForItem, deleteUserPermissionsForItem, getUsersWithPermissionsForItem,
+    searchItems,
   }
 }
 

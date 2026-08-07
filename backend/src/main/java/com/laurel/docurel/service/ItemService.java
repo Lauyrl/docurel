@@ -159,7 +159,7 @@ public class ItemService {
         if (user.getId().equals(userService.getCurrentUserEntity().getId())) return null; // avoid setting permissions for self
 
         UserItemEntity userItem = userItemRepository
-            .findByUserIdAndItemId(user.getId(), item.getId())
+            .findByUserAndItem(user, item)
             .orElse(new UserItemEntity(user, item, permission));
         userItem.setPermission(permission);
         userItemRepository.save(userItem);
@@ -202,7 +202,12 @@ public class ItemService {
 
         UserEntity user = userService.getUserByUsernameOrEmail(username);
         ItemEntity item = itemRepository.findByPublicId(itemPublicId).orElseThrow();
-        userItemRepository.deleteByUserAndItem(user, item);
+        
+        List<ItemEntity> selfAndDescendants = itemRepository.findSelfAndDescendants(itemPublicId);
+        userItemRepository.deleteByUserAndItems(user, selfAndDescendants);
+
+        // to block items from inheriting permissions after old permissions were revoked
+        userItemRepository.save(new UserItemEntity(user, item, PermissionType.NO_PERMISSION));
     }
     /**
      * Firstly, build a map of all accessible items for the current user, 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,7 +18,16 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
     
     public Optional<UserItemEntity> findByUserIdAndItemId(Long userId, Long itemId);
 
+    public Optional<UserItemEntity> findByUserAndItem(UserEntity user, ItemEntity item);
+
     public void deleteByUserAndItem(UserEntity user, ItemEntity item);
+
+    @Modifying(clearAutomatically = true)
+    @Query("""
+        DELETE FROM UserItemEntity ui
+        WHERE ui.user = :user AND ui.item IN (:items) 
+    """)
+    public void deleteByUserAndItems(UserEntity user, List<ItemEntity> items);
 
     @Query("""
         SELECT ui 

@@ -115,6 +115,22 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     public List<ItemEntity> findItemsOnPath(@Param("publicDestId") UUID publicDestId);
 
     @Query(value = """
+        WITH RECURSIVE tree AS (
+            SELECT *
+            FROM items
+            WHERE public_id = :publicRootId
+
+            UNION ALL
+
+            SELECT i.*
+            FROM items i
+            JOIN tree t ON i.parent_id = t.id
+        )
+        SELECT * FROM tree
+    """, nativeQuery = true)
+    public List<ItemEntity> findSelfAndDescendants(@Param("publicRootId") UUID publicRootId);
+
+    @Query(value = """
         WITH RECURSIVE first_permission AS (
             SELECT i.*, ui.permission
             FROM items i

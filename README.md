@@ -6,7 +6,8 @@ Toggle Preview: Ctrl+Shift+V
   - To avoid name collisions within this structure, stored files are named as their ID in the DB 
 
 ### Sharing and Permissions
-- Items inherit the highest-level permissions among itself or its' ancestors for the current user
+- Items inherit the nearest permissions among itself or its' ancestors for the current user
+- Revoking/deleting permissions on an item also revokes permissions on all of its' descendants 
 - Users can unconditionally delete or move an item if they have OWNER permissions to it, 
   otherwise, they need EDITOR permissions, or higher, to the *parent* of that item to do so
 - Users can only add new items, or move items into a folder if they have EDITOR permissions, 

@@ -3,7 +3,7 @@ package com.laurel.docurel.enums;
 import java.util.List;
 
 public enum PermissionType {
-    VIEWER(0), SHARER(1), EDITOR(2), OWNER(3);
+    NO_PERMISSION(-1), VIEWER(0), SHARER(1), EDITOR(2), OWNER(3);
 
     private final int level;
 
@@ -12,8 +12,16 @@ public enum PermissionType {
     }
 
     public boolean greaterThanOrEqualTo(PermissionType that) {
-        return this.level >= that.level;
+        return that == null || this.level >= that.level;
     }
+
+    public static boolean greaterThanOrEqualTo(PermissionType a, PermissionType b) {
+        if (a == null && b == null) return true;
+        if (a == null) return false; // null is greater than nothing
+        if (b == null) return true;  // everything is greater than null
+        return a.level >= b.level;
+    }
+
 
     public static PermissionType max(PermissionType a, PermissionType b) {
         if (a == null) return b;

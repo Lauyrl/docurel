@@ -46,17 +46,16 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
         WITH RECURSIVE shared AS (
             SELECT i.*
             FROM items i
-            JOIN user_items ui
-              ON i.id = ui.item_id
-            WHERE ui.user_id = :current_user_id
-              AND ui.permission != 'OWNER'
+            JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id
+            WHERE ui.permission != 'OWNER' AND ui.permission != 'NO_PERMISSION'
 
             UNION ALL
 
             SELECT i.*
             FROM items i
-            JOIN shared s
-              ON i.parent_id = s.id
+            JOIN shared s ON i.parent_id = s.id
+            LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id
+            WHERE ui.permission IS NULL OR ui.permission != 'NO_PERMISSION'
         )
         SELECT DISTINCT * FROM shared              
     """, nativeQuery = true) // add SELECT DISTINCT for items whom multiple ancestors have entries 

@@ -28,9 +28,9 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
        FROM UserEntity u
        JOIN UserItemEntity ui ON ui.user = u 
        WHERE ui.item.publicId = :publicId
-         AND ui.permission = com.laurel.docurel.enums.PermissionType.OWNER
+         AND ui.permission = :permission
     """)
-    Optional<UserEntity> findOwnerByItemPublicId(UUID publicId);
+    Optional<UserEntity> findByItemPublicIdAndPermission(UUID publicId, PermissionType permission);
 
     @Modifying(clearAutomatically = true)
     @Query("""

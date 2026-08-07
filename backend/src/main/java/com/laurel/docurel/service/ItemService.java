@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -73,7 +74,7 @@ public class ItemService {
         UserEntity uploader = userService.getCurrentUserEntity();
         // any folder added to this directory before would have been uploaded into the owner's root folder, of a folder whose parent is the root folder,
         // therefore the owner of any folder being uploaded into would be the owner of the entire tree
-        UserEntity directoryOwner = userItemRepository.findOwnerByItemPublicId(publicParentId).orElseThrow(); 
+        UserEntity directoryOwner = findOwnerByItemPublicId(publicParentId).orElseThrow(); 
         if (!uploader.getId().equals(directoryOwner.getId())) {
             userItemRepository.save(new UserItemEntity(uploader, item, PermissionType.EDITOR));
         } 
@@ -114,7 +115,7 @@ public class ItemService {
         ItemEntity folder = itemRepository.save(new ItemEntity(foldername, parentId, ItemType.FOLDER, null));
 
         UserEntity uploader = userService.getCurrentUserEntity();
-        UserEntity directoryOwner = userItemRepository.findOwnerByItemPublicId(publicParentId).orElseThrow(); 
+        UserEntity directoryOwner = findOwnerByItemPublicId(publicParentId).orElseThrow(); 
         if (!uploader.getId().equals(directoryOwner.getId())) {
             userItemRepository.save(new UserItemEntity(uploader, folder, PermissionType.EDITOR));
         } 
@@ -166,7 +167,7 @@ public class ItemService {
             entityToUpdate.setParentId(newParentId);
 
             UserEntity oldOwner = userService.getCurrentUserEntity();
-            UserEntity newOwner = userItemRepository.findOwnerByItemPublicId(newPublicParentId).orElseThrow();
+            UserEntity newOwner = findOwnerByItemPublicId(newPublicParentId).orElseThrow();
             if (!oldOwner.getId().equals(newOwner.getId())) {
                 List<ItemEntity> selfAndDescendants = itemRepository.findSelfAndDescendants(publicId);
                 for (ItemEntity i : selfAndDescendants) { 
@@ -243,6 +244,7 @@ public class ItemService {
         // to block items from inheriting permissions after old permissions were revoked
         userItemRepository.save(new UserItemEntity(user, item, PermissionType.NO_PERMISSION));
     }
+
     /**
      * Firstly, build a map of all accessible items for the current user, 
      * and a map of all items with explicit UserItem permission entries.
@@ -329,6 +331,10 @@ public class ItemService {
 
     public PermissionType getEffectivePermissionLevel(UUID publicId) {
         return itemRepository.findFirstPermissionOnPath(itemRepository.findIdByPublicId(publicId), userService.getCurrentUserEntity().getId());
+    }
+
+    public Optional<UserEntity> findOwnerByItemPublicId(UUID publicId) {
+        return userItemRepository.findByItemPublicIdAndPermission(publicId, PermissionType.OWNER);
     }
 
     // public PermissionType getEffectivePermissionLevel(UUID publicId) {

@@ -8,6 +8,6 @@
 .ribbon {
     background: rgb(43, 42, 41);
     display: flex;
-    gap: 20px;
+    gap: 10px;
     padding: 10px;
 }

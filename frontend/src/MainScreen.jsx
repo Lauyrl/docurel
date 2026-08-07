@@ -6,6 +6,7 @@ import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
 import Workspace from "./components/workspace/Workspace";
 import { ExplorerProvider } from "./context/ExplorerProvider";
+import SearchBar from "./components/SearchBar";
 
 function MainScreen() {
 	// React stores the state of state variables across renders, a render happens whenever the state changes
@@ -29,6 +30,7 @@ function MainScreen() {
 						<div className="ribbon">
 							<FileUpload currentPageIdx={currentPageIdx}/>
 							<FolderUpload currentPageIdx={currentPageIdx}/>
+							<SearchBar currentPageIdx={currentPageIdx}/>
 						</div>
 
 						<Workspace currentPageIdx={currentPageIdx} />

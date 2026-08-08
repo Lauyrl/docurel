@@ -22,3 +22,13 @@
 .ribbon-button:hover {
     background: #221f1f;
 }
+
+.ribbon-button:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.ribbon-button:disabled:hover {
+    /* reset what hover does */
+    background: rgb(70, 67, 64);
+}

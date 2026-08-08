@@ -3,8 +3,10 @@ import "./css/ribbon.css";
 import { useState } from "react";
 import useExplorerOperations from "../context/useExplorerOperations";
 import { FolderUp } from "lucide-react";
+import { useExplorer } from "../context/ExplorerContext";
 
 function FolderUpload({ currentPageIdx }) {
+  const {currentFolder} = useExplorer();
   const {createFolder} = useExplorerOperations(currentPageIdx);
 
   const [creatingFolder, setCreatingFolder] = useState(false);
@@ -52,6 +54,7 @@ function FolderUpload({ currentPageIdx }) {
       }
       <button 
         className="ribbon-button"
+        disabled={!currentFolder}
         onClick={(e) => {
           e.stopPropagation();
           setCreatingFolder(true);

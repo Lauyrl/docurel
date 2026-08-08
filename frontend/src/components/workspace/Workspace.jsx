@@ -12,7 +12,7 @@ import SharedWithMe from "./pages/SharedWithMe";
 import Breadcrumbs from "../Breadcrumbs";
 
 function Workspace({ currentPageIdx }) {
-  const {childrenIndex} = useExplorer();
+  const {childrenIndex, setItemMap} = useExplorer();
   const {selectItem, patchItem, deleteItem} = useExplorerOperations(currentPageIdx);
 
   const [contextMenu, setContextMenu] = useState({
@@ -20,21 +20,17 @@ function Workspace({ currentPageIdx }) {
     x: null,
     y: null,
   });
-
-  const [itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf] = useState(null);
-
   const [itemRename, setItemRename] = useState({
     item: null,
     newName: null,
   });
-
+  const [itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
   
-  function exitRename() {
-    setItemRename(null);
-  }
-
   useEffect(() => {
+    function exitRename() {
+      setItemRename(null);
+    }
     window.addEventListener("click", exitRename);
     window.addEventListener("contextmenu", exitRename);
     return () => {
@@ -53,14 +49,9 @@ function Workspace({ currentPageIdx }) {
 
   function isDescendant(potentialDescendantItem, potentialAncestorItem) {
     if (potentialAncestorItem.type !== "FOLDER") return false;
-    for (const child of childrenIndex.get(potentialAncestorItem.publicId) ??
-      []) {
-      if (
-        child.publicId === potentialDescendantItem.publicId ||
-        (child.type === "FOLDER" &&
-          isDescendant(potentialDescendantItem, child))
-      )
-        return true;
+    for (const child of childrenIndex.get(potentialAncestorItem.publicId) ?? []) {
+      if (child.publicId === potentialDescendantItem.publicId) return true;
+      if (child.type === "FOLDER" && isDescendant(potentialDescendantItem, child)) return true;
     }
     return false;
   }
@@ -71,12 +62,38 @@ function Workspace({ currentPageIdx }) {
       destinationItem.type === "FOLDER" &&
       destinationItem.publicId !== draggedItem?.publicId &&
       destinationItem.publicId !== draggedItem?.publicParentId &&
-      !(
-        draggedItem.type === "FOLDER" &&
-        isDescendant(destinationItem, draggedItem)
-      )
+      !(draggedItem.type === "FOLDER" && isDescendant(destinationItem, draggedItem))
     );
     /* deny dragging a folder into one of its' descendant folders, causing a cyclic relationship */
+  }
+
+  function renameDialogue(item) {
+    return (
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        onContextMenu={(e) => {
+          e.stopPropagation(); 
+          e.preventDefault();
+        }}
+        style={{zIndex: 1100, position: "relative"}}
+      >
+        <input
+          autoFocus
+          type="text"
+          value={itemRename.newName}
+          onChange={(e) => setItemRename({ item: item, newName: e.target.value })}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
+              if (newName) {
+                patchItem(itemRename.item, newName, null);
+                setItemRename(null);
+              }
+            }
+          }}
+        />
+      </div>
+    )
   }
 
   /**
@@ -112,40 +129,16 @@ function Workspace({ currentPageIdx }) {
           e.preventDefault();
           e.stopPropagation();
           if (canDropInto(item)) {
-            selectItem(item);
+            if (!item.isExpanded) {
+              const itemTemp = { ...item, isExpanded: true };
+              setItemMap((current) => new Map(current).set(item.publicId, itemTemp));
+            }
             patchItem(draggedItem, null, item.publicId);
           }
         }}
       >
         {itemRename?.item?.publicId !== item.publicId && displayItem(item) }
-        {itemRename?.item?.publicId === item.publicId && (
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            onContextMenu={(e) => {
-              e.stopPropagation(); 
-              e.preventDefault();
-            }}
-            style={{zIndex: 1100, position: "relative"}}
-          >
-            <input
-              autoFocus
-              type="text"
-              value={itemRename.newName}
-              onChange={(e) =>
-                setItemRename({ item: item, newName: e.target.value })
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const newName = itemRename.newName.trim(); // trim spaces so that "  " or similar wouldn't be accepted
-                  if (newName && newName != "") {
-                    patchItem(itemRename.item, newName, null);
-                    setItemRename(null);
-                  }
-                }
-              }}
-            />
-          </div>
-        )}
+        {itemRename?.item?.publicId === item.publicId && renameDialogue(item) }
       </div>
     );
   }

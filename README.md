@@ -7,10 +7,9 @@ Toggle Preview: Ctrl+Shift+V
 
 ### Sharing and Permissions
 - Items inherit the nearest permissions among itself or its' ancestors for the current user
-- Revoking/deleting permissions on an item also revokes permissions on all of its' descendants 
-- Users can unconditionally delete or move an item if they have OWNER permissions to it, 
-  otherwise, they need EDITOR permissions, or higher, to the *parent* of that item to do so
-- Users can only add new items, or move items into a folder if they have EDITOR permissions, 
+- Revoking/deleting permissions on an item also revokes permissions on all of its' descendants
+- Uploading items into another user's file tree gives them OWNER permissions, while the uploader becomes an EDITOR 
+- Users can only move items they own 
+- Users can only rename/delete children, add new items, or move items into a folder if they have EDITOR permissions, 
   or higher, to it
-- Users can rename any item they have EDITOR permissions, or higher, to  
 - Only OWNERs can view or manage outward permissions for an item they own

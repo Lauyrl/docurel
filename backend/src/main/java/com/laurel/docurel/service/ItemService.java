@@ -142,14 +142,15 @@ public class ItemService {
     @SuppressWarnings("null")
     public void updateItem(UUID publicId, String newName, UUID newPublicParentId) throws InvalidPermissionsException {        
         ItemEntity entityToUpdate = itemRepository.findByPublicId(publicId).orElseThrow();
+        UUID currentParentPublicId = itemRepository.findPublicParentIdByPublicId(publicId);
         if (newName != null) {
-            validateRename(publicId);
+            validateModifyFolderContents(currentParentPublicId);
             entityToUpdate.setName(newName);
         }
         if (newPublicParentId != null) {
-            validateOwnership(publicId);                                                         // must own an item to move it away
-            validateModifyFolderContents(itemRepository.findPublicParentIdByPublicId(publicId)); // can 'delete' item from original folder
-            validateModifyFolderContents(newPublicParentId);                                     // can 'upload' item into new folder
+            validateOwnership(publicId);                          // must own an item to move it away
+            validateModifyFolderContents(currentParentPublicId);  // can 'delete' item from original folder
+            validateModifyFolderContents(newPublicParentId);      // can 'upload' item into new folder
 
             ItemEntity newParent = itemRepository.findByPublicId(newPublicParentId).orElseThrow();
 
@@ -308,11 +309,11 @@ public class ItemService {
         }
     }
 
-    public void validateRename(UUID publicId) throws InvalidPermissionsException {
-        if (!PermissionType.greaterThanOrEqualTo(getEffectivePermissionLevel(publicId), PermissionType.EDITOR)) {
-            throw new InvalidPermissionsException("You cannot rename this item.");
-        }
-    }
+    // public void validateRename(UUID publicId) throws InvalidPermissionsException {
+    //     if (!PermissionType.greaterThanOrEqualTo(getEffectivePermissionLevel(publicId), PermissionType.EDITOR)) {
+    //         throw new InvalidPermissionsException("You cannot rename this item.");
+    //     }
+    // }
 
     public void validateViewing(UUID publicId) throws InvalidPermissionsException {
         if (!PermissionType.greaterThanOrEqualTo(getEffectivePermissionLevel(publicId), PermissionType.VIEWER)) {

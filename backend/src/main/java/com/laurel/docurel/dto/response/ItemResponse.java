@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.enums.ItemType;
+import com.laurel.docurel.enums.PermissionType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,8 +22,9 @@ public class ItemResponse {
     private Instant createdAt;
     private Instant updatedAt;
     private UUID publicId;
+    private PermissionType permission;
 
-    public ItemResponse(ItemEntity entity, UUID publicParentId) {
+    public ItemResponse(ItemEntity entity, UUID publicParentId, PermissionType permission) {
         setPublicParentId(entity.getParentId() == null ? null : publicParentId);
         setName(entity.getName());
         setType(entity.getType());
@@ -31,5 +33,6 @@ public class ItemResponse {
         setCreatedAt(entity.getCreatedAt());
         setUpdatedAt(entity.getUpdatedAt());
         setPublicId(entity.getPublicId());
+        setPermission(permission);
     }
 }

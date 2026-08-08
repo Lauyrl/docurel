@@ -21,7 +21,6 @@ import com.laurel.docurel.dto.request.DeletePermissionRequest;
 import com.laurel.docurel.dto.request.SetPermissionsRequest;
 import com.laurel.docurel.dto.request.UpdateItemRequest;
 import com.laurel.docurel.dto.response.ItemResponse;
-import com.laurel.docurel.dto.response.SharedItemResponse;
 import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
 import com.laurel.docurel.enums.PermissionType;
 import com.laurel.docurel.exception.InvalidPermissionsException;
@@ -118,12 +117,12 @@ public class ItemController {
     }
 
     @GetMapping("/item/search")
-    public List<ItemResponse> searchItems(@RequestParam String query) {
+    public List<UUID> searchItems(@RequestParam String query) {
         return itemService.searchItems(query);
     }
 
     @GetMapping("/shared")
-    public List<SharedItemResponse> getItemsSharedWithCurrentUser() {
+    public List<ItemResponse> getItemsSharedWithCurrentUser() {
         return itemService.getItemsUserCanAccessExceptOwned();
     }
 }

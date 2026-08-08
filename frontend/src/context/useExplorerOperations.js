@@ -58,10 +58,8 @@ function useMyFilesOperations() {
   }
 
   async function searchItems(searchQuery) {
-    const filteredItems = await searchItemsCommon(searchQuery);
-    const ids = new Set;
-    for (const item of filteredItems) ids.add(item.publicId); 
-    setFilteredItemIdSet(ids);
+    const filteredItemsPublicId = await searchItemsCommon(searchQuery); 
+    setFilteredItemIdSet(new Set(filteredItemsPublicId));
   }
 
   return {

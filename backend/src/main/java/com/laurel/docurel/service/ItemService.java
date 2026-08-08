@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.laurel.docurel.dto.response.ItemResponse;
-import com.laurel.docurel.dto.response.SharedItemResponse;
 import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
 import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.entity.UserEntity;
@@ -41,13 +40,13 @@ public class ItemService {
     private final UserItemRepository userItemRepository; // services can cross-call repositories
     private final UserService userService;
 
-    public List<ItemResponse> getDocumentsExceptUserRoot() {
+    public List<ItemResponse> getDocumentsExceptUserRoot() { // specifically for owned items in My Files
         List<ItemEntity> entities = userItemRepository.findItemsByUser(userService.getCurrentUserEntity());
 
         List<ItemResponse> responses = new ArrayList<>();
         for (ItemEntity entity : entities) {
             if (entity.getParentId() == GLOBAL_ROOT_ID) continue; // skip user root
-            responses.add(new ItemResponse(entity, itemRepository.findPublicIdById(entity.getParentId())));
+            responses.add(new ItemResponse(entity, itemRepository.findPublicIdById(entity.getParentId()), PermissionType.OWNER));
         }
         return responses;
     }
@@ -55,7 +54,7 @@ public class ItemService {
     public ItemResponse getUserRoot() {
         ItemEntity userRootItem = userItemRepository.findUserRootItemByUser(userService.getCurrentUserEntity(), GLOBAL_ROOT_ID).orElseThrow();
         // abstract the global root by setting the user root's parentId as null
-        return new ItemResponse(userRootItem, null);
+        return new ItemResponse(userRootItem, null, PermissionType.OWNER);
     }
 
     @SuppressWarnings("null")
@@ -75,15 +74,17 @@ public class ItemService {
         // any folder added to this directory before would have been uploaded into the owner's root folder, of a folder whose parent is the root folder,
         // therefore the owner of any folder being uploaded into would be the owner of the entire tree
         UserEntity directoryOwner = findOwnerByItemPublicId(publicParentId).orElseThrow(); 
+        PermissionType uploadersPermission = PermissionType.OWNER;
         if (!uploader.getId().equals(directoryOwner.getId())) {
             userItemRepository.save(new UserItemEntity(uploader, item, PermissionType.EDITOR));
+            uploadersPermission = PermissionType.EDITOR;
         } 
         userItemRepository.save(new UserItemEntity(directoryOwner, item, PermissionType.OWNER));
 
         Path dest = Path.of(STORAGE_PATH, item.getId().toString());            
         document.transferTo(dest);
 
-        return new ItemResponse(item, publicParentId);
+        return new ItemResponse(item, publicParentId, uploadersPermission);
     }
 
     public byte[] getFileBytes(UUID publicId) throws IOException, InvalidPermissionsException {
@@ -116,11 +117,13 @@ public class ItemService {
 
         UserEntity uploader = userService.getCurrentUserEntity();
         UserEntity directoryOwner = findOwnerByItemPublicId(publicParentId).orElseThrow(); 
+        PermissionType uploadersPermission = PermissionType.OWNER;
         if (!uploader.getId().equals(directoryOwner.getId())) {
             userItemRepository.save(new UserItemEntity(uploader, folder, PermissionType.EDITOR));
+            uploadersPermission = PermissionType.EDITOR;
         } 
         userItemRepository.save(new UserItemEntity(directoryOwner, folder, PermissionType.OWNER));
-        return new ItemResponse(folder, publicParentId);
+        return new ItemResponse(folder, publicParentId, uploadersPermission);
     }
 
     @SuppressWarnings("null")
@@ -255,7 +258,7 @@ public class ItemService {
      * 
      * @return A list of accessible items paired with their explicitly defined, or inherited, permissions, and their publicParentId
      */
-    public List<SharedItemResponse> getItemsUserCanAccessExceptOwned() {
+    public List<ItemResponse> getItemsUserCanAccessExceptOwned() {
         UserEntity currentUser = userService.getCurrentUserEntity();
 
         List<ItemEntity> accessibleItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(currentUser.getId()); 
@@ -270,7 +273,7 @@ public class ItemService {
             explicitPermissionsMap.put(ui.getItem().getId(), ui.getPermission());
         }
 
-        List<SharedItemResponse> sharedItemResponses = new ArrayList<>();
+        List<ItemResponse> sharedItemResponses = new ArrayList<>();
         for (ItemEntity item : accessibleItems) {
             PermissionType firstPermission = explicitPermissionsMap.get(item.getId());
             ItemEntity accessibleAncestor = accessibleItemsMap.get(item.getParentId());
@@ -286,19 +289,16 @@ public class ItemService {
             // needed to build ItemResponse inside SharedItemResponse 
             // if the parent is not shared/accessible to the current user, abstract its' publicId as null
             UUID publicParentId = accessibleParent != null ? accessibleParent.getPublicId() : null;
-            sharedItemResponses.add(new SharedItemResponse(item, publicParentId, firstPermission));
+            sharedItemResponses.add(new ItemResponse(item, publicParentId, firstPermission));
         }
         return sharedItemResponses;
     }
 
-    public List<ItemResponse> searchItems(String query) {
-        List<ItemEntity> results = itemRepository.findMatchingItems(
+    public List<UUID> searchItems(String query) {
+        return itemRepository.findMatchingItemsPublicId(
             userService.getCurrentUserEntity().getId(), 
             query
         );
-        List<ItemResponse> responses = new ArrayList<>();
-        for (ItemEntity i : results) responses.add(new ItemResponse(i, itemRepository.findPublicIdById(i.getParentId())));
-        return responses;
     }
     
 //-----validation
@@ -346,6 +346,16 @@ public class ItemService {
     public Optional<UserEntity> findOwnerByItemPublicId(UUID publicId) {
         return userItemRepository.findByItemPublicIdAndPermission(publicId, PermissionType.OWNER);
     }
+
+    // public List<ItemResponse> searchItems(String query) {
+    //     List<ItemEntity> results = itemRepository.findMatchingItems(
+    //         userService.getCurrentUserEntity().getId(), 
+    //         query
+    //     );
+    //     List<ItemResponse> responses = new ArrayList<>();
+    //     for (ItemEntity i : results) responses.add(new ItemResponse(i, itemRepository.findPublicIdById(i.getParentId())));
+    //     return responses;
+    // }
 
     // public PermissionType getEffectivePermissionLevel(UUID publicId) {
     //     List<ItemEntity> itemsOnPath = itemRepository.findItemsOnPath(publicId);

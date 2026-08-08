@@ -36,6 +36,13 @@ export function ExplorerProvider({ children }) {
 	const currentFolder = itemMap.get(currentFolderId);
 	const previewItem   = itemMap.get(previewItemId);
 
+  const canModifyCurrentFolderContents = (currentFolder && (currentFolder.permission === "OWNER" || currentFolder.permission === "EDITOR"))
+  
+  function canModifyParentContents(item) {
+    const parent = itemMap.get(item.publicParentId);
+    return (parent && (parent.permission === "OWNER" || parent.permission === "EDITOR"));
+  }
+
   function rebuildNavigationStacks(stackTopId) {
     let path = []
     let folder = itemMap.get(stackTopId);
@@ -71,9 +78,9 @@ export function ExplorerProvider({ children }) {
       itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex, itemNavigationStackForward, itemNavigationStackBackward, filteredItemIdSet,
       setItemMap, setCurrentFolderId, setPreviewItemId, setFilteredItemIdSet,
 
-      currentFolder, previewItem,
+      currentFolder, previewItem, canModifyCurrentFolderContents,
 
-      rebuildNavigationStacks, navigateItems
+      canModifyParentContents, rebuildNavigationStacks, navigateItems
     }}>
       {children}
     </ExplorerContext.Provider>

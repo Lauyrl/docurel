@@ -65,6 +65,8 @@ function MainScreen() {
 	function canDropInto(destinationItem) {
 		return (
 			draggedItem &&
+			destinationItem && 
+		 (destinationItem.permission === "OWNER" || destinationItem.permission === "EDITOR") &&
 			destinationItem.type === "FOLDER" &&
 			destinationItem.publicId !== draggedItem?.publicId &&
 			destinationItem.publicId !== draggedItem?.publicParentId &&
@@ -128,7 +130,7 @@ function MainScreen() {
 					makeContextMenu(e, item);
 				}}
 
-				draggable={isDraggable && !(itemRename?.item?.publicId === item.publicId)} // if item is being renamed dont let it be draggable
+				draggable={item.permission === "OWNER" && isDraggable && !(itemRename?.item?.publicId === item.publicId)} // if item is being renamed dont let it be draggable
 				onDragStart={() => setDraggedItem(item)}
 				onDragEnd={() => setDraggedItem(null)}
 				onDragOver={(e) => {
@@ -155,8 +157,8 @@ function MainScreen() {
 		<>
 			<button onClick={() => {
 				localStorage.removeItem("jwt");
-				window.location.href = "/"    // reloads the page, which resets state variables and
-																			// reruns const [isLoggedIn, setIsLoggedIn] = useState(token != null) to reset isLoggedIn accordingly
+				window.location.href = "/"    /* reloads the page, which resets state variables and
+																			   reruns const [isLoggedIn, setIsLoggedIn] = useState(token != null) to reset isLoggedIn accordingly */
 			}}>
 				Logout
 			</button>
@@ -168,12 +170,12 @@ function MainScreen() {
 					setContextMenu={setContextMenu}
 					onItemDownload={downloadDocumentRedirect}
 					onItemDelete={deleteItem}
-					onItemRename={(item) => {setItemRename({item: item, newName: item.name})}}
-					onItemEditPermissions={(item) => {setItemToEditUserPermissionsOf(item)}}
+					onItemRename={(item) => { setItemRename({ item: item, newName: item.name }) }}
+					onItemEditPermissions={(item) => { setItemToEditUserPermissionsOf(item) }}
 				/>
 			}
 			{
-				itemToEditUserPermissionsOf && 
+				itemToEditUserPermissionsOf &&
 				<PermissionsEdit
 					itemToEditUserPermissionsOf={itemToEditUserPermissionsOf}
 					setItemToEditUserPermissionsOf={setItemToEditUserPermissionsOf}
@@ -185,18 +187,18 @@ function MainScreen() {
 					<div className="ribbon">
 						<FileUpload currentPageIdx={currentPageIdx} />
 						<FolderUpload currentPageIdx={currentPageIdx} />
-						<SearchBar 
-							currentPageIdx={currentPageIdx} 
+						<SearchBar
+							currentPageIdx={currentPageIdx}
 							draggedItem={draggedItem}
 							renderItemListing={renderItemListing} />
 					</div>
 
-					<Breadcrumbs 
+					<Breadcrumbs
 						currentPageIdx={currentPageIdx}
 						renderItemListing={renderItemListing}
 					/>
 
-					<Workspace 
+					<Workspace
 						currentPageIdx={currentPageIdx}
 						draggedItem={draggedItem}
 						renderItemListing={renderItemListing}

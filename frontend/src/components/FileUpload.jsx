@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { useExplorer } from "../context/ExplorerContext";
 
 function FileUpload({ currentPageIdx }) {
-  const {currentFolder} = useExplorer();
+  const {canModifyCurrentFolderContents} = useExplorer();
   const {uploadDocument} = useExplorerOperations(currentPageIdx);
   const fileInputRef = useRef(null);
 
@@ -28,7 +28,7 @@ function FileUpload({ currentPageIdx }) {
 
       <button
         className="ribbon-button"
-        disabled={!currentFolder}
+        disabled={!canModifyCurrentFolderContents}
         onClick={() => fileInputRef.current.click()} // since the <input/> is hidden, simulate the click through the Ref
       >
         <FileUp/>

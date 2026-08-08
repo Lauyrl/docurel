@@ -1,8 +1,10 @@
 import "./css/ContextMenu.css";
 import "../../css/common.css";
+import { useExplorer } from "../../context/ExplorerContext";
 
 function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete, onItemRename, onItemEditPermissions }) {
-  
+  const {canModifyParentContents} = useExplorer();
+
   function renderContextButton(label, contextAction) {
     return (
       <div 
@@ -19,6 +21,7 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
     );
   }
 
+  // outer element already checks contextMenu and contextMenu.item
   return (
     <div 
       className="overlay" 
@@ -41,10 +44,11 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
         }}
       >
         <div>
-          { contextMenu.item?.type === "DOCUMENT" && renderContextButton("Download", onItemDownload) }
-          { renderContextButton("Delete"          , onItemDelete          ) }
-          { renderContextButton("Rename"          , onItemRename          ) }
-          { renderContextButton("Edit Permissions", onItemEditPermissions ) }
+          { contextMenu.item.type === "DOCUMENT"      && renderContextButton("Download"        , onItemDownload) }
+          { canModifyParentContents(contextMenu.item) && renderContextButton("Delete"          , onItemDelete) }
+          { canModifyParentContents(contextMenu.item) && renderContextButton("Rename"          , onItemRename) }
+          { contextMenu.item.permission === "OWNER"   && renderContextButton("Edit Permissions", onItemEditPermissions ) }
+          { renderContextButton("Share to...", () => {})}
         </div>
       </div>
     </div>

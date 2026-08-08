@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -295,10 +296,28 @@ public class ItemService {
         return sharedItemResponses;
     }
 
-    public List<UUID> searchItems(String query) {
+    public List<UUID> searchItems(
+        boolean ownedOnly,
+        String query, 
+        ItemType type,
+        String contentType,
+        Instant createdAfter,
+        Instant createdBefore,
+        Instant updatedAfter,
+        Instant updatedBefore
+    ) {
+        if (query != null && query.isBlank() ) query = null; // frontend should prevent this but handle anyway
+        if (query == null && type == null && contentType == null && createdAfter == null && createdBefore == null && updatedAfter == null && updatedBefore == null) return Collections.emptyList();
         return itemRepository.findMatchingItemsPublicId(
             userService.getCurrentUserEntity().getId(), 
-            query
+            ownedOnly,
+            query,
+            type,
+            contentType,
+            createdAfter,
+            createdBefore,
+            updatedAfter,
+            updatedBefore
         );
     }
     

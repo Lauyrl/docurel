@@ -1,5 +1,6 @@
 package com.laurel.docurel.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.laurel.docurel.entity.ItemEntity;
+import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
 
 /* this repo is attached to the same table("items") that ItemEntity is attached to,
@@ -44,16 +46,36 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     List<ItemEntity> findByParentId(Long parentId);
 
     @Query(value = """
-        SELECT public_id
+        SELECT i.public_id
         FROM items i
         JOIN user_items ui ON i.id = ui.item_id 
         WHERE ui.user_id = :userId
-          AND ui.permission = 'OWNER'
+          AND ((:ownedOnly AND ui.permission = 'OWNER') OR (NOT :ownedOnly AND ui.permission IN ('VIEWER', 'SHARER', 'EDITOR')))
           AND i.parent_id != 0
-          AND similarity(i.name, :query) > 0.25
-        ORDER BY similarity(i.name, :query) DESC
+          AND (:query         IS NULL OR similarity(i.name, :query) > 0.25)
+          AND (:type          IS NULL OR i.type         = :type)
+          AND (:contentType   IS NULL OR i.content_type = :contentType)
+          AND (:createdAfter  IS NULL OR i.created_at  >= :createdAfter)
+          AND (:createdBefore IS NULL OR i.created_at  <= :createdBefore)
+          AND (:updatedAfter  IS NULL OR i.updated_at  >= :updatedAfter)
+          AND (:updatedBefore IS NULL OR i.updated_at  <= :updatedBefore) 
+        ORDER BY 
+            CASE WHEN (:query IS NOT NULL) THEN similarity(i.name, :query) ELSE 0 END DESC, 
+            i.updated_at DESC, 
+            i.created_at DESC
+        LIMIT 100
     """, nativeQuery = true)
-    List<UUID> findMatchingItemsPublicId(@Param("userId") Long userId, @Param("query") String query);
+    List<UUID> findMatchingItemsPublicId(
+        @Param("userId") Long userId, 
+        @Param("ownedOnly") boolean ownedOnly,
+        @Param("query") String query,
+        @Param("type") ItemType type,
+        @Param("contentType") String contentType,
+        @Param("createdAfter") Instant createdAfter,
+        @Param("createdBefore") Instant createdBefore,
+        @Param("updatedAfter") Instant updatedAfter,
+        @Param("updatedBefore") Instant updatedBefore
+    );
 
     @Query(value = """
         WITH RECURSIVE family AS (

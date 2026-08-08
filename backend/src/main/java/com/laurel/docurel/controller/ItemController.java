@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import com.laurel.docurel.dto.request.SetPermissionsRequest;
 import com.laurel.docurel.dto.request.UpdateItemRequest;
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
+import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
 import com.laurel.docurel.exception.InvalidPermissionsException;
 import com.laurel.docurel.service.ItemService;
@@ -117,8 +119,26 @@ public class ItemController {
     }
 
     @GetMapping("/item/search")
-    public List<UUID> searchItems(@RequestParam String query) {
-        return itemService.searchItems(query);
+    public List<UUID> searchItems(
+        @RequestParam(required = true) boolean ownedOnly,
+        @RequestParam(required = false) String query,
+        @RequestParam(required = false) ItemType type,
+        @RequestParam(required = false) String contentType,
+        @RequestParam(required = false) Instant createdAfter,
+        @RequestParam(required = false) Instant createdBefore,
+        @RequestParam(required = false) Instant updatedAfter,
+        @RequestParam(required = false) Instant updatedBefore
+    ) {
+        return itemService.searchItems(
+            ownedOnly,
+            query,
+            type,
+            contentType,
+            createdAfter,
+            createdBefore,
+            updatedAfter,
+            updatedBefore
+        );
     }
 
     @GetMapping("/shared")

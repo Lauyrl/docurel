@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ExplorerProvider } from "./context/ExplorerProvider";
 import AuthScreen from "./AuthScreen";
 import MainScreen from "./MainScreen";
 
@@ -9,7 +10,7 @@ function App() {
   return (
     <>
       { !isLoggedIn ? 
-          <AuthScreen setIsLoggedIn={setIsLoggedIn} /> : <MainScreen /> }
+          <AuthScreen setIsLoggedIn={setIsLoggedIn} /> : <ExplorerProvider> <MainScreen /> </ExplorerProvider>}
     </>
   )
 }

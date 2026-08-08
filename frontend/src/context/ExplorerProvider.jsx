@@ -11,7 +11,7 @@ export function ExplorerProvider({ children }) {
   const [itemMap, setItemMap] = useState(new Map);
   const [currentFolderId, setCurrentFolderId] = useState(null);
   const [previewItemId, setPreviewItemId] = useState(null);
-  const [filteredItemIdSet, setFilteredItemIdSet] = useState(new Set);
+  const [filteredItemIdSet, setFilteredItemIdSet] = useState(null); // new Set
 
   const [itemNavigationStackForward, setItemNavigationStackForward] = useState([]);
   const [itemNavigationStackBackward, setItemNavigationStackBackward] = useState([]);

@@ -52,13 +52,13 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         WHERE ui.user_id = :userId
           AND ((:ownedOnly AND ui.permission = 'OWNER') OR (NOT :ownedOnly AND ui.permission IN ('VIEWER', 'SHARER', 'EDITOR')))
           AND i.parent_id != 0
-          AND (:query         IS NULL OR similarity(i.name, :query) > 0.25)
-          AND (:type          IS NULL OR i.type         = :type)
-          AND (:contentType   IS NULL OR i.content_type = :contentType)
-          AND (:createdAfter  IS NULL OR i.created_at  >= :createdAfter)
-          AND (:createdBefore IS NULL OR i.created_at  <= :createdBefore)
-          AND (:updatedAfter  IS NULL OR i.updated_at  >= :updatedAfter)
-          AND (:updatedBefore IS NULL OR i.updated_at  <= :updatedBefore) 
+          AND (:query                              IS NULL OR similarity(i.name, :query) > 0.25)
+          AND (CAST(:type AS item_type)            IS NULL OR i.type         = :type)
+          AND (:contentType                        IS NULL OR i.content_type = :contentType)
+          AND (CAST(:createdAfter  AS TIMESTAMPTZ) IS NULL OR i.created_at  >= :createdAfter)
+          AND (CAST(:createdBefore AS TIMESTAMPTZ) IS NULL OR i.created_at  <= :createdBefore)
+          AND (CAST(:updatedAfter  AS TIMESTAMPTZ) IS NULL OR i.updated_at  >= :updatedAfter)
+          AND (CAST(:updatedBefore AS TIMESTAMPTZ) IS NULL OR i.updated_at  <= :updatedBefore)
         ORDER BY 
             CASE WHEN (:query IS NOT NULL) THEN similarity(i.name, :query) ELSE 0 END DESC, 
             i.updated_at DESC, 

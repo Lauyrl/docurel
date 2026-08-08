@@ -20,7 +20,8 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
   }
 
   return (
-    <div className="overlay" 
+    <div 
+      className="overlay" 
       onClick={() => setContextMenu(null)}
       onContextMenu={(e) => {
         e.preventDefault();

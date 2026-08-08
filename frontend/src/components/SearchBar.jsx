@@ -1,7 +1,8 @@
-import { Search } from "lucide-react";
+import { File, Folder, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import "./css/SearchBar.css"
 import "../css/common.css"
+import "./workspace/pages/css/ItemTreeView.css"
 import useExplorerOperations from "../context/useExplorerOperations";
 import { useExplorer } from "../context/ExplorerContext";
 
@@ -37,7 +38,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   function displayItem(item) {
     return (
       <div className="item">
-        <span> {item.type === "FOLDER" ? "📁" : "📄"} </span>
+        {item.type === "FOLDER" ?  <Folder/> : <File/>}
         <span> {item.name} </span>
       </div>
     );

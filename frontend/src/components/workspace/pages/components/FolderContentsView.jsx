@@ -1,6 +1,7 @@
 import "../css/FolderContentsView.css";
 import { useExplorer } from "../../../../context/ExplorerContext";
 import useExplorerOperations from "../../../../context/useExplorerOperations";
+import { File, Folder } from "lucide-react";
 
 function FolderContentsView({currentPageIdx, currentFolderChildren, draggedItem, renderItemListing}) {
   const {currentFolder} = useExplorer(); 
@@ -9,7 +10,7 @@ function FolderContentsView({currentPageIdx, currentFolderChildren, draggedItem,
   function displayItem(item) {
     return (
       <div>
-        <div> {item.type === "FOLDER" ? "📁" : "📄"} </div>
+        {item.type === "FOLDER" ?  <Folder fill="grey" size={60}/> : <File fill="grey" size={60}/>}
         <div> {item.name} </div>
       </div>
     );

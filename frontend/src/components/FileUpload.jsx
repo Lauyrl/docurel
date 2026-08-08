@@ -1,3 +1,4 @@
+import { FileUp } from "lucide-react";
 import useExplorerOperations from "../context/useExplorerOperations";
 import "./css/ribbon.css"
 import { useRef } from "react";
@@ -27,7 +28,8 @@ function FileUpload({ currentPageIdx }) {
         className="ribbon-button"
         onClick={() => fileInputRef.current.click()} // since the <input/> is hidden, simulate the click through the Ref
       >
-        Upload File
+        <FileUp/>
+        {"Upload File"}
       </button>
     </div>
   );

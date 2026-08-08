@@ -2,6 +2,7 @@ import "../css/common.css";
 import "./css/ribbon.css";
 import { useState } from "react";
 import useExplorerOperations from "../context/useExplorerOperations";
+import { FolderUp } from "lucide-react";
 
 function FolderUpload({ currentPageIdx }) {
   const {createFolder} = useExplorerOperations(currentPageIdx);
@@ -56,7 +57,8 @@ function FolderUpload({ currentPageIdx }) {
           setCreatingFolder(true);
         }}
       >
-        Create Folder
+        <FolderUp/>
+        {"Create Folder"}
       </button>
     </div>
   );

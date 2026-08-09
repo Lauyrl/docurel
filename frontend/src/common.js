@@ -109,7 +109,27 @@ export async function getUsersWithPermissionsForItemCommon(item) {
   
   return map;
 }
-// assume only search owned items for now, must fix
-export async function searchItemsCommon(searchQuery) {
-  return api("/item/search?query=" + encodeURIComponent(searchQuery)).then(response => response.json());
+
+export async function searchItemsCommon(
+    ownedOnly,
+    searchQuery,
+    type,
+    contentType,
+    createdAfter,
+    createdBefore,
+    updatedAfter,
+    updatedBefore
+  ) {
+  let url = "/item/search?";
+  url += "ownedOnly=" + ownedOnly;
+  // dont add null string params since encodeURIComponent(null) evaluates to "null" instead of leaving empty
+  if (searchQuery)   url += "&query=" + encodeURIComponent(searchQuery); 
+  if (type)          url += "&type="  + encodeURIComponent(type);
+  if (contentType)   url += "&contentType="   + encodeURIComponent(contentType);
+  if (createdAfter)  url += "&createdAfter="  + encodeURIComponent(new Date(createdAfter).toISOString());
+  if (createdBefore) url += "&createdBefore=" + encodeURIComponent(new Date(createdBefore).toISOString());
+  if (updatedAfter)  url += "&updatedAfter="  + encodeURIComponent(new Date(updatedAfter).toISOString());
+  if (updatedBefore) url += "&updatedBefore=" + encodeURIComponent(new Date(updatedBefore).toISOString());
+
+  return api(url).then(response => response.json());
 }

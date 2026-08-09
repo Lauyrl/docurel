@@ -57,8 +57,25 @@ function useMyFilesOperations() {
     return await getUsersWithPermissionsForItemCommon(item);
   }
 
-  async function searchItems(searchQuery) {
-    const filteredItemsPublicId = await searchItemsCommon(searchQuery); 
+  async function searchItems(
+    searchQuery, 
+    type,
+    contentType,
+    createdAfter,
+    createdBefore,
+    updatedAfter,
+    updatedBefore
+  ) {
+    const filteredItemsPublicId = await searchItemsCommon(
+      true, 
+      searchQuery, 
+      type,
+      contentType,
+      createdAfter,
+      createdBefore,
+      updatedAfter,
+      updatedBefore
+    ); 
     setFilteredItemIdSet(new Set(filteredItemsPublicId));
   }
 
@@ -70,7 +87,7 @@ function useMyFilesOperations() {
 }
 
 function useSharedOperations() {
-  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks } = useExplorer();
+  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks, setFilteredItemIdSet } = useExplorer();
 
     function selectItem(item) {
     setPreviewItemId(null);
@@ -117,8 +134,30 @@ function useSharedOperations() {
     return await getUsersWithPermissionsForItemCommon(item);
   }, []);
 
+  async function searchItems(
+    searchQuery, 
+    type,
+    contentType,
+    createdAfter,
+    createdBefore,
+    updatedAfter,
+    updatedBefore
+  ) {
+    const filteredItemsPublicId = await searchItemsCommon(
+      false, 
+      searchQuery, 
+      type,
+      contentType,
+      createdAfter,
+      createdBefore,
+      updatedAfter,
+      updatedBefore
+    ); 
+    setFilteredItemIdSet(new Set(filteredItemsPublicId));
+  }
+
   return {
-    selectItem, uploadDocument, createFolder, deleteItem, patchItem, editUserPermissionsForItem, getUsersWithPermissionsForItem
+    selectItem, uploadDocument, createFolder, deleteItem, patchItem, editUserPermissionsForItem, getUsersWithPermissionsForItem, searchItems
   }
 }
 

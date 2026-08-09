@@ -2,7 +2,7 @@ import "./css/SearchFilterOptions.css"
 import "../../css/common.css"
 import DateFilter from "./DateFilter";
 
-function SearchFilterOptions({ filterValues, setFilterValues, setSearchFiltersIsOpen }) {
+function SearchFilterOptions({ filterValues, setFilterValues, confirmFilters }) {
   function clearFilters() {
     setFilterValues({
       type: null, contentType: null, createdAfter: null, createdBefore: null, updatedAfter: null, updatedBefore: null
@@ -88,7 +88,7 @@ function SearchFilterOptions({ filterValues, setFilterValues, setSearchFiltersIs
         <button onClick={clearFilters}>
           Clear Filters
         </button>
-        <button onClick={() => setSearchFiltersIsOpen(false)}>
+        <button onClick={confirmFilters}>
           Confirm
         </button>
       </div>

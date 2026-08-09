@@ -17,13 +17,13 @@ export function ExplorerProvider({ children }) {
   const [itemNavigationStackBackward, setItemNavigationStackBackward] = useState([]);
 
   const childrenIndex = useMemo(() => {
-      const index = new Map();
-      for (const item of itemMap.values()) {
-        if (!index.has(item.publicParentId)) index.set(item.publicParentId, []);
-        index.get(item.publicParentId).push(item);
-      }
-      return index;
-    }, [itemMap]);
+    const index = new Map();
+    for (const item of itemMap.values()) {
+      if (!index.has(item.publicParentId)) index.set(item.publicParentId, []);
+      index.get(item.publicParentId).push(item);
+    }
+    return index;
+  }, [itemMap]);
 
   const rootLevelItemsIndex = useMemo(() => {
       const index = [];

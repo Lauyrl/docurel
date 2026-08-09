@@ -66,7 +66,7 @@ function MainScreen() {
 		return (
 			draggedItem &&
 			destinationItem && 
-		 (destinationItem.permission === "OWNER" || destinationItem.permission === "EDITOR") &&
+		   (destinationItem.permission === "OWNER" || destinationItem.permission === "EDITOR") &&
 			destinationItem.type === "FOLDER" &&
 			destinationItem.publicId !== draggedItem?.publicId &&
 			destinationItem.publicId !== draggedItem?.publicParentId &&

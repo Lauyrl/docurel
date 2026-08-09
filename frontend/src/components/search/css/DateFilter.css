@@ -1,0 +1,44 @@
+.date-filter {
+    display: flex;
+    align-items: center;
+    width: 180px;
+    height: 36px;
+    box-sizing: border-box;
+    border: 1px solid #888;
+    border-radius: 5px;
+}
+
+.date-filter span {
+    flex: 1;
+    font-size: 17px;
+    user-select: none;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+    display: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+.date-filter {
+    position: relative;
+}
+
+.date-filter input {
+    position: absolute;
+    right: 120px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 22px;
+    opacity: 0;
+}
+
+.date-filter svg {
+    position: relative;
+    padding-right: 5px;
+    z-index: 1;
+    pointer-events: none;
+}

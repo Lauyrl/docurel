@@ -13,9 +13,28 @@
     color: #f39150;
 }
 
+.search-filters-button {
+    position: absolute;
+    height: 40px;
+    left: 46px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 2px solid;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.search-filters-button:hover {
+    background-color: #585454;
+}
+
 .search-bar input {
     width: 100%;
-    padding: 9px 12px 8px 45px; /* extra left padding for the icon */
+    padding: 9px 12px 8px 160px; /* extra left padding for the icon */
     box-sizing: border-box;
     border-radius: 40px;
     border: 1px solid white;

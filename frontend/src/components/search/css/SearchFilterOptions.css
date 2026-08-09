@@ -1,0 +1,26 @@
+
+.search-filter-option {
+    height: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px
+}
+
+.search-filter-option:not(:first-of-type) {
+    border-top: 1px solid #ccc;
+    padding-top: 15px;
+}
+
+.date-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.select-filter {
+    width: 180px; 
+    height: 35px;
+    font-size: 17px;
+    padding: 1px;
+}

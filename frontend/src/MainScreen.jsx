@@ -8,11 +8,11 @@ import useExplorerOperations from "./context/useExplorerOperations";
 import PagesPanel from "./components/workspace/pages/PagesPanel";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
-import SearchBar from "./components/SearchBar";
 import Breadcrumbs from "./components/Breadcrumbs";
 import Workspace from "./components/workspace/Workspace";
 import PermissionsEdit from "./components/workspace/PermissionsEdit";
 import ContextMenu from "./components/workspace/ContextMenu";
+import SearchBar from "./components/search/SearchBar";
 
 function MainScreen() {
 	const [currentPageIdx, setCurrentPageIdx] = useState(0);
@@ -190,7 +190,8 @@ function MainScreen() {
 						<SearchBar
 							currentPageIdx={currentPageIdx}
 							draggedItem={draggedItem}
-							renderItemListing={renderItemListing} />
+							renderItemListing={renderItemListing} 
+						/>
 					</div>
 
 					<Breadcrumbs

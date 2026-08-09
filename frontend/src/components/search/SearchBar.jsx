@@ -7,6 +7,7 @@ import useExplorerOperations from "../../context/useExplorerOperations";
 import { useExplorer } from "../../context/ExplorerContext";
 import SearchFilterOptions from "./SearchFilterOptions";
 import FunnelSearch from "./css/FunnelSearch.svg"
+import { formatFileSize } from "../../common";
 
 function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   const {filteredItemIdSet, itemMap, setFilteredItemIdSet} = useExplorer();
@@ -19,11 +20,11 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   });
 
   function anyFilterActive() {
-    return (searchQuery || filterValues.type || filterValues.contentType || filterValues.createdAfter || filterValues.createdBefore || filterValues.updatedAfter || filterValues.updatedBefore);
+    return (filterValues.type || filterValues.contentType || filterValues.createdAfter || filterValues.createdBefore || filterValues.updatedAfter || filterValues.updatedBefore);
   }
 
   function search() {
-    if (anyFilterActive()) { 
+    if (searchQuery || anyFilterActive()) { 
       searchItems(
         searchQuery, 
         filterValues.type, 
@@ -64,11 +65,37 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
     return () => clearTimeout(timeout); // cancels previously scheduled run
   }, [searchQuery]);
 
+  function getPathTo(destItem) {
+    let path = []
+    let item = destItem;
+    while (item && !item.userRoot) {
+      path.push(item.name);
+      item = itemMap.get(item.publicParentId);
+    } 
+    return "Path: /" + path.reverse().join("/");
+  }
+
   function displayItem(item) {
     return (
-      <div className="item">
-        {item.type === "FOLDER" ?  <Folder/> : <File/>}
-        <span> {item.name} </span>
+      <div className="result-item">
+        <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+          {item.type === "FOLDER" ?  <Folder/> : <File/>}
+          <div style={{display: "flex", flexDirection: "column"}}>
+            <div> {item.name}  </div>
+            <div style={{display: "flex", gap: "20px", fontSize: 16}}>
+              <span style={{ fontStyle: "italic", fontFamily: "calibri" }}> 
+                {getPathTo(item)}  
+              </span>
+              <span> 
+                Created On: {new Date(item.createdAt).toLocaleDateString()} 
+              </span>
+              <span>
+                Last Updated: {new Date(item.updatedAt).toLocaleDateString()} 
+              </span>
+            </div>
+          </div>
+        </div>
+        <span style={{fontSize: 17}}> {formatFileSize(item.sizeBytes)} </span>
       </div>
     );
   }

@@ -43,6 +43,7 @@
 
 .search-results {
     position: absolute;
+    text-align: left;
     top: 100%;
     left: 0;
     width: 100%;
@@ -55,4 +56,10 @@
     overflow-y: auto;
 
     z-index: 1000;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }

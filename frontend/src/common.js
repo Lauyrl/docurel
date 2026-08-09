@@ -133,3 +133,18 @@ export async function searchItemsCommon(
 
   return api(url).then(response => response.json());
 }
+
+export function formatFileSize(bytes) {
+  if (bytes == null) return "";
+
+  const units = ["B", "KB", "MB", "GB", "TB", "PB"];
+  let size = bytes;
+  let unitIdx = 0;
+
+  while (size >= 1024 && unitIdx < units.length - 1) {
+    size /= 1024;
+    unitIdx++;
+  }
+
+  return size.toFixed(1) + " " + units[unitIdx];
+}

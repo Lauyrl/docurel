@@ -41,21 +41,16 @@ public class ItemService {
     private final UserItemRepository userItemRepository; // services can cross-call repositories
     private final UserService userService;
 
-    public List<ItemResponse> getDocumentsExceptUserRoot() { // specifically for owned items in My Files
+    public List<ItemResponse> getOwnedItems() {
         List<ItemEntity> entities = userItemRepository.findItemsByUser(userService.getCurrentUserEntity());
 
         List<ItemResponse> responses = new ArrayList<>();
         for (ItemEntity entity : entities) {
-            if (entity.getParentId() == GLOBAL_ROOT_ID) continue; // skip user root
-            responses.add(new ItemResponse(entity, itemRepository.findPublicIdById(entity.getParentId()), PermissionType.OWNER));
+            boolean isUserRoot = (entity.getParentId() == GLOBAL_ROOT_ID); 
+            UUID publicParentId = isUserRoot ? null : itemRepository.findPublicIdById(entity.getParentId());
+            responses.add(new ItemResponse(entity, publicParentId, PermissionType.OWNER, isUserRoot));
         }
         return responses;
-    }
-
-    public ItemResponse getUserRoot() {
-        ItemEntity userRootItem = userItemRepository.findUserRootItemByUser(userService.getCurrentUserEntity(), GLOBAL_ROOT_ID).orElseThrow();
-        // abstract the global root by setting the user root's parentId as null
-        return new ItemResponse(userRootItem, null, PermissionType.OWNER);
     }
 
     @SuppressWarnings("null")
@@ -468,5 +463,22 @@ public class ItemService {
     //         sharedItemResponses.add(new SharedItemResponse(item, publicParentId, maxPermission));
     //     }
     //     return sharedItemResponses;
+    // }
+    
+    // public List<ItemResponse> getDocumentsExceptUserRoot() { // specifically for owned items in My Files
+    //     List<ItemEntity> entities = userItemRepository.findItemsByUser(userService.getCurrentUserEntity());
+
+    //     List<ItemResponse> responses = new ArrayList<>();
+    //     for (ItemEntity entity : entities) {
+    //         if (entity.getParentId() == GLOBAL_ROOT_ID) continue; // skip user root
+    //         responses.add(new ItemResponse(entity, itemRepository.findPublicIdById(entity.getParentId()), PermissionType.OWNER));
+    //     }
+    //     return responses;
+    // }
+
+    // public ItemResponse getUserRoot() {
+    //     ItemEntity userRootItem = userItemRepository.findUserRootItemByUser(userService.getCurrentUserEntity(), GLOBAL_ROOT_ID).orElseThrow();
+    //     // abstract the global root by setting the user root's parentId as null
+    //     return new ItemResponse(userRootItem, null, PermissionType.OWNER);
     // }
 }

@@ -37,7 +37,7 @@ public class ItemController {
 
     @GetMapping("/document")
     public List<ItemResponse> getDocuments() {
-        return itemService.getDocumentsExceptUserRoot();
+        return itemService.getOwnedItems();
     }
     
     @PostMapping("/document")
@@ -83,10 +83,10 @@ public class ItemController {
         return itemService.createDirectory(foldername, publicParentId);
     }
 
-    @GetMapping("/folder/root")
-    public ItemResponse getUserRoot() {
-        return itemService.getUserRoot();
-    }
+    // @GetMapping("/folder/root")
+    // public ItemResponse getUserRoot() {
+    //     return itemService.getUserRoot();
+    // }
 
     @DeleteMapping("/folder/{publicId}")
     public ResponseEntity<Void> deleteFolder(@PathVariable UUID publicId) throws IOException, InvalidPermissionsException {

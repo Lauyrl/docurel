@@ -23,6 +23,7 @@ public class ItemResponse {
     private Instant updatedAt;
     private UUID publicId;
     private PermissionType permission;
+    private boolean isUserRoot;
 
     public ItemResponse(ItemEntity entity, UUID publicParentId, PermissionType permission) {
         setPublicParentId(entity.getParentId() == null ? null : publicParentId);
@@ -34,5 +35,19 @@ public class ItemResponse {
         setUpdatedAt(entity.getUpdatedAt());
         setPublicId(entity.getPublicId());
         setPermission(permission);
+        setUserRoot(false);
+    }
+
+    public ItemResponse(ItemEntity entity, UUID publicParentId, PermissionType permission, boolean isUserRoot) {
+        setPublicParentId(entity.getParentId() == null ? null : publicParentId);
+        setName(entity.getName());
+        setType(entity.getType());
+        setSizeBytes(entity.getSizeBytes());
+        setContentType(entity.getContentType());
+        setCreatedAt(entity.getCreatedAt());
+        setUpdatedAt(entity.getUpdatedAt());
+        setPublicId(entity.getPublicId());
+        setPermission(permission);
+        setUserRoot(isUserRoot);
     }
 }

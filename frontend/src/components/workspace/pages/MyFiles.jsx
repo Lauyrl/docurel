@@ -13,32 +13,29 @@ function MyFiles({ draggedItem, renderItemListing }) {
 	const [rootId, setRootId] = useState(null);
 	// [] contains dependencies to 'watch'
 	useEffect(() => {
-		Promise.all([ // wraps multiple Promises (fetches return Promises) inside a composite Promise that only resolves when all its' members do
-			          // .then() takes the result of a resolved Promise and returns another Promise
-			api("/folder/root").then(response => response.json()),
-			api("/document").then(response => response.json())
-		]).then(([root, items]) => {
-			const itemMapTemp = new Map;
+			api("/document").then(response => response.json()).then((items) => {
+				const itemMapTemp = new Map;
+				let rootId = null;
 
-			root = initializeFolderUIState(root);
-			setRootId(root.publicId);
-			setCurrentFolderId(root.publicId);
-			itemMapTemp.set(root.publicId, root);
-
-			items.forEach(item => { // non-inclusive of the user root, see backend
-				if (item.type === "FOLDER") item = initializeFolderUIState(item);
-				itemMapTemp.set(item.publicId, item)
+				items.forEach(item => {
+					if (item.type === "FOLDER") item = initializeFolderUIState(item);
+					if (item.userRoot) {
+						rootId = item.publicId
+						setRootId(item.publicId);
+						setCurrentFolderId(item.publicId);
+					}
+					itemMapTemp.set(item.publicId, item)
+				})
+				setItemMap(itemMapTemp);
+				rebuildNavigationStacks(rootId);
 			})
-			setItemMap(itemMapTemp);
-			rebuildNavigationStacks(root.publicId)
-		})
 	}, []);
 
 	if (!currentFolder) return;
 
 	const root = itemMap.get(rootId);
 	const currentFolderChildren = (childrenIndex.get(currentFolder?.publicId) ?? []);
-	
+
 	return (
 		<>
 			<ItemTreeView

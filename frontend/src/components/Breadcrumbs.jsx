@@ -16,17 +16,18 @@ function Breadcrumbs({ currentPageIdx, renderItemListing }) {
         <div className="breadcrumbs">
           { currentPageIdx === 0 && "My Files" }
           { currentPageIdx === 1 && "Shared with me" }
-          { 
-            itemNavigationStackBackward.map((item, i) => {
-              if (currentPageIdx === 0 && i === 0) return null; // if on MyFiles page, dont display user root
-              return (
-                <span style={{display: "flex", alignItems: "center", gap: "4px"}}>
-                  {" > "} 
-                  {renderItemListing(item, displayItem, true, false)} 
-                </span>
-              );
-            }) 
-          }
+          <div style={{paddingLeft: "15px", display: "flex", alignItems: "center"}}>
+            {
+              itemNavigationStackBackward.map((item) => {
+                if (item.userRoot) return;
+                return (
+                  <span style={{display: "flex", alignItems: "center"}}>
+                    {">"} {renderItemListing(item, displayItem, true, false)} 
+                  </span>
+                );
+              })
+            } 
+          </div>
         </div>
       </div>
     );

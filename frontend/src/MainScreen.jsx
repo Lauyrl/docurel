@@ -65,8 +65,8 @@ function MainScreen() {
 	function canDropInto(destinationItem) {
 		return (
 			draggedItem &&
-			destinationItem && 
-		   (destinationItem.permission === "OWNER" || destinationItem.permission === "EDITOR") &&
+			destinationItem &&
+			(destinationItem.permission === "OWNER" || destinationItem.permission === "EDITOR") &&
 			destinationItem.type === "FOLDER" &&
 			destinationItem.publicId !== draggedItem?.publicId &&
 			destinationItem.publicId !== draggedItem?.publicParentId &&
@@ -155,14 +155,6 @@ function MainScreen() {
 	}
 	return (
 		<>
-			<button onClick={() => {
-				localStorage.removeItem("jwt");
-				window.location.href = "/"    /* reloads the page, which resets state variables and
-																			   reruns const [isLoggedIn, setIsLoggedIn] = useState(token != null) to reset isLoggedIn accordingly */
-			}}>
-				Logout
-			</button>
-
 			{
 				contextMenu && contextMenu.item &&
 				<ContextMenu
@@ -190,8 +182,15 @@ function MainScreen() {
 						<SearchBar
 							currentPageIdx={currentPageIdx}
 							draggedItem={draggedItem}
-							renderItemListing={renderItemListing} 
+							renderItemListing={renderItemListing}
 						/>
+						<button onClick={() => {
+							localStorage.removeItem("jwt");
+							window.location.href = "/"    /* reloads the page, which resets state variables and
+																							reruns const [isLoggedIn, setIsLoggedIn] = useState(token != null) to reset isLoggedIn accordingly */
+						}}>
+							Logout
+						</button>
 					</div>
 
 					<Breadcrumbs

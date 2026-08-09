@@ -24,7 +24,7 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
   // outer element already checks contextMenu and contextMenu.item
   return (
     <div 
-      className="overlay" 
+      className="overlay-no-color" 
       onClick={() => setContextMenu(null)}
       onContextMenu={(e) => {
         e.preventDefault();

@@ -30,7 +30,7 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2> Edit permissions </h2>
 
-        <div> Add new permission </div>
+        <div style={{ textDecoration: "underline" }}> Add new permission </div>
         <input
           type="text"
           value={newPermissionsInfo.usernameOrEmail}
@@ -54,7 +54,7 @@ function PermissionsEdit({ itemToEditUserPermissionsOf, setItemToEditUserPermiss
             Add 
         </button>
 
-        <div> Existing permissions </div>
+        <div style={{ textDecoration: "underline" }}> Existing permissions </div>
         { 
           usersWithPermissionsForItem &&
           // [...usersWithPermissionsForItem.entries()] returns and array of arrays [ [key1, value1], [key2, value2],... ]

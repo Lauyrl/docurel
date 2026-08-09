@@ -27,7 +27,7 @@ function FolderUpload({ currentPageIdx }) {
           setCreatingFolder(false);
         }}>
           <div className="modal" onClick={(e) => {e.stopPropagation()}}>
-            <div> Create a Folder </div>
+            <h2> Create a Folder </h2>
             <input
               type="text"
               value={foldernameToCreate}

@@ -11,6 +11,17 @@
     z-index: 1100;
 }
 
+.overlay-no-color {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1100;
+}
+
 .in-place-overlay {
     position: fixed;
     inset: 0;
@@ -18,7 +29,7 @@
 }
 
 .modal {
-    width: 350px;
+    min-width: 350px;
     padding: 24px;
 
     background: rgb(9, 11, 14);

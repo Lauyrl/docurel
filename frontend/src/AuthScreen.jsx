@@ -80,7 +80,7 @@ function AuthScreen({ setIsLoggedIn }) {
             />
             <input 
               type="text"
-              placeholder="Enter email"
+              placeholder="Enter password"
               onClick={(e) => {e.stopPropagation()}}
               onChange={(e) => {setRegisterInfo({...registerInfo, password: e.target.value})}}
             />

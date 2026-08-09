@@ -8,6 +8,11 @@
     border-radius: 5px;
 }
 
+.date-filter:hover {
+    background-color: #3f3e3e;
+}
+
+
 .date-filter span {
     flex: 1;
     font-size: 17px;

@@ -1,4 +1,4 @@
-import { File, Filter, Folder, Search } from "lucide-react";
+import { File, Folder, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import "./css/SearchBar.css"
 import "../../css/common.css"
@@ -6,6 +6,7 @@ import "../workspace/pages/css/ItemTreeView.css"
 import useExplorerOperations from "../../context/useExplorerOperations";
 import { useExplorer } from "../../context/ExplorerContext";
 import SearchFilterOptions from "./SearchFilterOptions";
+import FunnelSearch from "./css/FunnelSearch.svg"
 
 function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   const {filteredItemIdSet, itemMap, setFilteredItemIdSet} = useExplorer();
@@ -20,7 +21,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   function anyFilterActive() {
     return (searchQuery || filterValues.type || filterValues.contentType || filterValues.createdAfter || filterValues.createdBefore || filterValues.updatedAfter || filterValues.updatedBefore);
   }
-  
+
   function search() {
     if (anyFilterActive()) { 
       searchItems(
@@ -98,7 +99,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             setSearchFiltersIsOpen(true);
           }}
         > 
-          {<Filter size={20}/>} {"Filters"} 
+          {<img src={FunnelSearch} alt="" size={20}/>} {"Filters"} 
         </button>
         <input
           type="text"

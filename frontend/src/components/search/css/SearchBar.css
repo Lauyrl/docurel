@@ -34,7 +34,7 @@
 
 .search-bar input {
     width: 100%;
-    padding: 9px 12px 8px 160px; /* extra left padding for the icon */
+    padding: 9px 12px 8px 140px; /* extra left padding for the icon */
     box-sizing: border-box;
     border-radius: 40px;
     border: 1px solid white;

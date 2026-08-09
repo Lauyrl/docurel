@@ -299,7 +299,7 @@ public class ItemService {
     public List<UUID> searchItems(
         boolean ownedOnly,
         String query, 
-        ItemType type,
+        String type,
         String contentType,
         Instant createdAfter,
         Instant createdBefore,

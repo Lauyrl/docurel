@@ -23,7 +23,6 @@ import com.laurel.docurel.dto.request.SetPermissionsRequest;
 import com.laurel.docurel.dto.request.UpdateItemRequest;
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
-import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
 import com.laurel.docurel.exception.InvalidPermissionsException;
 import com.laurel.docurel.service.ItemService;
@@ -122,7 +121,7 @@ public class ItemController {
     public List<UUID> searchItems(
         @RequestParam(required = true) boolean ownedOnly,
         @RequestParam(required = false) String query,
-        @RequestParam(required = false) ItemType type,
+        @RequestParam(required = false) String type,
         @RequestParam(required = false) String contentType,
         @RequestParam(required = false) Instant createdAfter,
         @RequestParam(required = false) Instant createdBefore,

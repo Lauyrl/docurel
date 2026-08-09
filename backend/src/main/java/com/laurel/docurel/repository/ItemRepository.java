@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.laurel.docurel.entity.ItemEntity;
-import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
 
 /* this repo is attached to the same table("items") that ItemEntity is attached to,
@@ -53,7 +52,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
           AND ((:ownedOnly AND ui.permission = 'OWNER') OR (NOT :ownedOnly AND ui.permission IN ('VIEWER', 'SHARER', 'EDITOR')))
           AND i.parent_id != 0
           AND (:query                              IS NULL OR similarity(i.name, :query) > 0.25)
-          AND (CAST(:type AS item_type)            IS NULL OR i.type         = :type)
+          AND (CAST(:type AS item_type)            IS NULL OR i.type         = CAST(:type AS item_type))
           AND (:contentType                        IS NULL OR i.content_type = :contentType)
           AND (CAST(:createdAfter  AS TIMESTAMPTZ) IS NULL OR i.created_at  >= :createdAfter)
           AND (CAST(:createdBefore AS TIMESTAMPTZ) IS NULL OR i.created_at  <= :createdBefore)
@@ -69,7 +68,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         @Param("userId") Long userId, 
         @Param("ownedOnly") boolean ownedOnly,
         @Param("query") String query,
-        @Param("type") ItemType type,
+        @Param("type") String type,
         @Param("contentType") String contentType,
         @Param("createdAfter") Instant createdAfter,
         @Param("createdBefore") Instant createdBefore,

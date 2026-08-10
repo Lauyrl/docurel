@@ -12,6 +12,8 @@ import Workspace from "./components/workspace/Workspace";
 import PermissionsEdit from "./components/workspace/PermissionsEdit";
 import ContextMenu from "./components/workspace/ContextMenu";
 import SearchBar from "./components/search/SearchBar";
+import FilterItems from "./components/FilterItems";
+import SortItems from "./components/SortItems";
 
 function MainScreen() {
 	const [currentPageIdx, setCurrentPageIdx] = useState(0);
@@ -178,6 +180,8 @@ function MainScreen() {
 					<div className="ribbon">
 						<FileUpload currentPageIdx={currentPageIdx} />
 						<FolderUpload currentPageIdx={currentPageIdx} />
+						<FilterItems />
+						<SortItems />
 						<SearchBar
 							currentPageIdx={currentPageIdx}
 							draggedItem={draggedItem}

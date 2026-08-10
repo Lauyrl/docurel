@@ -12,6 +12,12 @@ export function ExplorerProvider({ children }) {
   const [currentFolderId, setCurrentFolderId] = useState(null);
   const [previewItemId, setPreviewItemId] = useState(null);
   const [filteredItemIdSet, setFilteredItemIdSet] = useState(null); // new Set
+  const [filterValues, setFilterValues] = useState({
+    type: null, contentType: null, createdAfter: null, createdBefore: null, updatedAfter: null, updatedBefore: null
+  });
+  const [sortValues, setSortValues] = useState({
+    sortBy: "Alphabetical", descending: false
+  })
 
   const [itemNavigationStackForward, setItemNavigationStackForward] = useState([]);
   const [itemNavigationStackBackward, setItemNavigationStackBackward] = useState([]);
@@ -76,7 +82,7 @@ export function ExplorerProvider({ children }) {
   return (
     <ExplorerContext.Provider value={{
       itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex, itemNavigationStackForward, itemNavigationStackBackward, filteredItemIdSet,
-      setItemMap, setCurrentFolderId, setPreviewItemId, setFilteredItemIdSet,
+      setItemMap, setCurrentFolderId, setPreviewItemId, setFilteredItemIdSet, filterValues, setFilterValues, sortValues, setSortValues,
 
       currentFolder, previewItem, canModifyCurrentFolderContents,
 

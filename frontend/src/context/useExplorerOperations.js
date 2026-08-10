@@ -7,7 +7,11 @@ export function initializeFolderUIState(item) {
 }
 
 function useMyFilesOperations() {
-  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks, setFilteredItemIdSet } = useExplorer();  
+  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks, setFilteredItemIdSet, filterValues } = useExplorer();  
+
+  function anyFilterActive() {
+    return (filterValues.type || filterValues.contentType || filterValues.createdAfter || filterValues.createdBefore || filterValues.updatedAfter || filterValues.updatedBefore);
+  }
 
   function selectItem(item) {
     setPreviewItemId(null);
@@ -84,16 +88,20 @@ function useMyFilesOperations() {
   }
 
   return {
-    initializeFolderUIState, selectItem, uploadDocument, createFolder, deleteItem, patchItem, 
+    initializeFolderUIState, anyFilterActive, selectItem, uploadDocument, createFolder, deleteItem, patchItem, 
     editUserPermissionsForItem, deleteUserPermissionsForItem, getUsersWithPermissionsForItem,
     searchItems,
   }
 }
 
 function useSharedOperations() {
-  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks, setFilteredItemIdSet } = useExplorer();
+  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks, setFilteredItemIdSet, filterValues } = useExplorer();
 
-    function selectItem(item) {
+  function anyFilterActive() {
+    return (filterValues.type || filterValues.contentType || filterValues.createdAfter || filterValues.createdBefore || filterValues.updatedAfter || filterValues.updatedBefore);
+  }
+
+  function selectItem(item) {
     setPreviewItemId(null);
     if (item.type === "DOCUMENT") setPreviewItemId(item.publicId);
     if (item.type === "FOLDER") {
@@ -165,7 +173,7 @@ function useSharedOperations() {
   }
 
   return {
-    selectItem, uploadDocument, createFolder, deleteItem, patchItem, editUserPermissionsForItem, getUsersWithPermissionsForItem, searchItems
+    selectItem, anyFilterActive, uploadDocument, createFolder, deleteItem, patchItem, editUserPermissionsForItem, getUsersWithPermissionsForItem, searchItems
   }
 }
 

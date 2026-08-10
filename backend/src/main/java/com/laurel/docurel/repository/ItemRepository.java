@@ -45,11 +45,30 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     List<ItemEntity> findByParentId(Long parentId);
 
     @Query(value = """
+        WITH RECURSIVE all_items AS (
+            SELECT i.*
+            FROM items i
+            JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :userId
+            WHERE ui.permission != 'NO_PERMISSION'
+
+            UNION
+
+            SELECT i.*
+            FROM items i
+            JOIN all_items s ON i.parent_id = s.id
+            LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :userId
+            WHERE ui.permission IS NULL OR ui.permission != 'NO_PERMISSION'
+        )
+
         SELECT i.public_id
-        FROM items i
-        JOIN user_items ui ON i.id = ui.item_id 
-        WHERE ui.user_id = :userId
-          AND ((:ownedOnly AND ui.permission = 'OWNER') OR (NOT :ownedOnly AND ui.permission IN ('VIEWER', 'SHARER', 'EDITOR')))
+        FROM all_items i
+        LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :userId
+        WHERE (
+            (:ownedOnly AND ui.permission = 'OWNER') OR 
+            (NOT :ownedOnly AND 
+                (ui.permission IS NULL OR ui.permission IN ('VIEWER', 'SHARER', 'EDITOR'))
+            )
+        )
           AND i.parent_id != 0
           AND (:query                              IS NULL OR similarity(i.name, :query) > 0.25)
           AND (CAST(:type AS item_type)            IS NULL OR i.type         = CAST(:type AS item_type))

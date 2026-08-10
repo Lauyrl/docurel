@@ -123,6 +123,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             filterValues={searchFilterValues}
             setFilterValues={setSearchFilterValues} 
             confirmFilters={confirmFilters}
+            isForSearch={true}
           />
         </div>
       }
@@ -137,6 +138,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             sortValues={searchSortValues}
             setSortValues={setSearchSortValues}
             confirmSort={confirmSort}
+            isForSearch={true}
           />
         </div>
       }

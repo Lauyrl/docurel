@@ -2,7 +2,7 @@ import "./css/FilterConfig.css"
 import "../../../css/common.css"
 import DateFilter from "./DateFilter";
 
-function FilterConfig({ filterValues, setFilterValues, confirmFilters }) {
+function FilterConfig({ filterValues, setFilterValues, confirmFilters, isForSearch = false}) {
 
   function clearFilters() {
     setFilterValues({
@@ -12,7 +12,7 @@ function FilterConfig({ filterValues, setFilterValues, confirmFilters }) {
 
   return (
     <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <h2> Filter search results </h2>
+      <h2> { isForSearch ? "Filter search results" : "Filter items"} </h2>
 
       <div className="search-filter-option" style={{ opacity: filterValues.type ? 1.0 : 0.7 }}>
         <span> Type: </span>

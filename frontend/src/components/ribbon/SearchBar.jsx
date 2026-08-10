@@ -1,11 +1,12 @@
 import "./css/SearchBar.css";
 import "../../css/common.css";
-import { ArrowUpDown, File, Folder, Search } from "lucide-react";
+import { File, Folder, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useExplorer } from "../../context/ExplorerContext";
 import { formatFileSize } from "../../common";
 import useExplorerOperations from "../../context/useExplorerOperations";
-import FunnelSearch from "./css/FunnelSearch.svg"
+import FunnelSearch from "./css/FunnelSearch.svg";
+import SortSearch from "./css/SortSearch.svg";
 import FilterConfig from "./components/FilterConfig";
 import SortConfig from "./components/SortConfig";
 
@@ -162,7 +163,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             setSearchSortIsOpen(true);
           }}
         > 
-          <ArrowUpDown size={21}/> {"Sort by"} 
+          {<img src={SortSearch} alt="" size={20}/>} {"Sort by"} 
         </button>
         
         <input

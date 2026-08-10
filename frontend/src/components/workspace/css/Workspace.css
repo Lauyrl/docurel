@@ -2,7 +2,6 @@
     display: flex;
     flex: 1;
     overflow: hidden;
-    gap: 20px
 }
 
 .item-listing {

@@ -2,6 +2,7 @@ import "../css/FolderContentsView.css";
 import { useExplorer } from "../../../../context/ExplorerContext";
 import useExplorerOperations from "../../../../context/useExplorerOperations";
 import { File, Folder } from "lucide-react";
+import Breadcrumbs from "../../../Breadcrumbs";
 
 function FolderContentsView({currentPageIdx, currentFolderChildren, draggedItem, renderItemListing}) {
   const {currentFolder} = useExplorer(); 
@@ -17,18 +18,24 @@ function FolderContentsView({currentPageIdx, currentFolderChildren, draggedItem,
   }
 
   return (
-    <div 
-      className="selected-folder"
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        selectItem(currentFolder);
-        if (draggedItem) patchItem(draggedItem, null, currentFolder.publicId);
-      }}
-    >
-      {currentFolderChildren.length === 0 && <> This folder is empty. </>}
-      <div className="folder-grid-item-listing">
-        {currentFolderChildren.map((item) => (renderItemListing(item, displayItem, false)))}
+    <div style={{display:"flex", flexDirection:"column", alignItems: "stretch", width: "100%"}}>
+      <Breadcrumbs
+        currentPageIdx={currentPageIdx}
+        renderItemListing={renderItemListing}
+      />
+      <div 
+        className="selected-folder"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          selectItem(currentFolder);
+          if (draggedItem) patchItem(draggedItem, null, currentFolder.publicId);
+        }}
+      >
+        {currentFolderChildren.length === 0 && <> This folder is empty. </>}
+        <div className="folder-grid-item-listing">
+          {currentFolderChildren.map((item) => (renderItemListing(item, displayItem, false)))}
+        </div>
       </div>
     </div>
   );

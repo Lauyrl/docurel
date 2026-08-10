@@ -8,7 +8,6 @@ import useExplorerOperations from "./context/useExplorerOperations";
 import PagesPanel from "./components/workspace/pages/PagesPanel";
 import FileUpload from "./components/FileUpload";
 import FolderUpload from "./components/FolderUpload";
-import Breadcrumbs from "./components/Breadcrumbs";
 import Workspace from "./components/workspace/Workspace";
 import PermissionsEdit from "./components/workspace/PermissionsEdit";
 import ContextMenu from "./components/workspace/ContextMenu";
@@ -192,11 +191,6 @@ function MainScreen() {
 							Logout
 						</button>
 					</div>
-
-					<Breadcrumbs
-						currentPageIdx={currentPageIdx}
-						renderItemListing={renderItemListing}
-					/>
 
 					<Workspace
 						currentPageIdx={currentPageIdx}

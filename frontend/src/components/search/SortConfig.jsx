@@ -1,7 +1,7 @@
 import "../../css/common.css"
-import "./css/SearchSortOptions.css"
+import "./css/SortConfig.css"
 
-function SearchSortOptions({ sortValues, setSortValues, confirmSort }) {
+function SortConfig({ sortValues, setSortValues, confirmSort }) {
 
   return (
     <div 
@@ -36,4 +36,4 @@ function SearchSortOptions({ sortValues, setSortValues, confirmSort }) {
   )
 }
 
-export default SearchSortOptions;
+export default SortConfig;

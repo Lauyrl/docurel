@@ -3,7 +3,7 @@ import "./css/ribbon.css";
 import { useExplorer } from "../context/ExplorerContext";
 import { useState } from "react";
 import { ArrowUpDown } from "lucide-react";
-import SearchSortOptions from "./search/SearchSortOptions";
+import SortConfig from "./search/SortConfig";
 
 function SortItems() {
   const { sortValues, setSortValues } = useExplorer();
@@ -18,7 +18,7 @@ function SortItems() {
             setSearchSortIsOpen(false);
           }}
           >
-            <SearchSortOptions
+            <SortConfig
               sortValues={sortValues}
               setSortValues={setSortValues}
               confirmSort={() => setSearchSortIsOpen(false)}

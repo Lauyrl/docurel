@@ -5,10 +5,10 @@ import "../../css/common.css"
 import "../workspace/pages/css/ItemTreeView.css"
 import useExplorerOperations from "../../context/useExplorerOperations";
 import { useExplorer } from "../../context/ExplorerContext";
-import SearchFilterOptions from "./SearchFilterOptions";
 import FunnelSearch from "./css/FunnelSearch.svg"
 import { formatFileSize } from "../../common";
-import SearchSortOptions from "./SearchSortOptions";
+import FilterConfig from "./FilterConfig";
+import SortConfig from "./SortConfig";
 
 function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   const {filteredItemIdSet, itemMap, setFilteredItemIdSet} = useExplorer();
@@ -66,7 +66,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   useEffect(() => {
     const timeout = setTimeout(() => {
         if (searchQuery.trim()) {
-            searchItems(searchQuery);
+            search();
         } else {
           setFilteredItemIdSet(null);
         }
@@ -119,7 +119,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             setSearchFiltersIsOpen(false);
           }}
         >
-          <SearchFilterOptions 
+          <FilterConfig 
             filterValues={filterValues}
             setFilterValues={setFilterValues} 
             confirmFilters={confirmFilters}
@@ -133,7 +133,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             setSearchSortIsOpen(false);
           }}
         >
-          <SearchSortOptions 
+          <SortConfig 
             sortValues={sortValues}
             setSortValues={setSortValues}
             confirmSort={confirmSort}

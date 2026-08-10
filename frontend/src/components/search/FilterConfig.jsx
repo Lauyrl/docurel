@@ -1,8 +1,8 @@
-import "./css/SearchFilterOptions.css"
+import "./css/FilterConfig.css"
 import "../../css/common.css"
 import DateFilter from "./DateFilter";
 
-function SearchFilterOptions({ filterValues, setFilterValues, confirmFilters }) {
+function FilterConfig({ filterValues, setFilterValues, confirmFilters }) {
 
   function clearFilters() {
     setFilterValues({
@@ -97,4 +97,4 @@ function SearchFilterOptions({ filterValues, setFilterValues, confirmFilters }) 
   )
 }
 
-export default SearchFilterOptions;
+export default FilterConfig;

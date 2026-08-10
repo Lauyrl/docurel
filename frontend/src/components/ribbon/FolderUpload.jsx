@@ -1,9 +1,9 @@
-import "../css/common.css";
+import "../../css/common.css";
 import "./css/ribbon.css";
 import { useState } from "react";
-import useExplorerOperations from "../context/useExplorerOperations";
+import useExplorerOperations from "../../context/useExplorerOperations";
 import { FolderUp } from "lucide-react";
-import { useExplorer } from "../context/ExplorerContext";
+import { useExplorer } from "../../context/ExplorerContext";
 
 function FolderUpload({ currentPageIdx }) {
   const {canModifyCurrentFolderContents} = useExplorer();

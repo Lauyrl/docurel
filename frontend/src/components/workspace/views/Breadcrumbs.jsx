@@ -1,6 +1,5 @@
 import "./css/Breadcrumbs.css"
-import "./workspace/css/Workspace.css"
-import { useExplorer } from "../context/ExplorerContext";
+import { useExplorer } from "../../../context/ExplorerContext";
 import ItemNavigation from "./ItemNavigation";
 
 function Breadcrumbs({ currentPageIdx, renderItemListing }) {

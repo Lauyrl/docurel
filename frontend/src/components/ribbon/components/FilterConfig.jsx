@@ -1,5 +1,5 @@
 import "./css/FilterConfig.css"
-import "../../css/common.css"
+import "../../../css/common.css"
 import DateFilter from "./DateFilter";
 
 function FilterConfig({ filterValues, setFilterValues, confirmFilters }) {

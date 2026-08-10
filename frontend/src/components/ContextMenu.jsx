@@ -1,6 +1,6 @@
 import "./css/ContextMenu.css";
-import "../../css/common.css";
-import { useExplorer } from "../../context/ExplorerContext";
+import "../css/common.css";
+import { useExplorer } from "../context/ExplorerContext";
 
 function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete, onItemRename, onItemEditPermissions }) {
   const {canModifyParentContents} = useExplorer();

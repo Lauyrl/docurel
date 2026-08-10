@@ -1,8 +1,8 @@
-import "../css/FolderContentsView.css";
-import { useExplorer } from "../../../../context/ExplorerContext";
-import useExplorerOperations from "../../../../context/useExplorerOperations";
+import "./css/FolderContentsView.css";
+import { useExplorer } from "../../../context/ExplorerContext";
+import useExplorerOperations from "../../../context/useExplorerOperations";
 import { File, Folder } from "lucide-react";
-import Breadcrumbs from "../../../Breadcrumbs";
+import Breadcrumbs from "./Breadcrumbs";
 
 function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem, renderItemListing }) {
   const { currentFolder, filterValues, sortValues } = useExplorer();

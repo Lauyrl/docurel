@@ -1,4 +1,4 @@
-import { useExplorer } from "../context/ExplorerContext";
+import { useExplorer } from "../../../context/ExplorerContext";
 import "./css/ItemNavigation.css";
 
 function ItemNavigation({ currentPageIdx }) {

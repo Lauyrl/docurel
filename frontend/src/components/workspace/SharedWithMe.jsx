@@ -1,8 +1,7 @@
 import { useEffect } from "react";
-import { useExplorer } from "../../../context/ExplorerContext";
-import { api } from "../../../api";
-import "./css/FolderContentsView.css"
-import FolderContentsView from "./components/FolderContentsView";
+import { useExplorer } from "../../context/ExplorerContext";
+import { api } from "../../api";
+import FolderContentsView from "./views/FolderContentsView";
 
 function SharedWithMe({ draggedItem, renderItemListing }) {
   const {setItemMap, setCurrentFolderId, currentFolder, childrenIndex, rootLevelItemsIndex, rebuildNavigationStacks} = useExplorer();

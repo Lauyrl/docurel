@@ -1,9 +1,9 @@
-import "../css/common.css";
+import "../../css/common.css";
 import "./css/ribbon.css";
-import { useExplorer } from "../context/ExplorerContext";
+import { useExplorer } from "../../context/ExplorerContext";
 import { useState } from "react";
 import { ArrowUpDown } from "lucide-react";
-import SortConfig from "./search/SortConfig";
+import SortConfig from "./components/SortConfig";
 
 function SortItems() {
   const { sortValues, setSortValues } = useExplorer();

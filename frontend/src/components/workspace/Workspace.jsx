@@ -1,8 +1,7 @@
 import "./css/Workspace.css";
 import "../../css/common.css";
-import PreviewOverlay from "./PreviewOverlay";
-import MyFiles from "./pages/MyFiles";
-import SharedWithMe from "./pages/SharedWithMe";
+import MyFiles from "./MyFiles";
+import SharedWithMe from "./SharedWithMe";
 
 function Workspace({ currentPageIdx, draggedItem, renderItemListing }) {
   return (
@@ -22,7 +21,6 @@ function Workspace({ currentPageIdx, draggedItem, renderItemListing }) {
             renderItemListing={renderItemListing} 
           /> 
         }
-        <PreviewOverlay />
       </div>
     </>
   );

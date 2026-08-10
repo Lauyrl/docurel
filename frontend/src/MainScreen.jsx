@@ -1,24 +1,24 @@
 import "./css/MainScreen.css"
 import "./components/workspace/css/Workspace.css";
-import "./components/workspace/pages/css/MyFiles.css";
 import { useEffect, useState } from "react";
 import { useExplorer } from "./context/ExplorerContext";
 import { downloadDocumentRedirect } from "./common";
 import useExplorerOperations from "./context/useExplorerOperations";
-import PagesPanel from "./components/workspace/pages/PagesPanel";
-import FileUpload from "./components/FileUpload";
-import FolderUpload from "./components/FolderUpload";
+import PagesPanel from "./components/PagesPanel";
+import ContextMenu from "./components/ContextMenu";
+import PermissionsEdit from "./components/PermissionsEdit";
+import FolderUpload from "./components/ribbon/FolderUpload";
+import FileUpload from "./components/ribbon/FileUpload";
+import FilterItems from "./components/ribbon/FilterItems";
+import SortItems from "./components/ribbon/SortItems";
+import SearchBar from "./components/ribbon/SearchBar";
 import Workspace from "./components/workspace/Workspace";
-import PermissionsEdit from "./components/workspace/PermissionsEdit";
-import ContextMenu from "./components/workspace/ContextMenu";
-import SearchBar from "./components/search/SearchBar";
-import FilterItems from "./components/FilterItems";
-import SortItems from "./components/SortItems";
+import PreviewOverlay from "./components/PreviewOverlay";
 
 function MainScreen() {
 	const [currentPageIdx, setCurrentPageIdx] = useState(0);
 
-	const { childrenIndex, setItemMap, setFilteredItemIdSet } = useExplorer();
+	const { childrenIndex, setItemMap, setFilteredItemIdSet, previewItem } = useExplorer();
 	const { selectItem, patchItem, deleteItem } = useExplorerOperations(currentPageIdx);
 	// React stores the state of state variables across renders, a render happens whenever the state changes
 	// Render: a function call to the parent component (App() in this case)
@@ -173,6 +173,9 @@ function MainScreen() {
 					itemToEditUserPermissionsOf={itemToEditUserPermissionsOf}
 					setItemToEditUserPermissionsOf={setItemToEditUserPermissionsOf}
 				/>
+			}
+			{
+				previewItem && <PreviewOverlay />
 			}
 			<div className="app-layout">
 				<PagesPanel setCurrentPageIdx={setCurrentPageIdx} />

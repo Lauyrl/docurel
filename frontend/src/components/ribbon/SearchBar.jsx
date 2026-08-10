@@ -1,14 +1,13 @@
 import { ArrowUpDown, File, Folder, Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import "./css/SearchBar.css"
-import "../../css/common.css"
-import "../workspace/pages/css/ItemTreeView.css"
+import "./css/SearchBar.css";
+import "../../css/common.css";
 import useExplorerOperations from "../../context/useExplorerOperations";
 import { useExplorer } from "../../context/ExplorerContext";
 import FunnelSearch from "./css/FunnelSearch.svg"
 import { formatFileSize } from "../../common";
-import FilterConfig from "./FilterConfig";
-import SortConfig from "./SortConfig";
+import FilterConfig from "./components/FilterConfig";
+import SortConfig from "./components/SortConfig";
 
 function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   const {filteredItemIdSet, itemMap, setFilteredItemIdSet} = useExplorer();

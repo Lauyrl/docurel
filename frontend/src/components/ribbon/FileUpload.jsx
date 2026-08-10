@@ -1,8 +1,8 @@
 import { FileUp } from "lucide-react";
-import useExplorerOperations from "../context/useExplorerOperations";
+import useExplorerOperations from "../../context/useExplorerOperations";
 import "./css/ribbon.css"
 import { useRef } from "react";
-import { useExplorer } from "../context/ExplorerContext";
+import { useExplorer } from "../../context/ExplorerContext";
 
 function FileUpload({ currentPageIdx }) {
   const {canModifyCurrentFolderContents} = useExplorer();

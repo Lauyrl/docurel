@@ -58,10 +58,21 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
           AND (CAST(:createdBefore AS TIMESTAMPTZ) IS NULL OR i.created_at  <= :createdBefore)
           AND (CAST(:updatedAfter  AS TIMESTAMPTZ) IS NULL OR i.updated_at  >= :updatedAfter)
           AND (CAST(:updatedBefore AS TIMESTAMPTZ) IS NULL OR i.updated_at  <= :updatedBefore)
-        ORDER BY 
-            CASE WHEN (:query IS NOT NULL) THEN similarity(i.name, :query) ELSE 0 END DESC, 
-            i.updated_at DESC, 
-            i.created_at DESC
+        ORDER BY
+            CASE WHEN (:descending AND :sortBy = 'Name similarity' AND :query IS NOT NULL) THEN similarity(i.name, :query) ELSE NULL END DESC,
+            CASE WHEN (:descending AND :sortBy = 'Alphabetical') THEN i.name       ELSE NULL END DESC,
+            CASE WHEN (:descending AND :sortBy = 'Size')         THEN i.size_bytes ELSE NULL END DESC,
+            CASE WHEN (:descending AND :sortBy = 'Date created') THEN i.created_at ELSE NULL END DESC,
+            CASE WHEN (:descending AND :sortBy = 'Date updated') THEN i.updated_at ELSE NULL END DESC, 
+            
+            CASE WHEN (NOT :descending AND :sortBy = 'Name similarity' AND :query IS NOT NULL) THEN similarity(i.name, :query) ELSE NULL END ASC,
+            CASE WHEN (NOT :descending AND :sortBy = 'Alphabetical') THEN i.name       ELSE NULL END ASC,
+            CASE WHEN (NOT :descending AND :sortBy = 'Size')         THEN i.size_bytes ELSE NULL END ASC,
+            CASE WHEN (NOT :descending AND :sortBy = 'Date created') THEN i.created_at ELSE NULL END ASC,
+            CASE WHEN (NOT :descending AND :sortBy = 'Date updated') THEN i.updated_at ELSE NULL END ASC,
+
+            CASE WHEN (:query IS NOT NULL) THEN similarity(i.name, :query) ELSE NULL END DESC,
+            i.updated_at DESC
         LIMIT 100
     """, nativeQuery = true)
     List<UUID> findMatchingItemsPublicId(
@@ -73,7 +84,9 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         @Param("createdAfter") Instant createdAfter,
         @Param("createdBefore") Instant createdBefore,
         @Param("updatedAfter") Instant updatedAfter,
-        @Param("updatedBefore") Instant updatedBefore
+        @Param("updatedBefore") Instant updatedBefore,
+        @Param("sortBy") String sortBy,
+        @Param("descending") boolean descending
     );
 
     @Query(value = """

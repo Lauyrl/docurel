@@ -64,7 +64,9 @@ function useMyFilesOperations() {
     createdAfter,
     createdBefore,
     updatedAfter,
-    updatedBefore
+    updatedBefore,
+    sortBy,
+    descending
   ) {
     const filteredItemsPublicId = await searchItemsCommon(
       true, 
@@ -74,7 +76,9 @@ function useMyFilesOperations() {
       createdAfter,
       createdBefore,
       updatedAfter,
-      updatedBefore
+      updatedBefore,
+      sortBy,
+      descending
     ); 
     setFilteredItemIdSet(new Set(filteredItemsPublicId));
   }
@@ -141,7 +145,9 @@ function useSharedOperations() {
     createdAfter,
     createdBefore,
     updatedAfter,
-    updatedBefore
+    updatedBefore,
+    sortBy,
+    descending
   ) {
     const filteredItemsPublicId = await searchItemsCommon(
       false, 
@@ -151,7 +157,9 @@ function useSharedOperations() {
       createdAfter,
       createdBefore,
       updatedAfter,
-      updatedBefore
+      updatedBefore,
+      sortBy,
+      descending
     ); 
     setFilteredItemIdSet(new Set(filteredItemsPublicId));
   }

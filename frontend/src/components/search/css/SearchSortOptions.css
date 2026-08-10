@@ -1,0 +1,31 @@
+.sort-config {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 19px;
+    color: white;
+}
+
+.sort-config select {
+    font-size: 18px;
+    padding: 5px 2px;
+    border: 2px solid #8a8989;
+    border-radius: 5px;
+    background: rgb(38, 41, 43);
+    cursor: pointer;
+}
+
+.sort-config button {
+    min-width: 110px;
+    font-size: 18px;
+    padding: 5px 5px;
+    border: 2px solid #8a8989;
+    border-radius: 5px;
+    background: rgb(12, 34, 59);
+    cursor: pointer;
+}
+
+.sort-config button:hover {
+    background: #444444;
+}

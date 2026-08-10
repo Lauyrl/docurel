@@ -21,7 +21,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
     type: null, contentType: null, createdAfter: null, createdBefore: null, updatedAfter: null, updatedBefore: null
   });
   const [sortValues, setSortValues] = useState({
-    sortBy: null, descending: false 
+    sortBy: "Name similarity", descending: true
   })
 
   function anyFilterActive() {
@@ -32,7 +32,8 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
     if (searchQuery || anyFilterActive()) { 
       searchItems(
         searchQuery, filterValues.type, filterValues.contentType, 
-        filterValues.createdAfter, filterValues.createdBefore, filterValues.updatedAfter, filterValues.updatedBefore
+        filterValues.createdAfter, filterValues.createdBefore, filterValues.updatedAfter, filterValues.updatedBefore, 
+        sortValues.sortBy, sortValues.descending
       );
     }
   }
@@ -118,6 +119,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             filterValues={filterValues}
             setFilterValues={setFilterValues} 
             confirmFilters={confirmFilters}
+            search={search}
           />
         </div>
       }
@@ -132,6 +134,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             sortValues={sortValues}
             setSortValues={setSortValues}
             confirmSort={confirmSort}
+            search={search}
           />
         </div>
       }
@@ -152,7 +155,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
 
         <button 
           className="search-filters-button"
-          style={{left: "143px"}}
+          style={{left: "143px", backgroundColor: ((sortValues.sortBy !== "Name similarity" || !sortValues.descending) ? "#e7772d" : undefined)}}
           onClick={(e) => {
             e.stopPropagation();
             setSearchSortIsOpen(true);

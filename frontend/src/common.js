@@ -118,7 +118,9 @@ export async function searchItemsCommon(
     createdAfter,
     createdBefore,
     updatedAfter,
-    updatedBefore
+    updatedBefore,
+    sortBy,
+    descending
   ) {
   let url = "/item/search?";
   url += "ownedOnly=" + ownedOnly;
@@ -130,7 +132,9 @@ export async function searchItemsCommon(
   if (createdBefore) url += "&createdBefore=" + encodeURIComponent(new Date(createdBefore).toISOString());
   if (updatedAfter)  url += "&updatedAfter="  + encodeURIComponent(new Date(updatedAfter).toISOString());
   if (updatedBefore) url += "&updatedBefore=" + encodeURIComponent(new Date(updatedBefore).toISOString());
-
+  if (!sortBy) sortBy = "Name similarity";
+  url += "&sortBy=" + encodeURIComponent(sortBy);
+  url += "&descending=" + encodeURIComponent(descending);
   return api(url).then(response => response.json());
 }
 

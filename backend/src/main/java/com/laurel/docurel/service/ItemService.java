@@ -299,10 +299,18 @@ public class ItemService {
         Instant createdAfter,
         Instant createdBefore,
         Instant updatedAfter,
-        Instant updatedBefore
+        Instant updatedBefore,
+        String sortBy,
+        boolean descending
     ) {
         if (query != null && query.isBlank() ) query = null; // frontend should prevent this but handle anyway
         if (query == null && type == null && contentType == null && createdAfter == null && createdBefore == null && updatedAfter == null && updatedBefore == null) return Collections.emptyList();
+        if (!"Name similarity".equals(sortBy) &&
+            !"Alphabetical".equals(sortBy) &&
+            !"Size".equals(sortBy) &&
+            !"Date created".equals(sortBy) &&
+            !"Date updated".equals(sortBy)) sortBy = "Name similarity";
+            
         return itemRepository.findMatchingItemsPublicId(
             userService.getCurrentUserEntity().getId(), 
             ownedOnly,
@@ -312,7 +320,9 @@ public class ItemService {
             createdAfter,
             createdBefore,
             updatedAfter,
-            updatedBefore
+            updatedBefore,
+            sortBy,
+            descending
         );
     }
     

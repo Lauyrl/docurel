@@ -126,7 +126,9 @@ public class ItemController {
         @RequestParam(required = false) Instant createdAfter,
         @RequestParam(required = false) Instant createdBefore,
         @RequestParam(required = false) Instant updatedAfter,
-        @RequestParam(required = false) Instant updatedBefore
+        @RequestParam(required = false) Instant updatedBefore,
+        @RequestParam(required = true) String sortBy,
+        @RequestParam(required = true) boolean descending
     ) {
         return itemService.searchItems(
             ownedOnly,
@@ -136,7 +138,9 @@ public class ItemController {
             createdAfter,
             createdBefore,
             updatedAfter,
-            updatedBefore
+            updatedBefore,
+            sortBy, 
+            descending
         );
     }
 

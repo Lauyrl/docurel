@@ -326,6 +326,15 @@ public class ItemService {
         );
     }
     
+    public void open(UUID publicId) {
+        UserItemEntity ui = userItemRepository.findByUserAndItem(
+            userService.getCurrentUserEntity(), 
+            itemRepository.findByPublicId(publicId).orElseThrow()
+        ).orElseThrow();
+        ui.setLastOpened(Instant.now());
+        userItemRepository.save(ui);
+    }
+
 //-----validation
     public void validateModifyFolderContents(UUID publicParentId) throws InvalidPermissionsException { 
         if (!PermissionType.greaterThanOrEqualTo(getEffectivePermissionLevel(publicParentId), PermissionType.EDITOR)) {

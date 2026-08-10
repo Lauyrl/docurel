@@ -1,4 +1,4 @@
-import { createFolderCommon, deleteItemCommon, deleteUserPermissionsForItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, searchItemsCommon, uploadDocumentCommon } from "../common";
+import { createFolderCommon, deleteItemCommon, deleteUserPermissionsForItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, registerOpenCommon, searchItemsCommon, uploadDocumentCommon } from "../common";
 import { useExplorer } from "./ExplorerContext";
 
 export function initializeFolderUIState(item) {
@@ -60,6 +60,10 @@ export default function useExplorerOperations(currentPageIdx) {
     return await getUsersWithPermissionsForItemCommon(item);
   }
 
+  async function registerOpen(item) {
+    registerOpenCommon(item);
+  }
+
   async function searchItems(
     searchQuery, 
     type,
@@ -89,6 +93,6 @@ export default function useExplorerOperations(currentPageIdx) {
   return {
     initializeFolderUIState, anyFilterActive, selectItem, uploadDocument, createFolder, deleteItem, patchItem, 
     editUserPermissionsForItem, deleteUserPermissionsForItem, getUsersWithPermissionsForItem,
-    searchItems,
+    registerOpen, searchItems,
   }
 }

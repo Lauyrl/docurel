@@ -144,6 +144,12 @@ public class ItemController {
         );
     }
 
+    @PostMapping("/item/{publicId}/open")
+    public ResponseEntity<Void> open(@PathVariable UUID publicId) {
+        itemService.open(publicId);
+        return ResponseEntity.noContent().build();
+    }
+    
     @GetMapping("/shared")
     public List<ItemResponse> getItemsSharedWithCurrentUser() {
         return itemService.getItemsUserCanAccessExceptOwned();

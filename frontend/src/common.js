@@ -110,6 +110,10 @@ export async function getUsersWithPermissionsForItemCommon(item) {
   return map;
 }
 
+export async function registerOpenCommon(item) {
+  return api("/item/" + item.publicId + "/open", {method: "POST"})
+}
+
 export async function searchItemsCommon(
     ownedOnly,
     searchQuery,

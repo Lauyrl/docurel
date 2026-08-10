@@ -18,7 +18,7 @@ function MainScreen() {
 	const [currentPageIdx, setCurrentPageIdx] = useState(0);
 
 	const { childrenIndex, setItemMap, setFilteredItemIdSet, previewItem } = useExplorer();
-	const { selectItem, patchItem, deleteItem } = useExplorerOperations(currentPageIdx);
+	const { selectItem, patchItem, deleteItem, registerOpen } = useExplorerOperations(currentPageIdx);
 	// React stores the state of state variables across renders, a render happens whenever the state changes
 	// Render: a function call to the parent component (App() in this case)
 	const [itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf] = useState(null);
@@ -103,9 +103,10 @@ function MainScreen() {
 		)
 	}
 
-	function onSelect(e, item, isSearchResultItem) {
+	function onSelect(e, item, isSearchResultItem, registerAsOpened) {
 		e.stopPropagation();
 		selectItem(item);
+		if (registerAsOpened) registerOpen(item);
 		if (isSearchResultItem) setFilteredItemIdSet(null);
 	}
 
@@ -115,14 +116,14 @@ function MainScreen() {
 	 * @param {*} displayItem 
 	 * @returns JSX representing the item as defined by displayItem, or the rename dialogue if the item is being renamed
 	 */
-	function renderItemListing(item, displayItem, isSelectOnSingleClick = true, isDraggable = true, isSearchResultItem = false) {
+	function renderItemListing(item, displayItem, isSelectOnSingleClick = true, isDraggable = true, isSearchResultItem = false, registerAsOpened = true) {
 		return (
 			<div className="item-listing"
 				onClick={isSelectOnSingleClick ? (e) => {
-					onSelect(e, item, isSearchResultItem);
+					onSelect(e, item, isSearchResultItem, registerAsOpened);
 				} : undefined}
 				onDoubleClick={!isSelectOnSingleClick ? (e) => {
-					onSelect(e, item, isSearchResultItem);
+					onSelect(e, item, isSearchResultItem, registerAsOpened);
 				} : undefined}
 				onContextMenu={(e) => {
 					e.stopPropagation();

@@ -20,3 +20,18 @@
 .page-view {
     flex: 1;
 }
+
+.item-listing {
+    padding: 5px 13px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.item-listing:hover {
+    background-color: #a5663c8d;
+}
+
+.item-listing:active {
+    background-color: rgb(38, 16, 3);
+}

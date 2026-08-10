@@ -1,5 +1,5 @@
-import { House, Users } from "lucide-react";
 import "./css/PagesPanel.css";
+import { House, Users } from "lucide-react";
 
 function PagesPanel({ setCurrentPageIdx }) {
   return (

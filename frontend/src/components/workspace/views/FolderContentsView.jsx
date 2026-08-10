@@ -1,7 +1,7 @@
 import "./css/FolderContentsView.css";
 import { useExplorer } from "../../../context/ExplorerContext";
-import useExplorerOperations from "../../../context/useExplorerOperations";
 import { File, Folder } from "lucide-react";
+import useExplorerOperations from "../../../context/useExplorerOperations";
 import Breadcrumbs from "./Breadcrumbs";
 
 function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem, renderItemListing }) {

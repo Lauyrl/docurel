@@ -1,5 +1,4 @@
 import "./css/MainScreen.css"
-import "./components/workspace/css/Workspace.css";
 import { useEffect, useState } from "react";
 import { useExplorer } from "./context/ExplorerContext";
 import { downloadDocumentRedirect } from "./common";

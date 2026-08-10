@@ -1,11 +1,11 @@
-import { ArrowUpDown, File, Folder, Search } from "lucide-react";
-import { useEffect, useState } from "react";
 import "./css/SearchBar.css";
 import "../../css/common.css";
-import useExplorerOperations from "../../context/useExplorerOperations";
+import { ArrowUpDown, File, Folder, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useExplorer } from "../../context/ExplorerContext";
-import FunnelSearch from "./css/FunnelSearch.svg"
 import { formatFileSize } from "../../common";
+import useExplorerOperations from "../../context/useExplorerOperations";
+import FunnelSearch from "./css/FunnelSearch.svg"
 import FilterConfig from "./components/FilterConfig";
 import SortConfig from "./components/SortConfig";
 

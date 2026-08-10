@@ -1,5 +1,5 @@
-import { useExplorer } from "../../../context/ExplorerContext";
 import "./css/ItemNavigation.css";
+import { useExplorer } from "../../../context/ExplorerContext";
 
 function ItemNavigation({ currentPageIdx }) {
   const {itemNavigationStackBackward, itemNavigationStackForward, navigateItems} = useExplorer();

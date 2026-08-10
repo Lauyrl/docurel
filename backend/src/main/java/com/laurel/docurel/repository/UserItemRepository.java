@@ -1,6 +1,5 @@
 package com.laurel.docurel.repository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,12 +15,8 @@ import com.laurel.docurel.entity.UserItemEntity;
 import com.laurel.docurel.enums.PermissionType;
 
 public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> {
-    
-    public Optional<UserItemEntity> findByUserIdAndItemId(Long userId, Long itemId);
 
     public Optional<UserItemEntity> findByUserAndItem(UserEntity user, ItemEntity item);
-
-    public void deleteByUserAndItem(UserEntity user, ItemEntity item);
 
     @Query("""
        SELECT u
@@ -43,38 +38,34 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
         SELECT ui 
         FROM UserItemEntity ui
         WHERE ui.item IN (:items)
+        AND ui.permission IS NOT NULL
     """)
-    public List<UserItemEntity> findByItems(List<ItemEntity> items);
+    public List<UserItemEntity> findByItemsExceptNullPermission(List<ItemEntity> items);
 
     @Query(value = """
         SELECT ui.item
         FROM UserItemEntity ui
-        WHERE ui.user = :user        
+        WHERE ui.user = :user
+        AND ui.permission = 'OWNER'
     """)
-    public List<ItemEntity> findItemsByUser(UserEntity user);
+    public List<ItemEntity> findItemsOwnedByUser(UserEntity user);
 
+    // added NOT NULL condition after last_opened-related features allowed pure metadata rows with NULL permissions to be added
     @Query(value = """
         SELECT *
         FROM user_items ui
         WHERE ui.user_id = :userId
           AND ui.permission != 'OWNER'
+          AND ui.permission IS NOT NULL
     """, nativeQuery = true)
-    public List<UserItemEntity> findByUserExceptOwned(@Param("userId") Long userId);
-
-    @Query(value = """
-        SELECT ui.permission
-        FROM UserItemEntity ui
-        WHERE ui.item IN :items
-          AND ui.user = :user
-    """)
-    public List<PermissionType> findPermissionsByItemsAndUser(@Param("items") Collection<ItemEntity> items, @Param("user") UserEntity user);
+    public List<UserItemEntity> findByUserExceptOwnedOrNullPermission(@Param("userId") Long userId);
     
     @Query(value = """
         WITH RECURSIVE shared AS (
             SELECT i.*
             FROM items i
             JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id
-            WHERE ui.permission != 'OWNER' AND ui.permission != 'NO_PERMISSION'
+            WHERE ui.permission IS NOT NULL AND ui.permission != 'OWNER' AND ui.permission != 'NO_PERMISSION'
 
             UNION ALL
 
@@ -87,19 +78,4 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
         SELECT DISTINCT * FROM shared              
     """, nativeQuery = true) // add SELECT DISTINCT for items whom multiple ancestors have entries 
     public List<ItemEntity> findAccessibleItemsExceptOwnedByUserId(@Param("current_user_id") Long userId); // includes items without explicit entries, but inherited permissions
-
-    @Query(value = """
-        SELECT ui
-        FROM UserItemEntity ui
-        WHERE ui.item = :item        
-    """)
-    public List<UserItemEntity> findByItem(ItemEntity item);
-
-    @Query(value = """
-        SELECT ui.item
-        FROM UserItemEntity ui
-        WHERE ui.user = :user 
-          AND ui.item.parentId = :globalRootId        
-    """)
-    public Optional<ItemEntity> findUserRootItemByUser(UserEntity user, Long globalRootId);
 }

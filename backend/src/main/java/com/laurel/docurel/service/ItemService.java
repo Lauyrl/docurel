@@ -42,7 +42,7 @@ public class ItemService {
     private final UserService userService;
 
     public List<ItemResponse> getOwnedItems() {
-        List<ItemEntity> entities = userItemRepository.findItemsByUser(userService.getCurrentUserEntity());
+        List<ItemEntity> entities = userItemRepository.findItemsOwnedByUser(userService.getCurrentUserEntity());
 
         List<ItemResponse> responses = new ArrayList<>();
         for (ItemEntity entity : entities) {
@@ -207,24 +207,27 @@ public class ItemService {
 
         List<ItemEntity> itemsOnPath = itemRepository.findItemsOnPath(publicId);
         
-        List<UserItemEntity> userItemEntities = userItemRepository.findByItems(itemsOnPath);
+        List<UserItemEntity> userItemEntities = userItemRepository.findByItemsExceptNullPermission(itemsOnPath);
         Map<Long, List<UserItemEntity>> permissionMap = new HashMap<>();
         for (UserItemEntity ui : userItemEntities) {
-            permissionMap.computeIfAbsent(ui.getItem().getId(), e -> new ArrayList<UserItemEntity>()).add(ui);
+            if (ui.getPermission() != null) permissionMap.computeIfAbsent(ui.getItem().getId(), e -> new ArrayList<UserItemEntity>()).add(ui);
         }
 
         Map<Long, UsersPermissionsForItemResponse> userFirstPermissionResponses = new HashMap<>();
         for (ItemEntity item : itemsOnPath) {
             List<UserItemEntity> usersWithPermissions = permissionMap.getOrDefault(item.getId(), Collections.emptyList());
             for (UserItemEntity ui : usersWithPermissions) {
-                userFirstPermissionResponses.putIfAbsent(ui.getUser().getId(), new UsersPermissionsForItemResponse(ui.getUser().getUsername(), ui.getPermission()));
+                if (ui.getPermission() != null) userFirstPermissionResponses.putIfAbsent(
+                    ui.getUser().getId(), 
+                    new UsersPermissionsForItemResponse(ui.getUser().getUsername(), ui.getPermission())
+                );
             }
         }
 
         List<UsersPermissionsForItemResponse> responses = new ArrayList<>();
 
         for (UsersPermissionsForItemResponse response : userFirstPermissionResponses.values()) {
-            if (response.getPermission() != PermissionType.NO_PERMISSION) {
+            if (response.getPermission() != null && response.getPermission() != PermissionType.NO_PERMISSION) {
                 responses.add(response);
             }
         }
@@ -264,10 +267,10 @@ public class ItemService {
             accessibleItemsMap.put(item.getId(), item);
         }
 
-        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwned(currentUser.getId()); // include NO_PERMISSIONS to block walk ups
+        List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwnedOrNullPermission(currentUser.getId()); // include NO_PERMISSIONS to block walk ups
         Map<Long, PermissionType> explicitPermissionsMap = new HashMap<>();
         for (UserItemEntity ui : explicitPermissions) {
-            explicitPermissionsMap.put(ui.getItem().getId(), ui.getPermission());
+            if (ui.getPermission() != null) explicitPermissionsMap.put(ui.getItem().getId(), ui.getPermission());
         }
 
         List<ItemResponse> sharedItemResponses = new ArrayList<>();
@@ -326,11 +329,16 @@ public class ItemService {
         );
     }
     
-    public void open(UUID publicId) {
-        UserItemEntity ui = userItemRepository.findByUserAndItem(
-            userService.getCurrentUserEntity(), 
-            itemRepository.findByPublicId(publicId).orElseThrow()
-        ).orElseThrow();
+    public void open(UUID publicId) throws InvalidPermissionsException {
+        validateViewing(publicId);
+
+        UserEntity user = userService.getCurrentUserEntity();
+        ItemEntity item = itemRepository.findByPublicId(publicId).orElseThrow();
+        if (item.getType() == ItemType.FOLDER) return;
+
+        UserItemEntity ui = userItemRepository.findByUserAndItem(user, item)
+            .orElse(new UserItemEntity(user, item, null));
+
         ui.setLastOpened(Instant.now());
         userItemRepository.save(ui);
     }
@@ -493,11 +501,5 @@ public class ItemService {
     //         responses.add(new ItemResponse(entity, itemRepository.findPublicIdById(entity.getParentId()), PermissionType.OWNER));
     //     }
     //     return responses;
-    // }
-
-    // public ItemResponse getUserRoot() {
-    //     ItemEntity userRootItem = userItemRepository.findUserRootItemByUser(userService.getCurrentUserEntity(), GLOBAL_ROOT_ID).orElseThrow();
-    //     // abstract the global root by setting the user root's parentId as null
-    //     return new ItemResponse(userRootItem, null, PermissionType.OWNER);
     // }
 }

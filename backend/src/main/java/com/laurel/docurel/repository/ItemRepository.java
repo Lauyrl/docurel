@@ -49,7 +49,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
             SELECT i.*
             FROM items i
             JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :userId
-            WHERE ui.permission != 'NO_PERMISSION'
+            WHERE ui.permission IS NOT NULL AND ui.permission != 'NO_PERMISSION'
 
             UNION
 
@@ -232,16 +232,4 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         SELECT id FROM tree WHERE type != 'FOLDER';        
     """, nativeQuery = true)
     List<Long> findDocumentIdsByAncestorId(@Param("rootId") Long rootId); // inclusive of ancestor/root
-
-    @Query(value = """
-        SELECT * 
-        FROM items i
-        JOIN user_items ui ON i.id = ui.item_id 
-        WHERE ui.user_id = :userId
-          AND ui.permission = 'OWNER'
-          AND i.parent_id != 0
-          AND similarity(i.name, :query) > 0.25
-        ORDER BY similarity(i.name, :query) DESC
-    """, nativeQuery = true)
-    List<ItemEntity> findMatchingItems(@Param("userId") Long userId, @Param("query") String query);
 }

@@ -145,7 +145,7 @@ public class ItemController {
     }
 
     @PostMapping("/item/{publicId}/open")
-    public ResponseEntity<Void> open(@PathVariable UUID publicId) {
+    public ResponseEntity<Void> open(@PathVariable UUID publicId) throws InvalidPermissionsException {
         itemService.open(publicId);
         return ResponseEntity.noContent().build();
     }

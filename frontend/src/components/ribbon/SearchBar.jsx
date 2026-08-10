@@ -14,6 +14,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   const {filteredItemIdSet, itemMap, setFilteredItemIdSet} = useExplorer();
   const {searchItems} = useExplorerOperations(currentPageIdx);
 
+  // add this into global state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFiltersIsOpen, setSearchFiltersIsOpen] = useState(false);
   const [searchSortIsOpen, setSearchSortIsOpen] = useState(false);
@@ -183,7 +184,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
           }}
         />
         {
-          filteredItemIdSet?.size > 0 &&
+          (searchQuery || anyFilterActive()) && filteredItemIdSet?.size > 0 &&
           <div className="search-results" style={{opacity: draggedItem ? 0.3 : 1.0}}> 
             {
               [...filteredItemIdSet].map((id) => (
@@ -193,7 +194,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
           </div>
         }
         {
-          filteredItemIdSet && filteredItemIdSet.size === 0 &&
+          (searchQuery || anyFilterActive()) && filteredItemIdSet && filteredItemIdSet.size === 0 &&
           <div className="search-results" style={{opacity: draggedItem ? 0.3 : 1.0}}> No results. </div>
         }
       </div>

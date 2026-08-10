@@ -4,7 +4,7 @@ import { api } from "../../api";
 import FolderContentsView from "./views/FolderContentsView";
 
 function SharedWithMe({ draggedItem, renderItemListing }) {
-  const {setItemMap, setCurrentFolderId, currentFolder, childrenIndex, rootLevelItemsIndex, rebuildNavigationStacks} = useExplorer();
+  const {setItemMap, setCurrentFolderId, currentFolder, childrenIndex, rootLevelItemsIndex, rebuildNavigationStacks, setFilteredItemIdSet} = useExplorer();
 
   useEffect(() => {
     api("/shared")
@@ -15,6 +15,7 @@ function SharedWithMe({ draggedItem, renderItemListing }) {
         setItemMap(itemMapTemp);
         rebuildNavigationStacks(null);
         setCurrentFolderId(null);
+        setFilteredItemIdSet(null);
       });
   }, []);
 

@@ -1,8 +1,13 @@
 import "./css/SearchFilterOptions.css"
 import "../../css/common.css"
 import DateFilter from "./DateFilter";
+import { useEffect } from "react";
 
-function SearchFilterOptions({ filterValues, setFilterValues, confirmFilters }) {
+function SearchFilterOptions({ filterValues, setFilterValues, confirmFilters, search }) {
+  useEffect(() => {
+    search();
+  }, [filterValues])
+
   function clearFilters() {
     setFilterValues({
       type: null, contentType: null, createdAfter: null, createdBefore: null, updatedAfter: null, updatedBefore: null
@@ -11,7 +16,7 @@ function SearchFilterOptions({ filterValues, setFilterValues, confirmFilters }) 
 
   return (
     <div className="modal" onClick={(e) => e.stopPropagation()}>
-      <h2> Add search filters </h2>
+      <h2> Filter search results </h2>
 
       <div className="search-filter-option" style={{ opacity: filterValues.type ? 1.0 : 0.7 }}>
         <span> Type: </span>

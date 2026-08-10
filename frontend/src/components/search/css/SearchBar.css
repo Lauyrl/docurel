@@ -2,21 +2,23 @@
     position: relative;
     display: flex;
     flex: 1;
+    z-index: 2;
 }
 
 .search-icon {
     position: absolute;
-    left: 12px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none; /* clicks go to the input */
     color: #f39150;
+    z-index: 2;
 }
 
 .search-filters-button {
     position: absolute;
     height: 40px;
-    left: 46px;
+    left: 53px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -26,6 +28,7 @@
     border-radius: 5px;
     font-size: 14px;
     cursor: pointer;
+    z-index: 2;
 }
 
 .search-filters-button:hover {
@@ -34,11 +37,12 @@
 
 .search-bar input {
     width: 100%;
-    padding: 9px 12px 8px 140px; /* extra left padding for the icon */
+    padding: 9px 12px 8px 240px; /* extra left padding for the icon */
     box-sizing: border-box;
     border-radius: 40px;
     border: 1px solid white;
-    font-size: 17px;
+    font-size: 19px;
+    z-index: 1;
 }
 
 .search-results {
@@ -62,4 +66,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.search-bar-highlight {
+    position: absolute;
+    inset: -8px;
+    z-index: 0;
+    background-color: rgb(254, 255, 255);
+    border-radius: 40px;
 }

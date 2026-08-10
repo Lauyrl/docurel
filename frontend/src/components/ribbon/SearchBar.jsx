@@ -17,30 +17,26 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFiltersIsOpen, setSearchFiltersIsOpen] = useState(false);
   const [searchSortIsOpen, setSearchSortIsOpen] = useState(false);
-  const [filterValues, setFilterValues] = useState({
+  const [searchFilterValues, setSearchFilterValues] = useState({
     type: null, contentType: null, createdAfter: null, createdBefore: null, updatedAfter: null, updatedBefore: null
   });
-  const [sortValues, setSortValues] = useState({
+  const [searchSortValues, setSearchSortValues] = useState({
     sortBy: "Name similarity", descending: true
   })
 
   function anyFilterActive() {
-    return (filterValues.type || filterValues.contentType || filterValues.createdAfter || filterValues.createdBefore || filterValues.updatedAfter || filterValues.updatedBefore);
+    return (searchFilterValues.type || searchFilterValues.contentType || searchFilterValues.createdAfter || searchFilterValues.createdBefore || searchFilterValues.updatedAfter || searchFilterValues.updatedBefore);
   }
 
   function search() {
     if (searchQuery || anyFilterActive()) { 
       searchItems(
-        searchQuery, filterValues.type, filterValues.contentType, 
-        filterValues.createdAfter, filterValues.createdBefore, filterValues.updatedAfter, filterValues.updatedBefore, 
-        sortValues.sortBy, sortValues.descending
+        searchQuery, searchFilterValues.type, searchFilterValues.contentType, 
+        searchFilterValues.createdAfter, searchFilterValues.createdBefore, searchFilterValues.updatedAfter, searchFilterValues.updatedBefore, 
+        searchSortValues.sortBy, searchSortValues.descending
       );
     }
   }
-
-  useEffect(() => {
-    search();
-  }, [sortValues, filterValues])
 
   function confirmFilters() {
     search();
@@ -55,6 +51,10 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   function exitResults() {
     setFilteredItemIdSet(null);
   }
+
+  useEffect(() => {
+    search();
+  }, [searchFilterValues, searchSortValues]);
 
   useEffect(() => {
 		window.addEventListener("click", exitResults);
@@ -120,8 +120,8 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
           }}
         >
           <FilterConfig 
-            filterValues={filterValues}
-            setFilterValues={setFilterValues} 
+            filterValues={searchFilterValues}
+            setFilterValues={setSearchFilterValues} 
             confirmFilters={confirmFilters}
           />
         </div>
@@ -134,8 +134,8 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
           }}
         >
           <SortConfig 
-            sortValues={sortValues}
-            setSortValues={setSortValues}
+            sortValues={searchSortValues}
+            setSortValues={setSearchSortValues}
             confirmSort={confirmSort}
           />
         </div>
@@ -157,7 +157,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
 
         <button 
           className="search-filters-button"
-          style={{left: "143px", backgroundColor: ((sortValues.sortBy !== "Name similarity" || !sortValues.descending) ? "#e7772d" : undefined)}}
+          style={{left: "143px", backgroundColor: ((searchSortValues.sortBy !== "Name similarity" || !searchSortValues.descending) ? "#e7772d" : undefined)}}
           onClick={(e) => {
             e.stopPropagation();
             setSearchSortIsOpen(true);

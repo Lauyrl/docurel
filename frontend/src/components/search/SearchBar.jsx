@@ -1,4 +1,4 @@
-import { File, Folder, Search } from "lucide-react";
+import { ArrowUpDown, File, Folder, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import "./css/SearchBar.css"
 import "../../css/common.css"
@@ -8,6 +8,7 @@ import { useExplorer } from "../../context/ExplorerContext";
 import SearchFilterOptions from "./SearchFilterOptions";
 import FunnelSearch from "./css/FunnelSearch.svg"
 import { formatFileSize } from "../../common";
+import SearchSortOptions from "./SearchSortOptions";
 
 function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   const {filteredItemIdSet, itemMap, setFilteredItemIdSet} = useExplorer();
@@ -15,9 +16,13 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFiltersIsOpen, setSearchFiltersIsOpen] = useState(false);
+  const [searchSortIsOpen, setSearchSortIsOpen] = useState(false);
   const [filterValues, setFilterValues] = useState({
     type: null, contentType: null, createdAfter: null, createdBefore: null, updatedAfter: null, updatedBefore: null
   });
+  const [sortValues, setSortValues] = useState({
+    sortBy: null, descending: false 
+  })
 
   function anyFilterActive() {
     return (filterValues.type || filterValues.contentType || filterValues.createdAfter || filterValues.createdBefore || filterValues.updatedAfter || filterValues.updatedBefore);
@@ -26,13 +31,8 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   function search() {
     if (searchQuery || anyFilterActive()) { 
       searchItems(
-        searchQuery, 
-        filterValues.type, 
-        filterValues.contentType, 
-        filterValues.createdAfter, 
-        filterValues.createdBefore, 
-        filterValues.updatedAfter, 
-        filterValues.updatedBefore
+        searchQuery, filterValues.type, filterValues.contentType, 
+        filterValues.createdAfter, filterValues.createdBefore, filterValues.updatedAfter, filterValues.updatedBefore
       );
     }
   }
@@ -40,6 +40,11 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   function confirmFilters() {
     search();
     setSearchFiltersIsOpen(false);
+  }
+
+  function confirmSort() {
+    search();
+    setSearchSortIsOpen(false);
   }
 
   function exitResults() {
@@ -116,11 +121,27 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
           />
         </div>
       }
+      {
+        searchSortIsOpen &&
+        <div className="overlay" onClick={(e) => {
+            e.stopPropagation();
+            setSearchSortIsOpen(false);
+          }}
+        >
+          <SearchSortOptions 
+            sortValues={sortValues}
+            setSortValues={setSortValues}
+            confirmSort={confirmSort}
+          />
+        </div>
+      }
       <div className="search-bar">
-        <Search className="search-icon"/>
+        {(searchFiltersIsOpen || searchSortIsOpen) && <div className="search-bar-highlight"></div> }
+        <Search size={28} className="search-icon"/>
+
         <button 
           className="search-filters-button"
-          style={(anyFilterActive()) ? {backgroundColor: "#e7772d"} : undefined}
+          style={{backgroundColor: (anyFilterActive() ? "#e7772d" : undefined)}}
           onClick={(e) => {
             e.stopPropagation();
             setSearchFiltersIsOpen(true);
@@ -128,6 +149,18 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
         > 
           {<img src={FunnelSearch} alt="" size={20}/>} {"Filters"} 
         </button>
+
+        <button 
+          className="search-filters-button"
+          style={{left: "143px"}}
+          onClick={(e) => {
+            e.stopPropagation();
+            setSearchSortIsOpen(true);
+          }}
+        > 
+          <ArrowUpDown size={21}/> {"Sort by"} 
+        </button>
+        
         <input
           type="text"
           placeholder="Search..."

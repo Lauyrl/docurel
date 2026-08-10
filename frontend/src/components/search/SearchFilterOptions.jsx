@@ -1,12 +1,8 @@
 import "./css/SearchFilterOptions.css"
 import "../../css/common.css"
 import DateFilter from "./DateFilter";
-import { useEffect } from "react";
 
-function SearchFilterOptions({ filterValues, setFilterValues, confirmFilters, search }) {
-  useEffect(() => {
-    search();
-  }, [filterValues])
+function SearchFilterOptions({ filterValues, setFilterValues, confirmFilters }) {
 
   function clearFilters() {
     setFilterValues({

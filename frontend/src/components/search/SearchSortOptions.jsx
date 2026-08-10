@@ -1,11 +1,7 @@
-import { useEffect } from "react"
 import "../../css/common.css"
 import "./css/SearchSortOptions.css"
 
-function SearchSortOptions({ sortValues, setSortValues, confirmSort, search }) {
-  useEffect(() => {
-    search();
-  }, [sortValues])
+function SearchSortOptions({ sortValues, setSortValues, confirmSort }) {
 
   return (
     <div 

@@ -53,6 +53,7 @@ function ItemTreeView({root, draggedItem, renderItemListing}) {
         if (draggedItem) patchItem(draggedItem, null, root.publicId);
       }}
     > 
+      <div className="title-bar"> Tree view </div>
       { rootChildren.length === 0 && <h2> Upload a file </h2> }
       { rootChildren.length !== 0 && displayFolderContents(root, 0) }
     </div>

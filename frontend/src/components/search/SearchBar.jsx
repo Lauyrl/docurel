@@ -38,6 +38,10 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
     }
   }
 
+  useEffect(() => {
+    search();
+  }, [sortValues, filterValues])
+
   function confirmFilters() {
     search();
     setSearchFiltersIsOpen(false);
@@ -119,7 +123,6 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             filterValues={filterValues}
             setFilterValues={setFilterValues} 
             confirmFilters={confirmFilters}
-            search={search}
           />
         </div>
       }
@@ -134,7 +137,6 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
             sortValues={sortValues}
             setSortValues={setSortValues}
             confirmSort={confirmSort}
-            search={search}
           />
         </div>
       }

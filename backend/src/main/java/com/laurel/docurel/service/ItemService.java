@@ -263,7 +263,9 @@ public class ItemService {
     public List<ItemResponse> getItemsUserCanAccessExceptOwned() {
         UserEntity currentUser = userService.getCurrentUserEntity();
 
-        List<ItemWithMetaDataRecord> accessibleItems = findAccessibleItemsExceptOwnedByUserIdWithMetaData(currentUser.getId()); 
+        List<ItemWithMetaDataRecord> accessibleItems = getItemWithMetaDataRecordFromObjects(
+            userItemRepository.findAccessibleItemsExceptOwnedByUserId(currentUser.getId())
+        ); 
         Map<Long, ItemWithMetaDataRecord> accessibleItemsMap = new HashMap<>();
         for (ItemWithMetaDataRecord i : accessibleItems) {
             accessibleItemsMap.put(i.item().getId(), i);
@@ -300,6 +302,17 @@ public class ItemService {
         List<ItemWithMetaDataRecord> itemsLastOpened = itemRepository.findRecents(userService.getCurrentUserEntity().getId(), ItemType.FOLDER);
         List<ItemResponse> responses = new ArrayList<>();
         for (ItemWithMetaDataRecord i : itemsLastOpened) responses.add(new ItemResponse(i, null, false));
+        return responses;
+    }
+
+    public List<ItemResponse> getStarred() {
+        List<ItemWithMetaDataRecord> itemsStarredAndDescendants = getItemWithMetaDataRecordFromObjects(
+            userItemRepository.findStarredAndDescendants(userService.getCurrentUserEntity().getId())
+        );
+        List<ItemResponse> responses = new ArrayList<>();
+        for (ItemWithMetaDataRecord i : itemsStarredAndDescendants) {
+            responses.add(new ItemResponse(i, itemRepository.findPublicIdById(i.item().getParentId()), false));
+        }
         return responses;
     }
 
@@ -412,9 +425,7 @@ public class ItemService {
         return userItemRepository.findByItemPublicIdAndPermission(publicId, PermissionType.OWNER);
     }
 
-    private List<ItemWithMetaDataRecord> findAccessibleItemsExceptOwnedByUserIdWithMetaData(Long userId) {
-        List<Object[]> rows = userItemRepository.findAccessibleItemsExceptOwnedByUserId(userId);
-
+    private List<ItemWithMetaDataRecord> getItemWithMetaDataRecordFromObjects(List<Object[]> rows) {
         Map<Long, Object[]> rowById = rows.stream()
             .collect(Collectors.toMap(row -> (Long) row[0], row -> row));
         /*                                         ^             ^
@@ -427,13 +438,14 @@ public class ItemService {
             Object[] row = rowById.get(item.getId());
             result.add(new ItemWithMetaDataRecord(
                 item,
-                (PermissionType) row[1],    // row[0] is i.id, row[1]: ui.permission
+                row[1] == null ? null : PermissionType.valueOf((String) row[1]),    // row[0] is i.id, row[1]: ui.permission
                 (Instant) row[2],           // row[2]: ui.last_opened
                 (boolean) row[3]            // row[3]: ui.starred
             ));
         }
         return result;
     }
+
     // public List<ItemResponse> searchItems(String query) {
     //     List<ItemEntity> results = itemRepository.findMatchingItems(
     //         userService.getCurrentUserEntity().getId(), 

@@ -168,4 +168,9 @@ public class ItemController {
     public List<ItemResponse> getRecents() {
         return itemService.getRecents();
     }
+
+    @GetMapping("/starred")
+    public List<ItemResponse> getStarred() {
+        return itemService.getStarred();
+    }
 }

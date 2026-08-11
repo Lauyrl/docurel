@@ -76,9 +76,32 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
             LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id
             WHERE ui.permission IS NULL OR ui.permission != 'NO_PERMISSION'
         )
-        SELECT DISTINCT i.id, ui.permission, ui.last_opened, ui.starred
+        SELECT DISTINCT i.id, ui.permission, ui.last_opened, COALESCE(ui.starred, false)
         FROM shared i
         LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id          
     """, nativeQuery = true) // add SELECT DISTINCT for items whom multiple ancestors have entries 
     public List<Object[]> findAccessibleItemsExceptOwnedByUserId(@Param("current_user_id") Long userId); // includes items without explicit entries, but inherited permissions
+
+    @Query(value = """
+        WITH RECURSIVE shared AS (
+            SELECT i.*
+            FROM items i
+            JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id
+            WHERE ui.starred 
+              AND (ui.permission IS NULL OR ui.permission != 'NO_PERMISSION') ---- only accessible items can be starred, and if parent loses permission, descendants lose entry, so this is fine
+              AND i.parent_id != 0
+
+            UNION ALL
+
+            SELECT i.*
+            FROM items i
+            JOIN shared s ON i.parent_id = s.id
+            LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id
+            WHERE ui.permission IS NULL OR ui.permission != 'NO_PERMISSION'
+        )
+        SELECT DISTINCT i.id, ui.permission, ui.last_opened, COALESCE(ui.starred, false)
+        FROM shared i
+        LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id          
+    """, nativeQuery = true) // add SELECT DISTINCT for items whom multiple ancestors have entries 
+    public List<Object[]> findStarredAndDescendants(@Param("current_user_id") Long userId);
 }

@@ -151,6 +151,13 @@ public class ItemController {
         itemService.open(publicId);
         return ResponseEntity.noContent().build();
     }
+
+    // toggle
+    @PostMapping("/item/{publicId}/star")
+    public ResponseEntity<Void> star(@PathVariable UUID publicId) throws InvalidPermissionsException {
+        itemService.star(publicId);
+        return ResponseEntity.noContent().build();
+    }
     
     @GetMapping("/shared")
     public List<ItemResponse> getItemsSharedWithCurrentUser() {

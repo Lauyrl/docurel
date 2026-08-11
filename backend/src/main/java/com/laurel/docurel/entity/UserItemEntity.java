@@ -32,7 +32,14 @@ public class UserItemEntity {
         this.user = user;
         this.item = item;
         this.permission = permission;
-        starred = false;
+        this.starred = false;
+    }
+
+    public UserItemEntity(UserEntity user, ItemEntity item, PermissionType permission, boolean starred) {
+        this.user = user;
+        this.item = item;
+        this.permission = permission;
+        this.starred = starred;
     }
 
     @EmbeddedId

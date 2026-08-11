@@ -303,29 +303,6 @@ public class ItemService {
         return responses;
     }
 
-    private List<ItemWithMetaDataRecord> findAccessibleItemsExceptOwnedByUserIdWithMetaData(Long userId) {
-        List<Object[]> rows = userItemRepository.findAccessibleItemsExceptOwnedByUserId(userId);
-
-        Map<Long, Object[]> rowById = rows.stream()
-            .collect(Collectors.toMap(row -> (Long) row[0], row -> row));
-        /*                                         ^             ^
-                                           key: row[0] (i.id)    |
-                                                        value: the entire row (i.id, ui.permission,...)  */
-        List<ItemEntity> items = itemRepository.findAllById(rowById.keySet());
-        
-        List<ItemWithMetaDataRecord> result = new ArrayList<>();
-        for (ItemEntity item : items) {
-            Object[] row = rowById.get(item.getId());
-            result.add(new ItemWithMetaDataRecord(
-                item,
-                (PermissionType) row[1],    // row[0] is i.id, row[1]: ui.permission
-                (Instant) row[2],           // row[2]: ui.last_opened
-                (boolean) row[3]            // row[3]: ui.starred
-            ));
-        }
-        return result;
-    }
-
     public List<UUID> searchItems(
         boolean ownedOnly,
         boolean excludeOwned,
@@ -376,6 +353,18 @@ public class ItemService {
         ui.setLastOpened(Instant.now());
         userItemRepository.save(ui);
     }
+    
+    public void star(UUID publicId) throws InvalidPermissionsException {
+        validateViewing(publicId);
+
+        UserEntity user = userService.getCurrentUserEntity();
+        ItemEntity item = itemRepository.findByPublicId(publicId).orElseThrow();
+
+        UserItemEntity ui = userItemRepository.findByUserAndItem(user, item)
+            .orElse(new UserItemEntity(user, item, null, false));
+        ui.setStarred(!ui.isStarred());
+        userItemRepository.save(ui);
+    }
 
 //-----validation
     public void validateModifyFolderContents(UUID publicParentId) throws InvalidPermissionsException { 
@@ -423,6 +412,28 @@ public class ItemService {
         return userItemRepository.findByItemPublicIdAndPermission(publicId, PermissionType.OWNER);
     }
 
+    private List<ItemWithMetaDataRecord> findAccessibleItemsExceptOwnedByUserIdWithMetaData(Long userId) {
+        List<Object[]> rows = userItemRepository.findAccessibleItemsExceptOwnedByUserId(userId);
+
+        Map<Long, Object[]> rowById = rows.stream()
+            .collect(Collectors.toMap(row -> (Long) row[0], row -> row));
+        /*                                         ^             ^
+                                           key: row[0] (i.id)    |
+                                                        value: the entire row (i.id, ui.permission,...)  */
+        List<ItemEntity> items = itemRepository.findAllById(rowById.keySet());
+        
+        List<ItemWithMetaDataRecord> result = new ArrayList<>();
+        for (ItemEntity item : items) {
+            Object[] row = rowById.get(item.getId());
+            result.add(new ItemWithMetaDataRecord(
+                item,
+                (PermissionType) row[1],    // row[0] is i.id, row[1]: ui.permission
+                (Instant) row[2],           // row[2]: ui.last_opened
+                (boolean) row[3]            // row[3]: ui.starred
+            ));
+        }
+        return result;
+    }
     // public List<ItemResponse> searchItems(String query) {
     //     List<ItemEntity> results = itemRepository.findMatchingItems(
     //         userService.getCurrentUserEntity().getId(), 

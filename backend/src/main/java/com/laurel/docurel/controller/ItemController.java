@@ -154,4 +154,9 @@ public class ItemController {
     public List<ItemResponse> getItemsSharedWithCurrentUser() {
         return itemService.getItemsUserCanAccessExceptOwned();
     }
+
+    @GetMapping("/recents")
+    public List<ItemResponse> getRecents() {
+        return itemService.getRecents();
+    }
 }

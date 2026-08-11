@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
 import com.laurel.docurel.entity.ItemEntity;
+import com.laurel.docurel.entity.ItemLastOpenedRecord;
 import com.laurel.docurel.entity.UserEntity;
 import com.laurel.docurel.entity.UserItemEntity;
 import com.laurel.docurel.enums.ItemType;
@@ -292,6 +293,16 @@ public class ItemService {
             sharedItemResponses.add(new ItemResponse(item, publicParentId, firstPermission));
         }
         return sharedItemResponses;
+    }
+
+    public List<ItemResponse> getRecents() {
+        List<ItemLastOpenedRecord> itemsLastOpened = itemRepository.findRecents(userService.getCurrentUserEntity().getId());
+        List<ItemResponse> responses = new ArrayList<>();
+        for (ItemLastOpenedRecord i : itemsLastOpened) {
+            ItemEntity item = i.item();
+            responses.add(new ItemResponse(item, itemRepository.findPublicIdById(item.getParentId()), i.permission(), i.lastOpened()));
+        }
+        return responses;
     }
 
     public List<UUID> searchItems(

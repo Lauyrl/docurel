@@ -103,10 +103,10 @@ function MainScreen() {
 		)
 	}
 
-	function onSelect(e, item, isSearchResultItem, registerAsOpened) {
+	function onSelect(e, item, isSearchResultItem) {
 		e.stopPropagation();
 		selectItem(item);
-		if (registerAsOpened) registerOpen(item);
+		if (item.type !== "FOLDER") registerOpen(item);
 		if (isSearchResultItem) setFilteredItemIdSet(null);
 	}
 
@@ -116,14 +116,14 @@ function MainScreen() {
 	 * @param {*} displayItem 
 	 * @returns JSX representing the item as defined by displayItem, or the rename dialogue if the item is being renamed
 	 */
-	function renderItemListing(item, displayItem, isSelectOnSingleClick = true, isDraggable = true, isSearchResultItem = false, registerAsOpened = true) {
+	function renderItemListing(item, displayItem, isSelectOnSingleClick = true, isDraggable = true, isSearchResultItem = false) {
 		return (
 			<div className="item-listing"
 				onClick={isSelectOnSingleClick ? (e) => {
-					onSelect(e, item, isSearchResultItem, registerAsOpened);
+					onSelect(e, item, isSearchResultItem);
 				} : undefined}
 				onDoubleClick={!isSelectOnSingleClick ? (e) => {
-					onSelect(e, item, isSearchResultItem, registerAsOpened);
+					onSelect(e, item, isSearchResultItem);
 				} : undefined}
 				onContextMenu={(e) => {
 					e.stopPropagation();

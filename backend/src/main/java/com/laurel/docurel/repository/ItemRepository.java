@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.laurel.docurel.entity.ItemEntity;
-import com.laurel.docurel.entity.ItemLastOpenedRecord;
+import com.laurel.docurel.entity.ItemWithMetaDataRecord;
 import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
 
@@ -244,7 +244,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     List<Long> findDocumentIdsByAncestorId(@Param("rootId") Long rootId); // inclusive of ancestor/root
 
     @Query(value = """
-        SELECT new com.laurel.docurel.entity.ItemLastOpenedRecord(i, ui.permission, ui.lastOpened)
+        SELECT new com.laurel.docurel.entity.ItemWithMetaDataRecord(i, ui.permission, ui.lastOpened, ui.starred)
         FROM ItemEntity i
         JOIN UserItemEntity ui ON i.id = ui.item.id
         WHERE ui.user.id = :userId
@@ -252,5 +252,5 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
           AND ui.lastOpened IS NOT NULL
         ORDER BY ui.lastOpened DESC
     """)
-    List<ItemLastOpenedRecord> findRecents(@Param("userId") Long userId, @Param("folderType") ItemType folderType);
+    List<ItemWithMetaDataRecord> findRecents(@Param("userId") Long userId, @Param("folderType") ItemType folderType);
 }

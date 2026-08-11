@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.laurel.docurel.entity.ItemEntity;
+import com.laurel.docurel.entity.ItemWithMetaDataRecord;
 import com.laurel.docurel.entity.UserEntity;
 import com.laurel.docurel.entity.UserItemEntity;
 import com.laurel.docurel.enums.PermissionType;
@@ -43,12 +44,12 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
     public List<UserItemEntity> findByItemsExceptNullPermission(List<ItemEntity> items);
 
     @Query(value = """
-        SELECT ui.item
+        SELECT new com.laurel.docurel.entity.ItemWithMetaDataRecord(ui.item, ui.permission, ui.lastOpened, ui.starred)
         FROM UserItemEntity ui
         WHERE ui.user = :user
         AND ui.permission = 'OWNER'
     """)
-    public List<ItemEntity> findItemsOwnedByUser(UserEntity user);
+    public List<ItemWithMetaDataRecord> findItemsOwnedByUser(UserEntity user);
 
     // added NOT NULL condition after last_opened-related features allowed pure metadata rows with NULL permissions to be added
     @Query(value = """
@@ -75,7 +76,9 @@ public interface UserItemRepository extends JpaRepository<UserItemEntity, Long> 
             LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id
             WHERE ui.permission IS NULL OR ui.permission != 'NO_PERMISSION'
         )
-        SELECT DISTINCT * FROM shared              
+        SELECT DISTINCT i.id, ui.permission, ui.last_opened, ui.starred
+        FROM shared i
+        LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :current_user_id          
     """, nativeQuery = true) // add SELECT DISTINCT for items whom multiple ancestors have entries 
-    public List<ItemEntity> findAccessibleItemsExceptOwnedByUserId(@Param("current_user_id") Long userId); // includes items without explicit entries, but inherited permissions
+    public List<Object[]> findAccessibleItemsExceptOwnedByUserId(@Param("current_user_id") Long userId); // includes items without explicit entries, but inherited permissions
 }

@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
 import com.laurel.docurel.entity.ItemEntity;
-import com.laurel.docurel.entity.ItemLastOpenedRecord;
+import com.laurel.docurel.entity.ItemWithMetaDataRecord;
 import com.laurel.docurel.entity.UserEntity;
 import com.laurel.docurel.entity.UserItemEntity;
 import com.laurel.docurel.enums.ItemType;
@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,13 +44,13 @@ public class ItemService {
     private final UserService userService;
 
     public List<ItemResponse> getOwnedItems() {
-        List<ItemEntity> entities = userItemRepository.findItemsOwnedByUser(userService.getCurrentUserEntity());
+        List<ItemWithMetaDataRecord> entities = userItemRepository.findItemsOwnedByUser(userService.getCurrentUserEntity());
 
         List<ItemResponse> responses = new ArrayList<>();
-        for (ItemEntity entity : entities) {
-            boolean isUserRoot = (entity.getParentId() == GLOBAL_ROOT_ID); 
-            UUID publicParentId = isUserRoot ? null : itemRepository.findPublicIdById(entity.getParentId());
-            responses.add(new ItemResponse(entity, publicParentId, PermissionType.OWNER, isUserRoot));
+        for (ItemWithMetaDataRecord i : entities) {
+            boolean isUserRoot = (i.item().getParentId() == GLOBAL_ROOT_ID); 
+            UUID publicParentId = isUserRoot ? null : itemRepository.findPublicIdById(i.item().getParentId());
+            responses.add(new ItemResponse(i, publicParentId, isUserRoot));
         }
         return responses;
     }
@@ -262,10 +263,10 @@ public class ItemService {
     public List<ItemResponse> getItemsUserCanAccessExceptOwned() {
         UserEntity currentUser = userService.getCurrentUserEntity();
 
-        List<ItemEntity> accessibleItems = userItemRepository.findAccessibleItemsExceptOwnedByUserId(currentUser.getId()); 
-        Map<Long, ItemEntity> accessibleItemsMap = new HashMap<>();
-        for (ItemEntity item : accessibleItems) {
-            accessibleItemsMap.put(item.getId(), item);
+        List<ItemWithMetaDataRecord> accessibleItems = findAccessibleItemsExceptOwnedByUserIdWithMetaData(currentUser.getId()); 
+        Map<Long, ItemWithMetaDataRecord> accessibleItemsMap = new HashMap<>();
+        for (ItemWithMetaDataRecord i : accessibleItems) {
+            accessibleItemsMap.put(i.item().getId(), i);
         }
 
         List<UserItemEntity> explicitPermissions = userItemRepository.findByUserExceptOwnedOrNullPermission(currentUser.getId()); // include NO_PERMISSIONS to block walk ups
@@ -275,34 +276,54 @@ public class ItemService {
         }
 
         List<ItemResponse> sharedItemResponses = new ArrayList<>();
-        for (ItemEntity item : accessibleItems) {
-            PermissionType firstPermission = explicitPermissionsMap.get(item.getId());
-            ItemEntity accessibleAncestor = accessibleItemsMap.get(item.getParentId());
+        for (ItemWithMetaDataRecord i : accessibleItems) {
+            PermissionType firstPermission = explicitPermissionsMap.get(i.item().getId());
+            ItemWithMetaDataRecord accessibleAncestor = accessibleItemsMap.get(i.item().getParentId());
 
             while (accessibleAncestor != null && firstPermission == null) { // stop at the last accessible ancestor (until an ancestor that isn't "shared"), who holds the root permission
-                firstPermission = explicitPermissionsMap.get(accessibleAncestor.getId());
-                accessibleAncestor = accessibleItemsMap.get(accessibleAncestor.getParentId());
+                firstPermission = explicitPermissionsMap.get(accessibleAncestor.item().getId());
+                accessibleAncestor = accessibleItemsMap.get(accessibleAncestor.item().getParentId());
             }
 
             if (!PermissionType.greaterThanOrEqualTo(firstPermission, PermissionType.VIEWER)) continue;
 
-            ItemEntity accessibleParent = accessibleItemsMap.get(item.getParentId());
+            ItemWithMetaDataRecord accessibleParent = accessibleItemsMap.get(i.item().getParentId());
             // needed to build ItemResponse inside SharedItemResponse 
             // if the parent is not shared/accessible to the current user, abstract its' publicId as null
-            UUID publicParentId = accessibleParent != null ? accessibleParent.getPublicId() : null;
-            sharedItemResponses.add(new ItemResponse(item, publicParentId, firstPermission));
+            UUID publicParentId = accessibleParent != null ? accessibleParent.item().getPublicId() : null;
+            sharedItemResponses.add(new ItemResponse(i, publicParentId, firstPermission));
         }
         return sharedItemResponses;
     }
 
     public List<ItemResponse> getRecents() {
-        List<ItemLastOpenedRecord> itemsLastOpened = itemRepository.findRecents(userService.getCurrentUserEntity().getId(), ItemType.FOLDER);
+        List<ItemWithMetaDataRecord> itemsLastOpened = itemRepository.findRecents(userService.getCurrentUserEntity().getId(), ItemType.FOLDER);
         List<ItemResponse> responses = new ArrayList<>();
-        for (ItemLastOpenedRecord i : itemsLastOpened) {
-            ItemEntity item = i.item();
-            responses.add(new ItemResponse(item, null, i.permission(), i.lastOpened()));
-        }
+        for (ItemWithMetaDataRecord i : itemsLastOpened) responses.add(new ItemResponse(i, null, false));
         return responses;
+    }
+
+    private List<ItemWithMetaDataRecord> findAccessibleItemsExceptOwnedByUserIdWithMetaData(Long userId) {
+        List<Object[]> rows = userItemRepository.findAccessibleItemsExceptOwnedByUserId(userId);
+
+        Map<Long, Object[]> rowById = rows.stream()
+            .collect(Collectors.toMap(row -> (Long) row[0], row -> row));
+        /*                                         ^             ^
+                                           key: row[0] (i.id)    |
+                                                        value: the entire row (i.id, ui.permission,...)  */
+        List<ItemEntity> items = itemRepository.findAllById(rowById.keySet());
+        
+        List<ItemWithMetaDataRecord> result = new ArrayList<>();
+        for (ItemEntity item : items) {
+            Object[] row = rowById.get(item.getId());
+            result.add(new ItemWithMetaDataRecord(
+                item,
+                (PermissionType) row[1],    // row[0] is i.id, row[1]: ui.permission
+                (Instant) row[2],           // row[2]: ui.last_opened
+                (boolean) row[3]            // row[3]: ui.starred
+            ));
+        }
+        return result;
     }
 
     public List<UUID> searchItems(

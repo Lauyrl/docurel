@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.laurel.docurel.entity.ItemEntity;
+import com.laurel.docurel.entity.ItemWithMetaDataRecord;
 import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
 
@@ -24,6 +25,7 @@ public class ItemResponse {
     private Instant lastOpened;
     private UUID publicId;
     private PermissionType permission;
+    private boolean starred;
     private boolean isUserRoot;
 
     public ItemResponse(ItemEntity entity, UUID publicParentId, PermissionType permission) {
@@ -37,6 +39,7 @@ public class ItemResponse {
         setPublicId(entity.getPublicId());
         setPermission(permission);
         setUserRoot(false);
+        setStarred(false);
     }
 
     public ItemResponse(ItemEntity entity, UUID publicParentId, PermissionType permission, boolean isUserRoot) {
@@ -50,9 +53,11 @@ public class ItemResponse {
         setPublicId(entity.getPublicId());
         setPermission(permission);
         setUserRoot(isUserRoot);
+        setStarred(false);
     }
-
-    public ItemResponse(ItemEntity entity, UUID publicParentId, PermissionType permission, Instant lastOpened) {
+    
+    public ItemResponse(ItemWithMetaDataRecord i, UUID publicParentId, boolean isUserRoot) {
+        ItemEntity entity = i.item();
         setPublicParentId(entity.getParentId() == null ? null : publicParentId);
         setName(entity.getName());
         setType(entity.getType());
@@ -61,22 +66,25 @@ public class ItemResponse {
         setCreatedAt(entity.getCreatedAt());
         setUpdatedAt(entity.getUpdatedAt());
         setPublicId(entity.getPublicId());
-        setPermission(permission);
-        setUserRoot(false);
-        setLastOpened(lastOpened);
-    }
-
-    public ItemResponse(ItemEntity entity, UUID publicParentId, PermissionType permission, boolean isUserRoot, Instant lastOpened) {
-        setPublicParentId(entity.getParentId() == null ? null : publicParentId);
-        setName(entity.getName());
-        setType(entity.getType());
-        setSizeBytes(entity.getSizeBytes());
-        setContentType(entity.getContentType());
-        setCreatedAt(entity.getCreatedAt());
-        setUpdatedAt(entity.getUpdatedAt());
-        setPublicId(entity.getPublicId());
-        setPermission(permission);
+        setPermission(i.permission());
+        setLastOpened(i.lastOpened());
+        setStarred(i.starred());
         setUserRoot(isUserRoot);
-        setLastOpened(lastOpened);
+    }
+
+    public ItemResponse(ItemWithMetaDataRecord i, UUID publicParentId, PermissionType permission) {
+        ItemEntity entity = i.item();
+        setPublicParentId(entity.getParentId() == null ? null : publicParentId);
+        setName(entity.getName());
+        setType(entity.getType());
+        setSizeBytes(entity.getSizeBytes());
+        setContentType(entity.getContentType());
+        setCreatedAt(entity.getCreatedAt());
+        setUpdatedAt(entity.getUpdatedAt());
+        setPublicId(entity.getPublicId());
+        setPermission(permission);
+        setLastOpened(i.lastOpened());
+        setStarred(i.starred());
+        setUserRoot(false);
     }
 }

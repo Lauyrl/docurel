@@ -6,7 +6,7 @@ export function initializeFolderUIState(item) {
 }
 
 export default function useExplorerOperations(currentPageIdx) {
-  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks, setFilteredItemIdSet, filterValues } = useExplorer();
+  const { itemMap, currentFolderId, childrenIndex, setItemMap, setCurrentFolderId, setPreviewItemId, rebuildNavigationStacks, setFilteredItemIdSet, filterValues, sortValues } = useExplorer();
 
   function anyFilterActive() {
     return (filterValues.type || filterValues.contentType || filterValues.createdAfter || filterValues.createdBefore || filterValues.updatedAfter || filterValues.updatedBefore);
@@ -64,6 +64,35 @@ export default function useExplorerOperations(currentPageIdx) {
     registerOpenCommon(item);
   }
 
+  function filterAndSortItemsList(items, alwaysShowFolders = false) {
+    const filtered = items.filter(item => {
+      if (alwaysShowFolders && item.type === "FOLDER") return true;
+      if (filterValues.type          && item.type !== filterValues.type) return false;
+      if (filterValues.contentType   && item.contentType !== filterValues.contentType) return false;
+      if (filterValues.createdAfter  && new Date(item.createdAt) < new Date(filterValues.createdAfter))  return false;
+      if (filterValues.createdBefore && new Date(item.createdAt) > new Date(filterValues.createdBefore)) return false;
+      if (filterValues.updatedAfter  && new Date(item.updatedAt) < new Date(filterValues.updatedAfter))  return false;
+      if (filterValues.updatedBefore && new Date(item.updatedAt) > new Date(filterValues.updatedBefore)) return false;
+      return true;
+    });
+    filtered.sort((a, b) => {
+      let result;
+      switch (sortValues.sortBy) {
+        case "Alphabetical":
+          result = a.name.localeCompare(b.name); break;
+        case "Size":
+          result = a.sizeBytes - b.sizeBytes; break;
+        case "Date created":
+          result = new Date(a.createdAt) - new Date(b.createdAt); break;
+        case "Date updated":
+          result = new Date(a.updatedAt) - new Date(b.updatedAt); break;
+        default: result = a.name.localeCompare(b.name); break;
+      }
+      return sortValues.descending ? -result : result;
+    });
+    return filtered;
+  }
+
   async function searchItems(
     searchQuery, 
     type,
@@ -91,7 +120,8 @@ export default function useExplorerOperations(currentPageIdx) {
   }
 
   return {
-    initializeFolderUIState, anyFilterActive, selectItem, uploadDocument, createFolder, deleteItem, patchItem, 
+    initializeFolderUIState, filterAndSortItemsList, anyFilterActive, 
+    selectItem, uploadDocument, createFolder, deleteItem, patchItem, 
     editUserPermissionsForItem, deleteUserPermissionsForItem, getUsersWithPermissionsForItem,
     registerOpen, searchItems,
   }

@@ -4,8 +4,8 @@ import { useExplorer } from "../../../context/ExplorerContext";
 import useExplorerOperations from "../../../context/useExplorerOperations";
 
 function ItemTreeView({ root, draggedItem, renderItemListing }) {
-  const { childrenIndex, filterValues, sortValues } = useExplorer();
-  const { selectItem, patchItem } = useExplorerOperations(0);
+  const { childrenIndex } = useExplorer();
+  const { selectItem, patchItem, filterAndSortItemsList } = useExplorerOperations(0);
 
   function displayItem(item) {
     return (
@@ -22,32 +22,7 @@ function ItemTreeView({ root, draggedItem, renderItemListing }) {
 
   function displayFolderContents(folderRoot, depth) {
     const children = childrenIndex.get(folderRoot.publicId) ?? []
-    const filtered = children.filter(item => {
-      if (item.type === "FOLDER") return true;
-      if (filterValues.type          && item.type !== filterValues.type) return false;
-      if (filterValues.contentType   && item.contentType !== filterValues.contentType) return false;
-      if (filterValues.createdAfter  && new Date(item.createdAt) < filterValues.createdAfter)  return false;
-      if (filterValues.createdBefore && new Date(item.createdAt) > filterValues.createdBefore) return false;
-      if (filterValues.updatedAfter  && new Date(item.updatedAt) < filterValues.updatedAfter)  return false;
-      if (filterValues.updatedBefore && new Date(item.updatedAt) > filterValues.updatedBefore) return false;
-      return true;
-    });
-    filtered.sort((a, b) => {
-      let result;
-      switch (sortValues.sortBy) {
-        case "Alphabetical":
-          result = a.name.localeCompare(b.name); break;
-        case "Size":
-          result = a.sizeBytes - b.sizeBytes; break;
-        case "Date created":
-          result = new Date(a.createdAt) - new Date(b.createdAt); break;
-        case "Date updated":
-          result = new Date(a.updatedAt) - new Date(b.updatedAt); break;
-        default: result = a.name.localeCompare(b.name); break;
-      }
-      return sortValues.descending ? -result : result;
-    });
-
+    const filtered = filterAndSortItemsList(children, true);
     return (
       <div className="doc-list">
         {

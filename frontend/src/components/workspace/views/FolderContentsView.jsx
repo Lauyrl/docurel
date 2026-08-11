@@ -5,8 +5,8 @@ import useExplorerOperations from "../../../context/useExplorerOperations";
 import Breadcrumbs from "./Breadcrumbs";
 
 function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem, renderItemListing }) {
-  const { currentFolder, filterValues, sortValues } = useExplorer();
-  const { selectItem, patchItem } = useExplorerOperations(currentPageIdx);
+  const { currentFolder } = useExplorer();
+  const { selectItem, patchItem, filterAndSortItemsList } = useExplorerOperations(currentPageIdx);
 
   function displayItem(item) {
     return (
@@ -17,30 +17,7 @@ function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem
     );
   }
 
-  const filtered = currentFolderChildren.filter(item => {
-    if (filterValues.type          && item.type !== filterValues.type) return false;
-    if (filterValues.contentType   && item.contentType !== filterValues.contentType) return false;
-    if (filterValues.createdAfter  && new Date(item.createdAt) < filterValues.createdAfter)  return false;
-    if (filterValues.createdBefore && new Date(item.createdAt) > filterValues.createdBefore) return false;
-    if (filterValues.updatedAfter  && new Date(item.updatedAt) < filterValues.updatedAfter)  return false;
-    if (filterValues.updatedBefore && new Date(item.updatedAt) > filterValues.updatedBefore) return false;
-    return true;
-  });
-  filtered.sort((a, b) => {
-    let result;
-    switch (sortValues.sortBy) {
-      case "Alphabetical":
-        result = a.name.localeCompare(b.name); break;
-      case "Size":
-        result = a.sizeBytes - b.sizeBytes; break;
-      case "Date created":
-        result = new Date(a.createdAt) - new Date(b.createdAt); break;
-      case "Date updated":
-        result = new Date(a.updatedAt) - new Date(b.updatedAt); break;
-      default: result = a.name.localeCompare(b.name); break;
-    }
-    return sortValues.descending ? -result : result;
-  });
+  const filtered = filterAndSortItemsList(currentFolderChildren);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "stretch", width: "100%" }}>
@@ -59,7 +36,7 @@ function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem
       >
         {filtered.length === 0 && <> This folder is empty. </>}
         <div className="folder-grid-item-listing">
-          {filtered.map((item) => (renderItemListing(item, displayItem, false)))}
+          {filtered.map((item) => (renderItemListing(item, displayItem, false, (currentPageIdx !== 2))))}
         </div>
       </div>
     </div>

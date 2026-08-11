@@ -1,0 +1,38 @@
+.recents {
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+    padding: 15px 30px 0px 30px;
+}
+
+.last-opened {
+    font-style: italic;
+    font-family: calibri, sans-serif;
+}
+
+.recents-grid-item-listing {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 50px;
+}
+
+.recents-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 10px;
+}
+
+.recents-section-header::before,
+.recents-section-header::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.3;
+}
+
+.recents-section-header span {
+    white-space: nowrap;
+}
+

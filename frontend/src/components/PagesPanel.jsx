@@ -1,5 +1,5 @@
 import "./css/PagesPanel.css";
-import { House, Users } from "lucide-react";
+import { Clock, House, Users } from "lucide-react";
 
 function PagesPanel({ setCurrentPageIdx }) {
   return (
@@ -12,6 +12,10 @@ function PagesPanel({ setCurrentPageIdx }) {
       <button className="page-button" onClick={() => setCurrentPageIdx(1)}>
         <Users size={22}/>
         Shared with me
+      </button>
+      <button className="page-button" onClick={() => setCurrentPageIdx(2)}>
+        <Clock size={22}/>
+        Recents
       </button>
     </div>
   )

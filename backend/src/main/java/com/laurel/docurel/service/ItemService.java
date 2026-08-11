@@ -296,11 +296,11 @@ public class ItemService {
     }
 
     public List<ItemResponse> getRecents() {
-        List<ItemLastOpenedRecord> itemsLastOpened = itemRepository.findRecents(userService.getCurrentUserEntity().getId());
+        List<ItemLastOpenedRecord> itemsLastOpened = itemRepository.findRecents(userService.getCurrentUserEntity().getId(), ItemType.FOLDER);
         List<ItemResponse> responses = new ArrayList<>();
         for (ItemLastOpenedRecord i : itemsLastOpened) {
             ItemEntity item = i.item();
-            responses.add(new ItemResponse(item, itemRepository.findPublicIdById(item.getParentId()), i.permission(), i.lastOpened()));
+            responses.add(new ItemResponse(item, null, i.permission(), i.lastOpened()));
         }
         return responses;
     }

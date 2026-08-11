@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.entity.ItemLastOpenedRecord;
+import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
 
 /* this repo is attached to the same table("items") that ItemEntity is attached to,
@@ -235,14 +236,13 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     List<Long> findDocumentIdsByAncestorId(@Param("rootId") Long rootId); // inclusive of ancestor/root
 
     @Query(value = """
-        SELECT i.*, ui.permission, ui.last_opened
-        FROM items i
-        JOIN user_items ui ON i.id = ui.item_id
-        WHERE ui.user_id = :userId
-          AND i.type != 'FOLDER'
-          AND ui.last_opened IS NOT NULL
-        ORDER BY ui.last_opened DESC
-        LIMIT 1000  
-    """, nativeQuery = true)
-    List<ItemLastOpenedRecord> findRecents(@Param("userId") Long userId);
+        SELECT new com.laurel.docurel.entity.ItemLastOpenedRecord(i, ui.permission, ui.lastOpened)
+        FROM ItemEntity i
+        JOIN UserItemEntity ui ON i.id = ui.item.id
+        WHERE ui.user.id = :userId
+          AND i.type != :folderType
+          AND ui.lastOpened IS NOT NULL
+        ORDER BY ui.lastOpened DESC
+    """)
+    List<ItemLastOpenedRecord> findRecents(@Param("userId") Long userId, @Param("folderType") ItemType folderType);
 }

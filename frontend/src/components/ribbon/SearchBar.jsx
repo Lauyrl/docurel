@@ -188,7 +188,7 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
           <div className="search-results" style={{opacity: draggedItem ? 0.3 : 1.0}}> 
             {
               [...filteredItemIdSet].map((id) => (
-                <div> {renderItemListing(itemMap.get(id), displayItem, true, true, true)} </div>
+                itemMap.get(id) && <div> {renderItemListing(itemMap.get(id), displayItem, true, true, true)} </div>
               ))
             }
           </div>

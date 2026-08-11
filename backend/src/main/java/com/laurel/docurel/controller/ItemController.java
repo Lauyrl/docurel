@@ -120,6 +120,7 @@ public class ItemController {
     @GetMapping("/item/search")
     public List<UUID> searchItems(
         @RequestParam(required = true) boolean ownedOnly,
+        @RequestParam(required = true) boolean excludeOwned,
         @RequestParam(required = false) String query,
         @RequestParam(required = false) String type,
         @RequestParam(required = false) String contentType,
@@ -132,6 +133,7 @@ public class ItemController {
     ) {
         return itemService.searchItems(
             ownedOnly,
+            excludeOwned,
             query,
             type,
             contentType,

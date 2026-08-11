@@ -66,10 +66,17 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         FROM all_items i
         LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :userId
         WHERE (
-            (:ownedOnly AND ui.permission = 'OWNER') OR 
-            (NOT :ownedOnly AND 
-                (ui.permission IS NULL OR ui.permission IN ('VIEWER', 'SHARER', 'EDITOR'))
-            )
+            (:ownedOnly AND ui.permission = 'OWNER') 
+            OR 
+            (NOT :ownedOnly 
+            AND (
+                ui.permission IS NULL 
+                OR (
+                    (:excludeOwned AND ui.permission IN ('VIEWER', 'SHARER', 'EDITOR')) 
+                    OR 
+                    (NOT :excludeOwned AND ui.permission IN ('VIEWER', 'SHARER', 'EDITOR', 'OWNER'))
+                )
+            ))
         )
           AND i.parent_id != 0
           AND (:query                              IS NULL OR similarity(i.name, :query) > 0.25)
@@ -99,6 +106,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
     List<UUID> findMatchingItemsPublicId(
         @Param("userId") Long userId, 
         @Param("ownedOnly") boolean ownedOnly,
+        @Param("excludeOwned") boolean excludeOwned,
         @Param("query") String query,
         @Param("type") String type,
         @Param("contentType") String contentType,

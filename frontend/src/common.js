@@ -115,7 +115,6 @@ export async function registerOpenCommon(item) {
 }
 
 export async function searchItemsCommon(
-    ownedOnly,
     searchQuery,
     type,
     contentType,
@@ -124,10 +123,13 @@ export async function searchItemsCommon(
     updatedAfter,
     updatedBefore,
     sortBy,
-    descending
+    descending,
+    ownedOnly,
+    excludeOwned
   ) {
   let url = "/item/search?";
   url += "ownedOnly=" + ownedOnly;
+  url += "&excludeOwned=" + excludeOwned;
   // dont add null string params since encodeURIComponent(null) evaluates to "null" instead of leaving empty
   if (searchQuery)   url += "&query=" + encodeURIComponent(searchQuery); 
   if (type)          url += "&type="  + encodeURIComponent(type);

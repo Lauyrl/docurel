@@ -104,8 +104,7 @@ export default function useExplorerOperations(currentPageIdx) {
     sortBy,
     descending
   ) {
-    const filteredItemsPublicId = await searchItemsCommon(
-      (currentPageIdx === 0), 
+    const filteredItemsPublicId = await searchItemsCommon( 
       searchQuery, 
       type,
       contentType,
@@ -114,7 +113,9 @@ export default function useExplorerOperations(currentPageIdx) {
       updatedAfter,
       updatedBefore,
       sortBy,
-      descending
+      descending,
+      (currentPageIdx === 0),        // owned only, pg 0
+      (currentPageIdx === 1)         // exclude owned, pg 1
     ); 
     setFilteredItemIdSet(new Set(filteredItemsPublicId));
   }

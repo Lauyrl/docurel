@@ -307,6 +307,7 @@ public class ItemService {
 
     public List<UUID> searchItems(
         boolean ownedOnly,
+        boolean excludeOwned,
         String query, 
         String type,
         String contentType,
@@ -328,6 +329,7 @@ public class ItemService {
         return itemRepository.findMatchingItemsPublicId(
             userService.getCurrentUserEntity().getId(), 
             ownedOnly,
+            excludeOwned,
             query,
             type,
             contentType,

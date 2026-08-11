@@ -38,3 +38,28 @@
     border-bottom: 2px solid rgb(145, 144, 143);
     height: 44px;
 }
+
+.item {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.item-name-left-align {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.item-name-left-align > svg {
+    flex-shrink: 0;
+}
+
+.item-name-left-align > span {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

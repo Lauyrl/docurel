@@ -1,6 +1,6 @@
 import "./css/FolderContentsView.css";
 import { useExplorer } from "../../../context/ExplorerContext";
-import { File, Folder } from "lucide-react";
+import { File, Folder, Star } from "lucide-react";
 import useExplorerOperations from "../../../context/useExplorerOperations";
 import Breadcrumbs from "./Breadcrumbs";
 
@@ -12,7 +12,10 @@ function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem
     return (
       <div>
         {item.type === "FOLDER" ? <Folder fill="grey" size={60} /> : <File fill="grey" size={60} />}
-        <div> {item.name} </div>
+        <div className="item-name"> 
+          <span>{item.name}</span> 
+          {item.starred && <Star fill="rgb(251, 205, 121)"/>} 
+        </div>
       </div>
     );
   }
@@ -36,7 +39,7 @@ function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem
       >
         {filtered.length === 0 && <> This folder is empty. </>}
         <div className="folder-grid-item-listing">
-          {filtered.map((item) => (renderItemListing(item, displayItem, false, (currentPageIdx !== 2))))}
+          {filtered.map((item) => (renderItemListing(item, displayItem, false, (currentPageIdx !== 2 && currentPageIdx !== 3))))}
         </div>
       </div>
     </div>

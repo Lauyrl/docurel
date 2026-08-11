@@ -1,5 +1,6 @@
 import "./css/RecentsView.css";
-import { File, Folder } from "lucide-react";
+import "./css/FolderContentsView.css";
+import { File, Folder, Star } from "lucide-react";
 import useExplorerOperations from "../../../context/useExplorerOperations";
 
 function RecentsView({ recents, renderItemListing }) {
@@ -9,7 +10,10 @@ function RecentsView({ recents, renderItemListing }) {
     return (
       <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
         {item.type === "FOLDER" ? <Folder fill="grey" size={60} /> : <File fill="grey" size={60} />}
-        <div> {item.name} </div>
+        <div className="item-name"> 
+          <span>{item.name}</span> 
+          {item.starred && <Star fill="rgb(251, 205, 121)"/>} 
+        </div>
         <div className="last-opened"> {new Date(item.lastOpened).toLocaleDateString()} </div>
       </div>
     );

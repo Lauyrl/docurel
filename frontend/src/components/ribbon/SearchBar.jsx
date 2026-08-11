@@ -1,6 +1,6 @@
 import "./css/SearchBar.css";
 import "../../css/common.css";
-import { File, Folder, Search } from "lucide-react";
+import { File, Folder, Search, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useExplorer } from "../../context/ExplorerContext";
 import { formatFileSize } from "../../common";
@@ -92,7 +92,10 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
         <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
           {item.type === "FOLDER" ?  <Folder/> : <File/>}
           <div style={{display: "flex", flexDirection: "column"}}>
-            <div> {item.name}  </div>
+            <div style={{display: "flex"}}> 
+              {item.name}  
+              {item.starred && <Star fill="rgb(251, 205, 121)"/>}
+            </div>
             <div style={{display: "flex", gap: "20px", fontSize: 16}}>
               <span style={{ fontStyle: "italic", fontFamily: "calibri" }}> 
                 {getPathTo(item)}  

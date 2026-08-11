@@ -1,5 +1,5 @@
 import "./css/ItemTreeView.css";
-import { File, Folder } from "lucide-react";
+import { File, Folder, Star } from "lucide-react";
 import { useExplorer } from "../../../context/ExplorerContext";
 import useExplorerOperations from "../../../context/useExplorerOperations";
 
@@ -11,11 +11,14 @@ function ItemTreeView({ root, draggedItem, renderItemListing }) {
     return (
       <div className="item">
         <span className="item-arrow">
-          {" "}
-          {item.type === "FOLDER" ? (item.isExpanded ? "▼" : "▶") : ""}{" "}
+          {item.type === "FOLDER" ? (item.isExpanded ? "▼" : "▶") : ""}
         </span>
-        {item.type === "FOLDER" ? <Folder /> : <File />}
-        <span> {item.name} </span>
+
+        <div className="item-name-left-align">
+          {item.type === "FOLDER" ? <Folder /> : <File />}
+          <span>{item.name}</span>
+          {item.starred && <Star fill="rgb(251, 205, 121)"/>} 
+        </div>
       </div>
     );
   }

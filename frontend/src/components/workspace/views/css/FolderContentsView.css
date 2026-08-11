@@ -8,6 +8,27 @@
 
 .folder-grid-item-listing {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 40px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 50px;
+}
+
+.item-name {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.item-name > svg {
+    flex-shrink: 0;
+}
+
+.item-name span {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }

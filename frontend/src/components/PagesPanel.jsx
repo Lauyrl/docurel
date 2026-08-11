@@ -1,22 +1,25 @@
 import "./css/PagesPanel.css";
-import { Clock, House, Users } from "lucide-react";
+import { Clock, House, Star, Users } from "lucide-react";
 
-function PagesPanel({ setCurrentPageIdx }) {
+function PagesPanel({ currentPageIdx, setCurrentPageIdx }) {
+  function button(icon, page, label) {
+    return (
+      <button 
+        className="page-button" onClick={() => {setCurrentPageIdx(page)}}
+        style={{backgroundColor: (currentPageIdx === page) ? "#e7772d" : undefined}}
+      >
+        { icon } { label }
+      </button>
+    );
+  }
+
   return (
     <div className="pages-panel">
-      <div className="logo"> Docurel </div>	
-      <button className="page-button" onClick={() => setCurrentPageIdx(0)}>
-        <House size={22}/>
-        {"My Files"}
-      </button>
-      <button className="page-button" onClick={() => setCurrentPageIdx(1)}>
-        <Users size={22}/>
-        Shared with me
-      </button>
-      <button className="page-button" onClick={() => setCurrentPageIdx(2)}>
-        <Clock size={22}/>
-        Recents
-      </button>
+      <div className="logo"> Docurel </div>
+      { button(<House size={22} />, 0, "My Files") }
+      { button(<Users size={22} />, 1, "Shared with me") }
+      { button(<Clock size={22} />, 2, "Recents") }
+      { button(<Star  size={22} />, 3, "Starred") }
     </div>
   )
 }

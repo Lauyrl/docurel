@@ -3,6 +3,7 @@ import "../../css/common.css";
 import MyFiles from "./MyFiles";
 import SharedWithMe from "./SharedWithMe";
 import Recents from "./Recents";
+import Starred from "./Starred";
 
 function Workspace({ currentPageIdx, draggedItem, renderItemListing }) {
   return (
@@ -25,6 +26,10 @@ function Workspace({ currentPageIdx, draggedItem, renderItemListing }) {
         { 
           currentPageIdx == 2 && 
           <Recents renderItemListing={renderItemListing} /> 
+        }
+        {
+          currentPageIdx == 3 &&
+          <Starred renderItemListing={renderItemListing}/>
         }
       </div>
     </>

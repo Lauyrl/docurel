@@ -15,7 +15,8 @@ function Breadcrumbs({ currentPageIdx, renderItemListing }) {
         <div className="breadcrumbs">
           { currentPageIdx === 0 && "My Files" }
           { currentPageIdx === 1 && "Shared with me" }
-          <div style={{paddingLeft: "15px", display: "flex", alignItems: "center"}}>
+          { currentPageIdx === 3 && "Starred " }
+          <div style={{paddingLeft: "10px", display: "flex", alignItems: "center"}}>
             {
               itemNavigationStackBackward.map((item) => {
                 if (item.userRoot) return;

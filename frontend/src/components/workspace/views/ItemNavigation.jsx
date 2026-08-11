@@ -5,7 +5,7 @@ function ItemNavigation({ currentPageIdx }) {
   const {itemNavigationStackBackward, itemNavigationStackForward, navigateItems} = useExplorer();
   const canGoBackward = (
     (currentPageIdx === 0 && itemNavigationStackBackward.length > 1) || 
-    (currentPageIdx === 1 && itemNavigationStackBackward.length > 0)
+    ((currentPageIdx === 1 || currentPageIdx == 3) && itemNavigationStackBackward.length > 0)
   );
 
   const canGoForward = itemNavigationStackForward.length > 0;

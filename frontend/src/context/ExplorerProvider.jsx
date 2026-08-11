@@ -32,12 +32,20 @@ export function ExplorerProvider({ children }) {
   }, [itemMap]);
 
   const rootLevelItemsIndex = useMemo(() => {
-      const index = [];
-      for (const item of itemMap.values()) {
-        if (item.publicParentId == null) index.push(item); 
-      }
-      return index
-    }, [itemMap])
+    const index = [];
+    for (const item of itemMap.values()) {
+      if (item.publicParentId == null) index.push(item); 
+    }
+    return index;
+  }, [itemMap]);
+
+  const topLevelStarred = useMemo(() => {
+    const starred = [];
+    for (const item of itemMap.values()) {
+      if (item.starred) starred.push(item);
+    }
+    return starred;
+  }, [itemMap])
 
 	const currentFolder = itemMap.get(currentFolderId);
 	const previewItem   = itemMap.get(previewItemId);
@@ -81,7 +89,7 @@ export function ExplorerProvider({ children }) {
 
   return (
     <ExplorerContext.Provider value={{
-      itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex, itemNavigationStackForward, itemNavigationStackBackward, filteredItemIdSet,
+      itemMap, currentFolderId, previewItemId, childrenIndex, rootLevelItemsIndex, topLevelStarred, itemNavigationStackForward, itemNavigationStackBackward, filteredItemIdSet,
       setItemMap, setCurrentFolderId, setPreviewItemId, setFilteredItemIdSet, filterValues, setFilterValues, sortValues, setSortValues,
 
       currentFolder, previewItem, canModifyCurrentFolderContents,

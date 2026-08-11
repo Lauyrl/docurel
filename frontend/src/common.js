@@ -114,6 +114,10 @@ export async function registerOpenCommon(item) {
   return api("/item/" + item.publicId + "/open", {method: "POST"})
 }
 
+export async function starCommon(item) {
+  return api("/item/" + item.publicId + "/star", {method: "POST"})
+}
+
 export async function searchItemsCommon(
     searchQuery,
     type,

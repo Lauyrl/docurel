@@ -18,7 +18,7 @@ function MainScreen() {
 	const [currentPageIdx, setCurrentPageIdx] = useState(0);
 
 	const { childrenIndex, setItemMap, setFilteredItemIdSet, previewItem } = useExplorer();
-	const { selectItem, patchItem, deleteItem, registerOpen } = useExplorerOperations(currentPageIdx);
+	const { selectItem, patchItem, deleteItem, registerOpen, star } = useExplorerOperations(currentPageIdx);
 	// React stores the state of state variables across renders, a render happens whenever the state changes
 	// Render: a function call to the parent component (App() in this case)
 	const [itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf] = useState(null);
@@ -165,6 +165,7 @@ function MainScreen() {
 					onItemDelete={deleteItem}
 					onItemRename={(item) => { setItemRename({ item: item, newName: item.name }) }}
 					onItemEditPermissions={(item) => { setItemToEditUserPermissionsOf(item) }}
+					onItemStar={star}
 				/>
 			}
 			{
@@ -178,7 +179,10 @@ function MainScreen() {
 				previewItem && <PreviewOverlay />
 			}
 			<div className="app-layout">
-				<PagesPanel setCurrentPageIdx={setCurrentPageIdx} />
+				<PagesPanel 
+					currentPageIdx={currentPageIdx} 
+					setCurrentPageIdx={setCurrentPageIdx} 
+				/>
 				<div className="app">
 					<div className="ribbon">
 						<FileUpload currentPageIdx={currentPageIdx} />

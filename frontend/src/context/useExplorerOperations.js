@@ -1,4 +1,4 @@
-import { createFolderCommon, deleteItemCommon, deleteUserPermissionsForItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, registerOpenCommon, searchItemsCommon, uploadDocumentCommon } from "../common";
+import { createFolderCommon, deleteItemCommon, deleteUserPermissionsForItemCommon, editUserPermissionsForItemCommon, getUsersWithPermissionsForItemCommon, patchItemCommon, registerOpenCommon, searchItemsCommon, starCommon, uploadDocumentCommon } from "../common";
 import { useExplorer } from "./ExplorerContext";
 
 export function initializeFolderUIState(item) {
@@ -64,6 +64,11 @@ export default function useExplorerOperations(currentPageIdx) {
     registerOpenCommon(item);
   }
 
+  async function star(item) {
+    await starCommon(item);
+    setItemMap(current => new Map(current).set(item.publicId, {...item, starred: !item.starred}));
+  }
+
   function filterAndSortItemsList(items, alwaysShowFolders = false) {
     const filtered = items.filter(item => {
       if (alwaysShowFolders && item.type === "FOLDER") return true;
@@ -124,6 +129,6 @@ export default function useExplorerOperations(currentPageIdx) {
     initializeFolderUIState, filterAndSortItemsList, anyFilterActive, 
     selectItem, uploadDocument, createFolder, deleteItem, patchItem, 
     editUserPermissionsForItem, deleteUserPermissionsForItem, getUsersWithPermissionsForItem,
-    registerOpen, searchItems,
+    registerOpen, star, searchItems,
   }
 }

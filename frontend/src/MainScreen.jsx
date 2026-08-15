@@ -23,6 +23,7 @@ function MainScreen() {
 	// Render: a function call to the parent component (App() in this case)
 	const [itemToEditUserPermissionsOf, setItemToEditUserPermissionsOf] = useState(null);
 	const [draggedItem, setDraggedItem] = useState(null);
+	const [currentView, setCurrentView] = useState("tree");
 	const [contextMenu, setContextMenu] = useState({
 		item: null,
 		x: null,
@@ -82,9 +83,10 @@ function MainScreen() {
 					e.stopPropagation();
 					e.preventDefault();
 				}}
-				style={{ zIndex: 1100, position: "relative" }}
+				style={{ position: "relative" }}
 			>
 				<input
+					className="rename-input"
 					autoFocus
 					type="text"
 					value={itemRename.newName}
@@ -149,8 +151,7 @@ function MainScreen() {
 					}
 				}}
 			>
-				{itemRename?.item?.publicId !== item.publicId && displayItem(item)}
-				{itemRename?.item?.publicId === item.publicId && renameDialogue(item)}
+				{displayItem(item, itemRename, renameDialogue, currentView, setCurrentView)}
 			</div>
 		);
 	}

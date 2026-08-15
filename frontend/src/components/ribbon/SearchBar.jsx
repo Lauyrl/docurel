@@ -10,6 +10,8 @@ import SortSearch from "./css/SortSearch.svg";
 import FilterConfig from "./components/FilterConfig";
 import SortConfig from "./components/SortConfig";
 
+const CURRENT_VIEW = "search_bar";
+
 function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
   const {filteredItemIdSet, itemMap, setFilteredItemIdSet} = useExplorer();
   const {searchItems} = useExplorerOperations(currentPageIdx);
@@ -86,14 +88,15 @@ function SearchBar({ currentPageIdx, draggedItem, renderItemListing }) {
     return "Path: /" + path.reverse().join("/");
   }
 
-  function displayItem(item) {
+  function displayItem(item, itemRename, renameDialogue, currentView, setCurrentView) {
     return (
-      <div className="result-item">
+      <div className="result-item" onMouseEnter={() => setCurrentView(CURRENT_VIEW)}>
         <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
           {item.type === "FOLDER" ?  <Folder/> : <File/>}
           <div style={{display: "flex", flexDirection: "column"}}>
             <div style={{display: "flex"}}> 
-              {item.name}  
+              {(itemRename?.item?.publicId !== item.publicId || currentView !== CURRENT_VIEW) ? 
+                <span>{item.name}</span> : renameDialogue(item)}
               {item.starred && <Star fill="rgb(251, 205, 121)"/>}
             </div>
             <div style={{display: "flex", gap: "20px", fontSize: 16}}>

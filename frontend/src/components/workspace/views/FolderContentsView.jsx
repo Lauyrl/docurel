@@ -4,16 +4,19 @@ import { File, Folder, Star } from "lucide-react";
 import useExplorerOperations from "../../../context/useExplorerOperations";
 import Breadcrumbs from "./Breadcrumbs";
 
+const CURRENT_VIEW = "folder_contents";
+
 function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem, renderItemListing }) {
   const { currentFolder } = useExplorer();
   const { selectItem, patchItem, filterAndSortItemsList } = useExplorerOperations(currentPageIdx);
 
-  function displayItem(item) {
+  function displayItem(item, itemRename, renameDialogue, currentView, setCurrentView) {
     return (
-      <div>
+      <div onMouseEnter={() => setCurrentView(CURRENT_VIEW)}>
         {item.type === "FOLDER" ? <Folder fill="grey" size={60} /> : <File fill="grey" size={60} />}
         <div className="item-name"> 
-          <span>{item.name}</span> 
+          {(itemRename?.item?.publicId !== item.publicId || currentView !== CURRENT_VIEW) ? 
+            <span>{item.name}</span> : renameDialogue(item)}
           {item.starred && <Star fill="rgb(251, 205, 121)"/>} 
         </div>
       </div>

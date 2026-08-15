@@ -3,20 +3,25 @@ import { File, Folder, Star } from "lucide-react";
 import { useExplorer } from "../../../context/ExplorerContext";
 import useExplorerOperations from "../../../context/useExplorerOperations";
 
+const CURRENT_VIEW = "tree";
+
 function ItemTreeView({ root, draggedItem, renderItemListing }) {
   const { childrenIndex } = useExplorer();
   const { selectItem, patchItem, filterAndSortItemsList } = useExplorerOperations(0);
 
-  function displayItem(item) {
+  function displayItem(item, itemRename, renameDialogue, currentView, setCurrentView) {
     return (
-      <div className="item">
+      <div className="item" onMouseEnter={() => setCurrentView(CURRENT_VIEW)}>
         <span className="item-arrow">
           {item.type === "FOLDER" ? (item.isExpanded ? "▼" : "▶") : ""}
         </span>
 
         <div className="item-name-left-align">
           {item.type === "FOLDER" ? <Folder /> : <File />}
-          <span>{item.name}</span>
+          <div className="item-name-text">
+            {(itemRename?.item?.publicId !== item.publicId || currentView !== CURRENT_VIEW) ? 
+              item.name : renameDialogue(item)}
+          </div>
           {item.starred && <Star fill="rgb(251, 205, 121)"/>} 
         </div>
       </div>

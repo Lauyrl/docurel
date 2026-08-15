@@ -45,11 +45,11 @@ function ContextMenu({ contextMenu, setContextMenu, onItemDownload, onItemDelete
       >
         <div>
           { contextMenu.item.type === "DOCUMENT"      && renderContextButton("Download"        , onItemDownload) }
-          { canModifyParentContents(contextMenu.item) && renderContextButton("Delete"          , onItemDelete) }
           { canModifyParentContents(contextMenu.item) && renderContextButton("Rename"          , onItemRename) }
           { contextMenu.item.permission === "OWNER"   && renderContextButton("Edit Permissions", onItemEditPermissions ) }
           { renderContextButton("Star", onItemStar) }
           { renderContextButton("Share to...", () => {}) }
+          { canModifyParentContents(contextMenu.item) && renderContextButton("Delete"          , onItemDelete) }
         </div>
       </div>
     </div>

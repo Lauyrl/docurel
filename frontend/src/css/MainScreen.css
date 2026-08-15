@@ -35,3 +35,22 @@
 .item-listing:active {
     background-color: rgb(38, 16, 3);
 }
+
+input.rename-input {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+
+    height: 1em;
+    line-height: inherit;
+
+    border-radius: 1px !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+
+    font: inherit;
+
+    transform: translateX(-1px);
+}

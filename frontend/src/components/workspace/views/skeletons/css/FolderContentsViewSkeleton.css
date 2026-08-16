@@ -1,0 +1,60 @@
+.skeleton-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    column-gap: 50px;
+    row-gap: 30px;
+    padding: 0;
+    margin: 0;
+}
+
+.folder-grid-skeleton-item {
+    width: 100%;
+    height: 115px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.folder-grid-skeleton-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background: #333;
+    animation: skeleton-pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.folder-grid-skeleton-name {
+    width: 85px;
+    height: 16px;
+    border-radius: 4px;
+    background: #333;
+    animation: skeleton-pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% {
+        opacity: 0.45;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.folder-grid-skeleton {
+    animation: show-skeleton 0.15s ease 2000ms forwards;
+    visibility: hidden !important;
+}
+
+@keyframes show-skeleton {
+    to {
+        visibility: visible;
+    }
+}

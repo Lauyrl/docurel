@@ -3,10 +3,11 @@ import { useExplorer } from "../../../context/ExplorerContext";
 import { File, Folder, Star } from "lucide-react";
 import useExplorerOperations from "../../../context/useExplorerOperations";
 import Breadcrumbs from "./Breadcrumbs";
+import FolderContentsViewSkeleton from "./skeletons/FolderContentsViewSkeleton";
 
 const CURRENT_VIEW = "folder_contents";
 
-function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem, renderItemListing }) {
+function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem, renderItemListing, loading }) {
   const { currentFolder } = useExplorer();
   const { selectItem, patchItem, filterAndSortItemsList } = useExplorerOperations(currentPageIdx);
 
@@ -40,10 +41,16 @@ function FolderContentsView({ currentPageIdx, currentFolderChildren, draggedItem
           if (draggedItem) patchItem(draggedItem, null, currentFolder.publicId);
         }}
       >
-        {filtered.length === 0 && <> This folder is empty. </>}
-        <div className="folder-grid-item-listing">
-          {filtered.map((item) => (renderItemListing(item, displayItem, false, (currentPageIdx !== 2 && currentPageIdx !== 3))))}
-        </div>
+        {
+          loading ?
+            <FolderContentsViewSkeleton count={8} /> :
+            <>
+              {filtered.length === 0 && <> This folder is empty. </>}
+              <div className="folder-grid-item-listing">
+                {filtered.map((item) => (renderItemListing(item, displayItem, false, (currentPageIdx !== 2 && currentPageIdx !== 3))))}
+              </div>
+            </>
+        }
       </div>
     </div>
   );

@@ -1,0 +1,88 @@
+.tree-skeleton {
+    padding-left: 25px;
+    width: fit-content;
+    max-width: 100%;
+}
+
+.tree-skeleton-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+}
+
+.tree-skeleton-row.depth-1 {
+    margin-left: 20px;
+}
+
+.tree-skeleton-row.depth-2 {
+    margin-left: 40px;
+}
+
+.tree-skeleton-icon,
+.tree-skeleton-folder {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: #343434;
+    flex-shrink: 0;
+    animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+.tree-skeleton-folder {
+    width: 24px;
+    border-radius: 4px;
+}
+
+.tree-skeleton-arrow {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: #343434;
+    flex-shrink: 0;
+    animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+.tree-skeleton-name {
+    height: 16px;
+    border-radius: 4px;
+    background: #343434;
+    animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+.width-1 {
+    width: 70px;
+}
+
+.width-2 {
+    width: 100px;
+}
+
+.width-3 {
+    width: 130px;
+}
+
+.width-4 {
+    width: 85px;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% {
+        opacity: 0.45;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.tree-skeleton {
+    animation: show-skeleton 0.15s ease 2000ms forwards;
+    visibility: hidden !important;
+}
+
+@keyframes show-skeleton {
+    to {
+        visibility: visible;
+    }
+}

@@ -10,9 +10,13 @@ function MyFiles({ draggedItem, renderItemListing }) {
 	const { itemMap, childrenIndex, currentFolder, setItemMap, setCurrentFolderId, rebuildNavigationStacks } = useExplorer();
 
 	const [rootId, setRootId] = useState(null);
+	const [loading, setLoading] = useState(true);
+
 	// [] contains dependencies to 'watch'
 	useEffect(() => {
-			api("/document").then(response => response.json()).then((items) => {
+		api("/document")
+			.then(response => response.json())
+			.then((items) => {
 				const itemMapTemp = new Map;
 				let rootId = null;
 
@@ -28,6 +32,7 @@ function MyFiles({ draggedItem, renderItemListing }) {
 				setItemMap(itemMapTemp);
 				rebuildNavigationStacks(rootId);
 			})
+		.finally(() => setLoading(false));
 	}, []);
 
 	if (!currentFolder) return;
@@ -41,12 +46,14 @@ function MyFiles({ draggedItem, renderItemListing }) {
 				root={root}
 				draggedItem={draggedItem}
 				renderItemListing={renderItemListing}
+				loading={loading}
 			/>
 			<FolderContentsView
 				currentPageIdx={0}
 				currentFolderChildren={currentFolderChildren}
 				draggedItem={draggedItem}
 				renderItemListing={renderItemListing}
+				loading={loading}
 			/>
 		</>
 	);

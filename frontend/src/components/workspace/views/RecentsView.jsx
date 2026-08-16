@@ -2,6 +2,7 @@ import "./css/RecentsView.css";
 import "./css/FolderContentsView.css";
 import { File, Folder, Star } from "lucide-react";
 import useExplorerOperations from "../../../context/useExplorerOperations";
+import FolderContentsViewSkeleton from "./skeletons/FolderContentsViewSkeleton";
 
 function RecentsView({ recents, renderItemListing, loading }) {
   const { filterAndSortItemsList } = useExplorerOperations(2)
@@ -28,19 +29,19 @@ function RecentsView({ recents, renderItemListing, loading }) {
   const sixMonths = new Date();
   sixMonths.setDate(sixMonths.getDate() - 180);
 
-  function recencyBlock(label, filterCallback) {
+  function recencyBlock(label, filterCallback, skeletonItemsCount = 5) {
     return (
       <>
         <div className="recents-section-header">
           <span>{label}</span>
         </div>
-        <div className="recents-grid-item-listing">
-          {
-            filtered
-              .filter(filterCallback)
-              .map((item) => renderItemListing(item, displayItem, true, false))
-          }
-        </div>
+        {
+          loading ? 
+            <FolderContentsViewSkeleton count={skeletonItemsCount} /> :
+            <div className="recents-grid-item-listing">
+              {filtered.filter(filterCallback).map((item) => renderItemListing(item, displayItem, true, false))}
+            </div>
+        }
       </>
     );
   }
@@ -53,10 +54,10 @@ function RecentsView({ recents, renderItemListing, loading }) {
       {
         filtered.length > 0 && 
         <>
-          {recencyBlock("Last week", ((item) => (new Date(item.lastOpened) >= week)))}
-          {recencyBlock("Last month", ((item) => (new Date(item.lastOpened) < week && new Date(item.lastOpened) >= month)))}
-          {recencyBlock("Last few months", ((item) => (new Date(item.lastOpened) < month && new Date(item.lastOpened) >= sixMonths)))}
-          {recencyBlock("Older", ((item) => (new Date(item.lastOpened) < sixMonths)))}
+          {recencyBlock("Last week", (item => (new Date(item.lastOpened) >= week)), 5)}
+          {recencyBlock("Last month", (item => (new Date(item.lastOpened) < week && new Date(item.lastOpened) >= month)), 4)}
+          {recencyBlock("Last few months", (item => (new Date(item.lastOpened) < month && new Date(item.lastOpened) >= sixMonths)), 6)}
+          {recencyBlock("Older", (item => (new Date(item.lastOpened) < sixMonths)), 3)}
         </>
       }
     </div>

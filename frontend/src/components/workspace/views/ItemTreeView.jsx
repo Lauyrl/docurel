@@ -2,10 +2,11 @@ import "./css/ItemTreeView.css";
 import { File, Folder, Star } from "lucide-react";
 import { useExplorer } from "../../../context/ExplorerContext";
 import useExplorerOperations from "../../../context/useExplorerOperations";
+import ItemTreeViewSkeleton from "./skeletons/ItemTreeViewSkeleton";
 
 const CURRENT_VIEW = "tree";
 
-function ItemTreeView({ root, draggedItem, renderItemListing }) {
+function ItemTreeView({ root, draggedItem, renderItemListing, loading }) {
   const { childrenIndex } = useExplorer();
   const { selectItem, patchItem, filterAndSortItemsList } = useExplorerOperations(0);
 
@@ -64,8 +65,14 @@ function ItemTreeView({ root, draggedItem, renderItemListing }) {
       }}
     >
       <div className="title-bar"> Tree view </div>
-      {rootChildren.length === 0 && <h2> Upload a file </h2>}
-      {rootChildren.length !== 0 && displayFolderContents(root, 0)}
+      {
+        loading ?
+          <ItemTreeViewSkeleton /> :
+          <>
+            {rootChildren.length === 0 && <h2> Upload a file </h2>}
+            {rootChildren.length !== 0 && displayFolderContents(root, 0)}
+          </>
+      }
     </div>
   );
 }

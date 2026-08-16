@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useExplorer } from "../../context/ExplorerContext";
 import { api } from "../../api";
 import FolderContentsView from "./views/FolderContentsView";
 
 function SharedWithMe({ draggedItem, renderItemListing }) {
   const {setItemMap, setCurrentFolderId, currentFolder, childrenIndex, rootLevelItemsIndex, rebuildNavigationStacks, setFilteredItemIdSet} = useExplorer();
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     api("/shared")
       .then(response => response.json())
@@ -16,7 +17,8 @@ function SharedWithMe({ draggedItem, renderItemListing }) {
         rebuildNavigationStacks(null);
         setCurrentFolderId(null);
         setFilteredItemIdSet(null);
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   let currentFolderChildren;
@@ -33,6 +35,7 @@ function SharedWithMe({ draggedItem, renderItemListing }) {
       currentFolderChildren={currentFolderChildren}
       draggedItem={draggedItem}
       renderItemListing={renderItemListing}
+      loading={loading}
     />
   );
 }

@@ -18,6 +18,7 @@ function SortConfig({ sortValues, setSortValues, confirmSort, isForSearch = fals
           onChange={(e) => setSortValues({ ...sortValues, sortBy: e.target.value })}  
         >
           {isForSearch && <option value={"Name similarity"}> Name similarity </option>}
+          {isForSearch && <option value={"Content relevance"}> Content relevance </option>}
           <option value={"Alphabetical"}>    Alphabetical    </option>
           <option value={"Size"}>            Size            </option>
           <option value={"Date created"}>    Date created    </option>

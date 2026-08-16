@@ -65,6 +65,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
         SELECT i.public_id
         FROM all_items i
         LEFT JOIN user_items ui ON i.id = ui.item_id AND ui.user_id = :userId
+        LEFT JOIN item_content ic ON i.id = ic.item_id
         WHERE (
             (:ownedOnly AND ui.permission = 'OWNER') 
             OR 
@@ -79,7 +80,7 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
             ))
         )
           AND i.parent_id != 0
-          AND (:query                              IS NULL OR similarity(i.name, :query) > 0.25)
+          AND (:query                              IS NULL OR similarity(i.name, :query) > 0.25 OR ic.full_text % :query)
           AND (CAST(:type AS item_type)            IS NULL OR i.type         = CAST(:type AS item_type))
           AND (:contentType                        IS NULL OR i.content_type = :contentType)
           AND (CAST(:createdAfter  AS TIMESTAMPTZ) IS NULL OR i.created_at  >= :createdAfter)
@@ -88,18 +89,21 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
           AND (CAST(:updatedBefore AS TIMESTAMPTZ) IS NULL OR i.updated_at  <= :updatedBefore)
         ORDER BY
             CASE WHEN (:descending AND :sortBy = 'Name similarity' AND :query IS NOT NULL) THEN similarity(i.name, :query) ELSE NULL END DESC,
+            CASE WHEN (:descending AND :sortBy = 'Content relevance' AND :query IS NOT NULL) THEN similarity(ic.full_text, :query) ELSE NULL END DESC,
             CASE WHEN (:descending AND :sortBy = 'Alphabetical') THEN i.name       ELSE NULL END DESC,
             CASE WHEN (:descending AND :sortBy = 'Size')         THEN i.size_bytes ELSE NULL END DESC,
             CASE WHEN (:descending AND :sortBy = 'Date created') THEN i.created_at ELSE NULL END DESC,
             CASE WHEN (:descending AND :sortBy = 'Date updated') THEN i.updated_at ELSE NULL END DESC, 
             
             CASE WHEN (NOT :descending AND :sortBy = 'Name similarity' AND :query IS NOT NULL) THEN similarity(i.name, :query) ELSE NULL END ASC,
+            CASE WHEN (NOT :descending AND :sortBy = 'Content relevance' AND :query IS NOT NULL) THEN similarity(ic.full_text, :query) ELSE NULL END ASC,
             CASE WHEN (NOT :descending AND :sortBy = 'Alphabetical') THEN i.name       ELSE NULL END ASC,
             CASE WHEN (NOT :descending AND :sortBy = 'Size')         THEN i.size_bytes ELSE NULL END ASC,
             CASE WHEN (NOT :descending AND :sortBy = 'Date created') THEN i.created_at ELSE NULL END ASC,
             CASE WHEN (NOT :descending AND :sortBy = 'Date updated') THEN i.updated_at ELSE NULL END ASC,
 
             CASE WHEN (:query IS NOT NULL) THEN similarity(i.name, :query) ELSE NULL END DESC,
+            CASE WHEN (:query IS NOT NULL) THEN similarity(ic.full_text, :query) ELSE NULL END DESC,
             i.updated_at DESC
         LIMIT 100
     """, nativeQuery = true)

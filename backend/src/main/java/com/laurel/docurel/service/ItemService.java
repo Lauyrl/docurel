@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.laurel.docurel.dto.response.ItemResponse;
 import com.laurel.docurel.dto.response.UsersPermissionsForItemResponse;
+import com.laurel.docurel.entity.ItemContentEntity;
 import com.laurel.docurel.entity.ItemEntity;
 import com.laurel.docurel.entity.ItemWithMetaDataRecord;
 import com.laurel.docurel.entity.UserEntity;
@@ -12,6 +13,7 @@ import com.laurel.docurel.entity.UserItemEntity;
 import com.laurel.docurel.enums.ItemType;
 import com.laurel.docurel.enums.PermissionType;
 import com.laurel.docurel.exception.InvalidPermissionsException;
+import com.laurel.docurel.repository.ItemContentRepository;
 import com.laurel.docurel.repository.ItemRepository;
 import com.laurel.docurel.repository.UserItemRepository;
 
@@ -19,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -41,6 +44,7 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final UserItemRepository userItemRepository; // services can cross-call repositories
+    private final ItemContentRepository itemContentRepository;
     private final UserService userService;
 
     public List<ItemResponse> getOwnedItems() {
@@ -78,6 +82,12 @@ public class ItemService {
             uploadersPermission = PermissionType.EDITOR;
         } 
         userItemRepository.save(new UserItemEntity(directoryOwner, item, PermissionType.OWNER));
+
+        if (item.getContentType().split("/")[0].equals("text")) {
+            String fullText = new String(document.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            ItemContentEntity content = new ItemContentEntity(item.getId(), fullText);
+            itemContentRepository.save(content);
+        }
 
         Path dest = Path.of(STORAGE_PATH, item.getId().toString());            
         document.transferTo(dest);

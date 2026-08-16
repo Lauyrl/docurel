@@ -4,7 +4,7 @@ function Preview({ blobURL, contentType }) {
   switch (contentType) {
     case "text/plain":
     case "application/pdf":
-      return <iframe width={1400} height={600} src={blobURL} />;
+      return <iframe style={{backgroundColor: "black"}} width={1400} height={600} src={blobURL} />;
 
     case "image/jpeg":
     case "image/png":

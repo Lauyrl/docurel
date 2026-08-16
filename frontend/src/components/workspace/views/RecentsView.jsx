@@ -3,7 +3,7 @@ import "./css/FolderContentsView.css";
 import { File, Folder, Star } from "lucide-react";
 import useExplorerOperations from "../../../context/useExplorerOperations";
 
-function RecentsView({ recents, renderItemListing }) {
+function RecentsView({ recents, renderItemListing, loading }) {
   const { filterAndSortItemsList } = useExplorerOperations(2)
 
   function displayItem(item) {
@@ -28,56 +28,35 @@ function RecentsView({ recents, renderItemListing }) {
   const sixMonths = new Date();
   sixMonths.setDate(sixMonths.getDate() - 180);
 
+  function recencyBlock(label, filterCallback) {
+    return (
+      <>
+        <div className="recents-section-header">
+          <span>{label}</span>
+        </div>
+        <div className="recents-grid-item-listing">
+          {
+            filtered
+              .filter(filterCallback)
+              .map((item) => renderItemListing(item, displayItem, true, false))
+          }
+        </div>
+      </>
+    );
+  }
+
   const filtered = filterAndSortItemsList(recents);
+
   return (
     <div className="recents">
       {filtered.length === 0 && <> You have no recent items. </>}
       {
         filtered.length > 0 && 
         <>
-          <div className="recents-section-header">
-            <span>Last week</span>
-          </div>
-          <div className="recents-grid-item-listing">
-            {
-              filtered
-                .filter((item) => (new Date(item.lastOpened) >= week))
-                .map((item) => renderItemListing(item, displayItem, true, false))
-            }
-          </div>
-
-          <div className="recents-section-header">
-            <span>Last month</span>
-          </div>
-          <div className="recents-grid-item-listing">
-            {
-              filtered
-                .filter((item) => (new Date(item.lastOpened) < week && new Date(item.lastOpened) >= month))
-                .map((item) => renderItemListing(item, displayItem, true, false))
-            }
-          </div>
-
-          <div className="recents-section-header">
-            <span>Last few months</span>
-          </div>
-          <div className="recents-grid-item-listing">
-            {
-              filtered
-                .filter((item) => (new Date(item.lastOpened) < month && new Date(item.lastOpened) >= sixMonths))
-                .map((item) => renderItemListing(item, displayItem, true, false))
-            }
-          </div>
-
-          <div className="recents-section-header">
-            <span>Older</span>
-          </div>
-          <div className="recents-grid-item-listing">
-            {
-              filtered
-                .filter((item) => (new Date(item.lastOpened) < sixMonths))
-                .map((item) => renderItemListing(item, displayItem, true, false))
-            }
-          </div>
+          {recencyBlock("Last week", ((item) => (new Date(item.lastOpened) >= week)))}
+          {recencyBlock("Last month", ((item) => (new Date(item.lastOpened) < week && new Date(item.lastOpened) >= month)))}
+          {recencyBlock("Last few months", ((item) => (new Date(item.lastOpened) < month && new Date(item.lastOpened) >= sixMonths)))}
+          {recencyBlock("Older", ((item) => (new Date(item.lastOpened) < sixMonths)))}
         </>
       }
     </div>
